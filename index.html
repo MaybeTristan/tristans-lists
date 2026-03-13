@@ -11,7 +11,7 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-    import { getDatabase, ref, get, set, update } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
+    import { getDatabase, ref, get, set, update, runTransaction } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCvQGB7YP434Ifh1ZqqxxDfYZf8TRzG1sI",
@@ -42,16 +42,27 @@
     ];
 
     window.claimItem = async function(itemId, link) {
-      window.open(link, "_blank");
       const itemRef = ref(db, 'items/' + itemId);
-      const snapshot = await get(itemRef);
-      if (snapshot.exists() && snapshot.val().claimed) {
-        alert("This item has already been claimed!");
-        return;
+
+      try {
+        const result = await runTransaction(itemRef, (currentData) => {
+          if (currentData && currentData.claimed) {
+            return; // Abort transaction - already claimed
+          }
+          return { claimed: true };
+        });
+
+        if (result.committed) {
+          window.open(link, "_blank"); // Only opens if claim succeeded
+          alert("You claimed this item!");
+          renderItems();
+        } else {
+          alert("This item has already been claimed!");
+        }
+      } catch (error) {
+        alert("Something went wrong. Please try again.");
+        console.error(error);
       }
-      await set(itemRef, { claimed: true });
-      alert("You claimed this item!");
-      renderItems();
     };
 
     window.resetSingleItem = async function(itemId) {
@@ -144,7 +155,7 @@
 
       document.getElementById("resetButton").addEventListener("click", async () => {
         const pin = prompt("Enter 4‑digit admin PIN to reset all items:");
-        if (pin !== "3323") return alert("Incorrect PIN.");
+        if (pin !== "3323") return alert("Incorrect PIN/No Pin Entered.");
         const updates = {};
         items.forEach(item => { updates['items/' + item.id + '/claimed'] = false; });
         await update(ref(db), updates);
@@ -187,7 +198,7 @@
     <button id="resetSingleButton" class="button">Reset Selected Item</button>
   </div>
 
-      <p style="font-size: 14pt; color: #000; font-weight: bold; margin-top: -14px;">
+  <p style="font-size: 14pt; color: #000; font-weight: bold; margin-top: -14px;">
     Howdy! If you accidently claim something please reset it at the top. 
       
   <p style="font-size: 1em; color: #555; margin-top: -10px;">
