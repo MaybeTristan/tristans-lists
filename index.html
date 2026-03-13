@@ -24,7 +24,8 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    const RAINFOREST_API_KEY = "B638A65014CE431599BBA44D93C8B66E";
+    const CANOPY_API_KEY = "16e57d61-4a2e-4a84-b6b9-75790aee93f3";
+    const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
 
     const items = [
       {id:"swedish_fish_bag",name:"Swedish Fish Bag",price:"$8.00",asin:"B082F2PKQ5",img:"https://m.media-amazon.com/images/I/51Jlys2Z5vL._SS135_.jpg",link:"https://www.amazon.com/dp/B082F2PKQ5",category:"Food",prime:true,note:""},
@@ -40,9 +41,8 @@
       {id:"smartwool_medium_gray_socks",name:"Smartwool Gray Socks",price:"$18.00",asin:"B0D7Y6332B",img:"https://m.media-amazon.com/images/I/811p5W6ciUL._AC_SX679_.jpg",link:"https://www.amazon.com/dp/B0D7Y6332B",category:"Clothes, Size M",prime:true,note:""},
     ];
 
-    // ── localStorage helpers for per-device claim tracking ─────────────────
+    // ── Per-device claim tracking (localStorage) ───────────────────────────
     const MY_CLAIMS_KEY = "my_claims";
-
     function getMyClaims() {
       try { return JSON.parse(localStorage.getItem(MY_CLAIMS_KEY)) || {}; } catch { return {}; }
     }
@@ -61,32 +61,52 @@
       });
     }
 
-    // ── Price cache ─────────────────────────────────────────────────────────
-    const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
-
+    // ── Firebase price cache ───────────────────────────────────────────────
+    // Prices are stored in Firebase under prices/<asin>/{ price, cachedAt }
+    // All visitors share this cache — only fetches from Canopy if >24hrs old.
     async function fetchLivePrice(asin) {
-      const cacheKey = "price_cache_" + asin;
+      const priceRef = ref(db, 'prices/' + asin);
+
+      // 1. Check Firebase cache first
       try {
-        const cached = localStorage.getItem(cacheKey);
-        if (cached) {
-          const { price, timestamp } = JSON.parse(cached);
-          if (Date.now() - timestamp < CACHE_TTL_MS) return price;
+        const snapshot = await get(priceRef);
+        if (snapshot.exists()) {
+          const { price, cachedAt } = snapshot.val();
+          if (Date.now() - cachedAt < CACHE_TTL_MS) {
+            return price; // Fresh — use cached value, no API call
+          }
         }
-      } catch {}
+      } catch (e) {
+        console.warn("Firebase cache read failed for", asin, e);
+      }
+
+      // 2. Cache miss or expired — call Canopy API
       try {
-        const url = `https://api.rainforestapi.com/request?api_key=${RAINFOREST_API_KEY}&type=product&amazon_domain=amazon.com&asin=${asin}&currency=usd`;
-        const res = await fetch(url);
+        const res = await fetch(
+          `https://rest.canopyapi.co/api/amazon/product?asin=${asin}`,
+          { headers: { "API-KEY": CANOPY_API_KEY } }
+        );
         const data = await res.json();
-        const priceValue = data?.product?.buybox_winner?.price?.value
-          ?? data?.product?.price?.value ?? null;
+
+        // Canopy returns price as a number or string like "$8.99"
+        let priceValue = data?.price ?? data?.buyingPrice ?? data?.displayPrice ?? null;
+
         if (priceValue !== null) {
-          const price = "$" + priceValue.toFixed(2);
-          try { localStorage.setItem(cacheKey, JSON.stringify({ price, timestamp: Date.now() })); } catch {}
+          // Normalise to "$X.XX" string
+          const price = typeof priceValue === "number"
+            ? "$" + priceValue.toFixed(2)
+            : String(priceValue);
+
+          // 3. Save to Firebase cache so all visitors benefit
+          try {
+            await set(priceRef, { price, cachedAt: Date.now() });
+          } catch (e) { console.warn("Firebase cache write failed", e); }
+
           return price;
         }
         return null;
       } catch (e) {
-        console.warn("Price fetch failed for", asin, e);
+        console.warn("Canopy price fetch failed for", asin, e);
         return null;
       }
     }
@@ -111,13 +131,13 @@
       }));
     }
 
-    // ── Claim / unclaim ─────────────────────────────────────────────────────
+    // ── Claim / unclaim ────────────────────────────────────────────────────
     window.claimItem = async function(itemId) {
       const itemRef = ref(db, 'items/' + itemId);
       const now = Date.now();
       try {
         const result = await runTransaction(itemRef, (currentData) => {
-          if (currentData && currentData.claimed) return; // abort — already claimed
+          if (currentData && currentData.claimed) return;
           return { claimed: true, claimedAt: now };
         });
         if (result.committed) {
@@ -141,7 +161,7 @@
       renderItems();
     };
 
-    // ── Card builder ────────────────────────────────────────────────────────
+    // ── Card builder ───────────────────────────────────────────────────────
     function createItemCard(item, claimData) {
       const claimed = claimData?.claimed || false;
       const claimedAt = claimData?.claimedAt || null;
@@ -179,7 +199,7 @@
       img.alt = item.name;
       div.appendChild(img);
 
-      // Info section
+      // Info
       const info = document.createElement("div");
       info.className = "item-info";
 
@@ -229,7 +249,6 @@
         claimRow.appendChild(checkbox);
         claimRow.appendChild(label);
       } else {
-        // Claimed info block (badge + timestamp)
         const claimInfo = document.createElement("div");
         claimInfo.className = "claim-info";
 
@@ -238,7 +257,6 @@
         badge.textContent = iClaimedThis ? "✓ You claimed this!" : "✓ Claimed";
         claimInfo.appendChild(badge);
 
-        // Show timestamp — prefer local time, fall back to Firebase timestamp
         const ts = myClaimedAt || claimedAt;
         if (ts) {
           const tsEl = document.createElement("span");
@@ -261,7 +279,7 @@
       return div;
     }
 
-    // ── Render ───────────────────────────────────────────────────────────────
+    // ── Render ─────────────────────────────────────────────────────────────
     async function renderItems() {
       const container = document.querySelector(".grid-container");
       container.innerHTML = "";
@@ -347,7 +365,6 @@
       display: block;
     }
 
-    /* Claim row */
     .claim-row {
       display: flex;
       align-items: center;
@@ -369,26 +386,10 @@
       cursor: pointer;
       user-select: none;
     }
-
-    /* Claimed state */
-    .claim-info {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
-    .claimed-badge {
-      font-size: 0.9em;
-      font-weight: bold;
-      color: #3a7a3a;
-    }
-    .claimed-badge.claimed-by-me {
-      color: #8f2121;
-    }
-    .claim-timestamp {
-      font-size: 0.75em;
-      color: #777;
-      font-style: italic;
-    }
+    .claim-info { display: flex; flex-direction: column; gap: 2px; }
+    .claimed-badge { font-size: 0.9em; font-weight: bold; color: #3a7a3a; }
+    .claimed-badge.claimed-by-me { color: #8f2121; }
+    .claim-timestamp { font-size: 0.75em; color: #777; font-style: italic; }
     .unclaim-btn {
       background: none;
       border: 1px solid #aaa;
@@ -402,13 +403,7 @@
     }
     .unclaim-btn:hover { background: #eee; }
 
-    /* Reset button at bottom */
-    .reset-area {
-      margin-top: 30px;
-      margin-bottom: 10px;
-      text-align: center;
-    }
-
+    .reset-area { margin-top: 30px; margin-bottom: 10px; text-align: center; }
     .footer { margin-top: 16px; text-align: center; font-size: 0.9em; color: #555; }
     .footer-img { max-width: 200px; margin: 12px auto 15px auto; display: block; }
   </style>
