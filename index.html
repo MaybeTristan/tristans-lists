@@ -88,14 +88,11 @@
         );
         const data = await res.json();
 
-        // Canopy returns price as a number or string like "$8.99"
-        let priceValue = data?.price ?? data?.buyingPrice ?? data?.displayPrice ?? null;
+        // Canopy returns price at data.data.amazonProduct.price.display
+        let priceValue = data?.data?.amazonProduct?.price?.display ?? null;
 
         if (priceValue !== null) {
-          // Normalise to "$X.XX" string
-          const price = typeof priceValue === "number"
-            ? "$" + priceValue.toFixed(2)
-            : String(priceValue);
+          const price = String(priceValue);
 
           // 3. Save to Firebase cache so all visitors benefit
           try {
