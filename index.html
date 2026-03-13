@@ -1,13 +1,13 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Tristan's Birthday List</title>
-    <link rel="icon" href="birthdayfavicon.ico">
-    <link href="https://fonts.googleapis.com/css2?family=Lexend&display=swap" rel="stylesheet">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tristan's Birthday List</title>
+  <link rel="icon" href="birthdayfavicon.ico">
+  <link href="https://fonts.googleapis.com/css2?family=Lexend&display=swap" rel="stylesheet">
 
-    <script type="module">
+  <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
     import { getDatabase, ref, get, set, update, runTransaction } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
 
@@ -24,19 +24,82 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
+    const RAINFOREST_API_KEY = "B638A65014CE431599BBA44D93C8B66E";
+
     const items = [
-      {id:"swedish_fish_bag",name:"Swedish Fish Bag",price:"$8.00",img:"https://m.media-amazon.com/images/I/51Jlys2Z5vL._SS135_.jpg",link:"https://a.co/d/g5AGkDh",category:"Food",prime:true,note:""},
-      {id:"extra_sweet_watermelon_gum",name:"EXTRA Sweet Watermelon Gum",price:"$21.00",img:"https://m.media-amazon.com/images/I/51+00nx6CKL._SS135_.jpg",link:"https://www.amazon.com/dp/B0BP8531HZ",category:"Food",prime:true,note:""},
-      {id:"tonys_chocoloney_chocolates_bag",name:"Tony's Chocoloney Chocolates Bag",price:"$7.00",img:"https://m.media-amazon.com/images/I/91xssnphbKL._AC_UL320_.jpg",link:"https://a.co/d/9cDBC8C",category:"Food",prime:false,note:"Some Sellers Offer Prime"},
-      {id:"lotus_biscoff_9_pack",name:"Lotus Biscoff 9 Pack",price:"$20.00",img:"https://m.media-amazon.com/images/I/51BZ2WzohSL._SS135_.jpg",link:"https://www.amazon.com/dp/B0BCL3Y2MM",category:"Food",prime:true,note:"Price May Be Inaccurate"},
-      {id:"tootsie_roll_large_bag",name:"Tootsie Roll Large Bag",price:"$22.00",img:"https://m.media-amazon.com/images/I/61UCY1IODWL._SS135_.jpg",link:"https://a.co/d/cxuDX7I",category:"Food",prime:true,note:"Price May Be Inaccurate"},
-      {id:"popsocket_magsafe_portable_phone_charger",name:"PopSocket MagSafe Portable Phone Charger",price:"$40.00",img:"https://m.media-amazon.com/images/I/31N7orkUYqL._SS135_.jpg",link:"https://www.amazon.com/dp/B0D62RK6QN",category:"Tech",prime:true,note:""},
-      {id:"anker_nano_charger",name:"Anker Nano Charger",price:"$30.00",img:"https://m.media-amazon.com/images/I/31QbbQWPMML._SS135_.jpg",link:"https://www.amazon.com/dp/B09C5RG6KV",category:"Tech",prime:true,note:"Price May Be Inaccurate"},
-        { id: "airpods_case", name: "AirPods Case", price: "$30.00", img: "https://m.media-amazon.com/images/I/510z5Ktsr-L._AC_SL1200_.jpg", link:"https://www.amazon.com/dp/B0DVTGTCNT/ref=sspa_dk_hqp_detail_aax_0?psc=1&sp_csd=d2lkZ2V0TmFtZT1zcF9ocXBfc2hhcmVk",category:"Tech",prime:false,note:"2 Notes: Price May Be Inaccurate, May Be Sold Out"},
-      {id:"rei_coop_black_beanie",name:"REI Co-Op Black Beanie",price:"$23.00",img:"https://www.rei.com/media/342a68a6-932b-43df-88b1-ecfe7e8241f7.jpg",link:"https://www.rei.com/product/127061/rei-co-op-lightweight-logo-beanie",category:"Clothes",prime:false,note:"No Prime"},
-      {id:"anker_braided_cables_2_pack",name:"Anker Braided Cables 2 Pack",price:"$13.00",img:"https://m.media-amazon.com/images/I/71fWdhjLjJL._AC_SY240_.jpg",link:"https://a.co/d/j8L7j2O",category:"Tech",prime:true,note:""},
-      {id:"smartwool_medium_gray_socks",name:"Smartwool Gray Socks",price:"$18.00",img:"https://m.media-amazon.com/images/I/811p5W6ciUL._AC_SX679_.jpg",link:"https://a.co/d/ihC1IPE",category:"Clothes, Size M",prime:true,note:""},
+      {id:"swedish_fish_bag",name:"Swedish Fish Bag",price:"$8.00",asin:"B00GV51ETK",img:"https://m.media-amazon.com/images/I/51Jlys2Z5vL._SS135_.jpg",link:"https://a.co/d/g5AGkDh",category:"Food",prime:true,note:""},
+      {id:"extra_sweet_watermelon_gum",name:"EXTRA Sweet Watermelon Gum",price:"$21.00",asin:"B0BP8531HZ",img:"https://m.media-amazon.com/images/I/51+00nx6CKL._SS135_.jpg",link:"https://www.amazon.com/dp/B0BP8531HZ",category:"Food",prime:true,note:""},
+      {id:"tonys_chocoloney_chocolates_bag",name:"Tony's Chocoloney Chocolates Bag",price:"$7.00",asin:"B09DJZKVX9",img:"https://m.media-amazon.com/images/I/91xssnphbKL._AC_UL320_.jpg",link:"https://a.co/d/9cDBC8C",category:"Food",prime:false,note:"Some Sellers Offer Prime"},
+      {id:"lotus_biscoff_9_pack",name:"Lotus Biscoff 9 Pack",price:"$20.00",asin:"B0BCL3Y2MM",img:"https://m.media-amazon.com/images/I/51BZ2WzohSL._SS135_.jpg",link:"https://www.amazon.com/dp/B0BCL3Y2MM",category:"Food",prime:true,note:""},
+      {id:"tootsie_roll_large_bag",name:"Tootsie Roll Large Bag",price:"$22.00",asin:"B01LZHA1ER",img:"https://m.media-amazon.com/images/I/61UCY1IODWL._SS135_.jpg",link:"https://a.co/d/cxuDX7I",category:"Food",prime:true,note:""},
+      {id:"popsocket_magsafe_portable_phone_charger",name:"PopSocket MagSafe Portable Phone Charger",price:"$40.00",asin:"B0D62RK6QN",img:"https://m.media-amazon.com/images/I/31N7orkUYqL._SS135_.jpg",link:"https://www.amazon.com/dp/B0D62RK6QN",category:"Tech",prime:true,note:""},
+      {id:"anker_nano_charger",name:"Anker Nano Charger",price:"$30.00",asin:"B09C5RG6KV",img:"https://m.media-amazon.com/images/I/31QbbQWPMML._SS135_.jpg",link:"https://www.amazon.com/dp/B09C5RG6KV",category:"Tech",prime:true,note:""},
+      {id:"airpods_case",name:"AirPods Case",price:"$30.00",asin:null,img:"https://m.media-amazon.com/images/I/510z5Ktsr-L._AC_SL1200_.jpg",link:"",category:"Tech",prime:false,note:"Price May Be Inaccurate, May Be Sold Out"},
+      {id:"rei_coop_black_beanie",name:"REI Co-Op Black Beanie",price:"$23.00",asin:null,img:"https://www.rei.com/media/342a68a6-932b-43df-88b1-ecfe7e8241f7.jpg",link:"https://www.rei.com/product/127061/rei-co-op-lightweight-logo-beanie",category:"Clothes",prime:false,note:"No Prime"},
+      {id:"anker_braided_cables_2_pack",name:"Anker Braided Cables 2 Pack",price:"$13.00",asin:"B07NKNBZYG",img:"https://m.media-amazon.com/images/I/71fWdhjLjJL._AC_SY240_.jpg",link:"https://a.co/d/j8L7j2O",category:"Tech",prime:true,note:""},
+      {id:"smartwool_medium_gray_socks",name:"Smartwool Gray Socks",price:"$18.00",asin:"B000BGOF7Q",img:"https://m.media-amazon.com/images/I/811p5W6ciUL._AC_SX679_.jpg",link:"https://a.co/d/ihC1IPE",category:"Clothes, Size M",prime:true,note:""},
     ];
+
+    const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
+
+    // Fetch live price from Rainforest API, with localStorage cache
+    async function fetchLivePrice(asin) {
+      const cacheKey = "price_cache_" + asin;
+
+      // Check cache first
+      try {
+        const cached = localStorage.getItem(cacheKey);
+        if (cached) {
+          const { price, timestamp } = JSON.parse(cached);
+          if (Date.now() - timestamp < CACHE_TTL_MS) {
+            return price; // Still fresh, use cached value
+          }
+        }
+      } catch (e) {
+        // If localStorage fails for any reason, just continue to fetch
+      }
+
+      // Cache miss or expired — fetch from Rainforest
+      try {
+        const url = `https://api.rainforestapi.com/request?api_key=${RAINFOREST_API_KEY}&type=product&amazon_domain=amazon.com&asin=${asin}&currency=usd`;
+        const res = await fetch(url);
+        const data = await res.json();
+        const priceValue = data?.product?.buybox_winner?.price?.value
+          ?? data?.product?.price?.value
+          ?? null;
+        if (priceValue !== null) {
+          const price = "$" + priceValue.toFixed(2);
+          try {
+            localStorage.setItem(cacheKey, JSON.stringify({ price, timestamp: Date.now() }));
+          } catch (e) { /* ignore storage errors */ }
+          return price;
+        }
+        return null;
+      } catch (e) {
+        console.warn("Price fetch failed for", asin, e);
+        return null;
+      }
+    }
+
+    // After render, update price elements with live/cached data
+    async function loadLivePrices() {
+      const pricePromises = items
+        .filter(item => item.asin)
+        .map(async item => {
+          const livePrice = await fetchLivePrice(item.asin);
+          const el = document.getElementById("price_" + item.id);
+          if (el && livePrice) {
+            el.textContent = livePrice;
+            el.classList.remove("price-loading");
+            el.title = "Live price from Amazon";
+          } else if (el) {
+            el.textContent = item.price;
+            el.classList.remove("price-loading");
+            el.title = "Could not load live price";
+          }
+        });
+      await Promise.all(pricePromises);
+    }
 
     // Claim an item (mark as claimed in Firebase, no redirect)
     window.claimItem = async function(itemId) {
@@ -106,8 +169,10 @@
       info.appendChild(title);
 
       const price = document.createElement("p");
-      price.className = "price";
-      price.textContent = item.price;
+      price.className = "price" + (item.asin ? " price-loading" : "");
+      price.id = "price_" + item.id;
+      price.textContent = item.asin ? "Loading…" : item.price;
+      price.title = item.asin ? "Fetching live price…" : "";
       info.appendChild(price);
 
       // View Item link (always visible if link exists)
@@ -171,7 +236,7 @@
     }
 
     window.addEventListener("DOMContentLoaded", () => {
-      renderItems();
+      renderItems().then(() => loadLivePrices());
 
       document.getElementById("resetButton").addEventListener("click", async () => {
         const pin = prompt("Enter 4-digit admin PIN to reset all items:");
@@ -183,183 +248,126 @@
         renderItems();
       });
     });
-    </script>
+  </script>
 
-    <style>
-        body {
-            font-family: 'Lexend', sans-serif;
-            margin: 20px;
-            background: #f0f0f0;
-        }
+  <style>
+    body { font-family: 'Lexend', sans-serif; margin: 20px; background: #f0f0f0; }
+    .grid-container { display: flex; flex-wrap: wrap; gap: 20px; justify-content: flex-start; }
 
-        .grid-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 20px;
-            justify-content: flex-start;
-        }
+    .item-card {
+      width: calc(50% - 20px);
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      background: #fff;
+      transition: opacity 0.2s;
+    }
+    .item-card.claimed { background: #ddd; opacity: 0.85; }
 
-        .item-card {
-            width: calc(50% - 20px);
-            border: 1px solid #ddd;
-            border-radius: 8px;
-            overflow: hidden;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-            display: flex;
-            flex-direction: column;
-            background: #fff;
-            transition: opacity 0.2s;
-        }
+    .item-card img { width: 100%; height: 200px; object-fit: contain; background: #f9f9f9; }
 
-            .item-card.claimed {
-                background: #ddd;
-                opacity: 0.85;
-            }
+    .tag-bar { display: flex; gap: 5px; padding: 5px 10px; flex-wrap: wrap; }
+    .category-tag, .prime-tag, .note-tag { background-color: #b0b0b0; padding: 2px 6px; border-radius: 4px; font-size: 0.8em; color: #333; }
+    .prime-tag { background-color: #d1f0d1; }
+    .note-tag { background-color: #fff4c2; }
 
-            .item-card img {
-                width: 100%;
-                height: 200px;
-                object-fit: contain;
-                background: #f9f9f9;
-            }
+    .item-info { padding: 10px; display: flex; flex-direction: column; flex-grow: 1; gap: 6px; }
+    .item-info h3 { margin: 0 0 2px 0; font-size: 1em; }
+    .price { margin: 0; font-weight: bold; }
+    .price-loading { color: #aaa; font-style: italic; font-weight: normal; }
+    .price:not(.price-loading)[title="Live price from Amazon"]::after {
+      content: " 🟢";
+      font-size: 0.7em;
+      vertical-align: middle;
+      title: "Live price";
+    }
 
-        .tag-bar {
-            display: flex;
-            gap: 5px;
-            padding: 5px 10px;
-            flex-wrap: wrap;
-        }
+    .button.view-btn {
+      background-color: #8f2121;
+      color: #fff;
+      text-align: center;
+      padding: 8px;
+      border-radius: 5px;
+      text-decoration: none;
+      font-size: 0.9em;
+      cursor: pointer;
+      display: block;
+    }
 
-        .category-tag, .prime-tag, .note-tag {
-            background-color: #b0b0b0;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-size: 0.8em;
-            color: #333;
-        }
+    /* Claim row */
+    .claim-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border-top: 1px solid #e0e0e0;
+      padding-top: 8px;
+      margin-top: auto;
+    }
 
-        .prime-tag {
-            background-color: #d1f0d1;
-        }
+    .claim-checkbox {
+      width: 18px;
+      height: 18px;
+      accent-color: #8f2121;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
 
-        .note-tag {
-            background-color: #fff4c2;
-        }
+    .claim-label {
+      font-size: 0.9em;
+      color: #444;
+      cursor: pointer;
+      user-select: none;
+    }
 
-        .item-info {
-            padding: 10px;
-            display: flex;
-            flex-direction: column;
-            flex-grow: 1;
-            gap: 6px;
-        }
+    .claimed-badge {
+      font-size: 0.9em;
+      font-weight: bold;
+      color: #3a7a3a;
+    }
 
-            .item-info h3 {
-                margin: 0 0 2px 0;
-                font-size: 1em;
-            }
+    .unclaim-btn {
+      background: none;
+      border: 1px solid #aaa;
+      border-radius: 4px;
+      padding: 2px 8px;
+      font-size: 0.78em;
+      color: #666;
+      cursor: pointer;
+      margin-left: auto;
+    }
+    .unclaim-btn:hover { background: #eee; }
 
-        .price {
-            margin: 0;
-            font-weight: bold;
-        }
-
-        .button.view-btn {
-            background-color: #8f2121;
-            color: #fff;
-            text-align: center;
-            padding: 8px;
-            border-radius: 5px;
-            text-decoration: none;
-            font-size: 0.9em;
-            cursor: pointer;
-            display: block;
-        }
-
-        /* Claim row */
-        .claim-row {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            border-top: 1px solid #e0e0e0;
-            padding-top: 8px;
-            margin-top: auto;
-        }
-
-        .claim-checkbox {
-            width: 18px;
-            height: 18px;
-            accent-color: #8f2121;
-            cursor: pointer;
-            flex-shrink: 0;
-        }
-
-        .claim-label {
-            font-size: 0.9em;
-            color: #444;
-            cursor: pointer;
-            user-select: none;
-        }
-
-        .claimed-badge {
-            font-size: 0.9em;
-            font-weight: bold;
-            color: #3a7a3a;
-        }
-
-        .unclaim-btn {
-            background: none;
-            border: 1px solid #aaa;
-            border-radius: 4px;
-            padding: 2px 8px;
-            font-size: 0.78em;
-            color: #666;
-            cursor: pointer;
-            margin-left: auto;
-        }
-
-            .unclaim-btn:hover {
-                background: #eee;
-            }
-
-        .footer {
-            margin-top: 30px;
-            text-align: center;
-            font-size: 0.9em;
-            color: #555;
-        }
-
-        .footer-img {
-            max-width: 200px;
-            margin: 12px auto 15px auto;
-            display: block;
-        }
-    </style>
+    .footer { margin-top: 30px; text-align: center; font-size: 0.9em; color: #555; }
+    .footer-img { max-width: 200px; margin: 12px auto 15px auto; display: block; }
+  </style>
 </head>
 <body>
-    <h1>Tristan's Birthday List</h1>
+  <h1>Tristan's Birthday List</h1>
 
-    <div style="margin-bottom:20px;">
-        <button id="resetButton" class="button view-btn" style="display:inline-block;width:auto;padding:8px 16px;">Reset All Claims</button>
-    </div>
+  <div style="margin-bottom:20px;">
+    <button id="resetButton" class="button view-btn" style="display:inline-block;width:auto;padding:8px 16px;">Reset All Claims</button>
+  </div>
 
-    <p style="font-size: 14pt; color: #000; font-weight: bold; margin-top: -14px;">
-        Howdy! Click "View Item" to see the product, then check "I'm buying this!" to claim it. If you accidentally claim something, hit Undo on that item.
-    </p>
+  <p style="font-size: 14pt; color: #000; font-weight: bold; margin-top: -14px;">
+    Howdy! Click "View Item" to see the product, then check "I'm buying this!" to claim it. If you accidentally claim something, hit Undo on that item.
+  </p>
 
-    <p style="font-size: 1em; color: #555; margin-top: -10px;">
-        If you notice any problems, please let me know via
-        <a href="https://forms.gle/YYmsCVazj6CR6v529" target="_blank">this link</a>.
-        For all reported issues and their statuses go to
-        <a href="https://github.com/MaybeTristan/christmas-list-2025/issues" target="_blank">this link</a>.
-    </p>
+  <p style="font-size: 1em; color: #555; margin-top: -10px;">
+    If you notice any problems, please let me know via
+    <a href="https://forms.gle/YYmsCVazj6CR6v529" target="_blank">this link</a>.
+    For all reported issues and their statuses go to
+    <a href="https://github.com/MaybeTristan/christmas-list-2025/issues" target="_blank">this link</a>.
+  </p>
 
-    <div class="grid-container"></div>
+  <div class="grid-container"></div>
 
-    <img class="footer-img" src="https://photos.tristanarbet.com/Adobe%20Express%20Photo%20project-5.png" alt="Footer image" />
+  <img class="footer-img" src="https://photos.tristanarbet.com/Adobe%20Express%20Photo%20project-5.png" alt="Footer image" />
 
-    <div class="footer">
-        Thank You!!! Love from Tristan ♡ Note: All clothes sizes, or other notes, should be next to the other tags on the item.
-    </div>
+  <div class="footer">
+    Thank You!!! Love from Tristan ♡ Note: All clothes sizes, or other notes, should be next to the other tags on the item.
+  </div>
 </body>
 </html>
