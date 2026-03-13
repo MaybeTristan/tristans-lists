@@ -34,44 +34,54 @@
       {id:"tootsie_roll_large_bag",name:"Tootsie Roll Large Bag",price:"$22.00",asin:"B07DX98QJL",img:"https://m.media-amazon.com/images/I/61UCY1IODWL._SS135_.jpg",link:"https://www.amazon.com/dp/B07DX98QJL",category:"Food",prime:true,note:""},
       {id:"popsocket_magsafe_portable_phone_charger",name:"PopSocket MagSafe Portable Phone Charger",price:"$40.00",asin:"B0D62RK6QN",img:"https://m.media-amazon.com/images/I/31N7orkUYqL._SS135_.jpg",link:"https://www.amazon.com/dp/B0D62RK6QN",category:"Tech",prime:true,note:""},
       {id:"anker_nano_charger",name:"Anker Nano Charger",price:"$30.00",asin:"B09C5RG6KV",img:"https://m.media-amazon.com/images/I/31QbbQWPMML._SS135_.jpg",link:"https://www.amazon.com/dp/B09C5RG6KV",category:"Tech",prime:true,note:""},
-      {id:"airpods_case",name:"AirPods Case",price:"$30.00",asin:"B0DVTGTCNT",img:"https://m.media-amazon.com/images/I/510z5Ktsr-L._AC_SL1200_.jpg",link:"https://www.amazon.com/dp/B0DVTGTCNT",category:"Tech",prime:false,note:"Price May Be Inaccurate, May Be Sold Out"},
+      {id:"airpods_case",name:"AirPods Case",price:"$30.00",asin:"B0DVTGTCNT",img:"https://m.media-amazon.com/images/I/510z5Ktsr-L._AC_SL1200_.jpg",link:"https://www.amazon.com/dp/B0DVTGTCNT",category:"Tech",prime:false,note:"May Be Sold Out"},
       {id:"rei_coop_black_beanie",name:"REI Co-Op Black Beanie",price:"$23.00",asin:null,img:"https://www.rei.com/media/342a68a6-932b-43df-88b1-ecfe7e8241f7.jpg",link:"https://www.rei.com/product/127061/rei-co-op-lightweight-logo-beanie",category:"Clothes",prime:false,note:"No Prime"},
       {id:"anker_braided_cables_2_pack",name:"Anker Braided Cables 2 Pack",price:"$13.00",asin:"B09LCJPZ1P",img:"https://m.media-amazon.com/images/I/71fWdhjLjJL._AC_SY240_.jpg",link:"https://www.amazon.com/dp/B09LCJPZ1P",category:"Tech",prime:true,note:""},
       {id:"smartwool_medium_gray_socks",name:"Smartwool Gray Socks",price:"$18.00",asin:"B0D7Y6332B",img:"https://m.media-amazon.com/images/I/811p5W6ciUL._AC_SX679_.jpg",link:"https://www.amazon.com/dp/B0D7Y6332B",category:"Clothes, Size M",prime:true,note:""},
     ];
 
-    const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
+    // ── localStorage helpers for per-device claim tracking ─────────────────
+    const MY_CLAIMS_KEY = "my_claims";
 
-    // Fetch live price from Rainforest API, with localStorage cache
+    function getMyClaims() {
+      try { return JSON.parse(localStorage.getItem(MY_CLAIMS_KEY)) || {}; } catch { return {}; }
+    }
+    function saveMyClaim(itemId, timestamp) {
+      const c = getMyClaims(); c[itemId] = timestamp;
+      try { localStorage.setItem(MY_CLAIMS_KEY, JSON.stringify(c)); } catch {}
+    }
+    function removeMyClaim(itemId) {
+      const c = getMyClaims(); delete c[itemId];
+      try { localStorage.setItem(MY_CLAIMS_KEY, JSON.stringify(c)); } catch {}
+    }
+    function formatTimestamp(ts) {
+      return new Date(ts).toLocaleString(undefined, {
+        month: "short", day: "numeric", year: "numeric",
+        hour: "numeric", minute: "2-digit"
+      });
+    }
+
+    // ── Price cache ─────────────────────────────────────────────────────────
+    const CACHE_TTL_MS = 24 * 60 * 60 * 1000;
+
     async function fetchLivePrice(asin) {
       const cacheKey = "price_cache_" + asin;
-
-      // Check cache first
       try {
         const cached = localStorage.getItem(cacheKey);
         if (cached) {
           const { price, timestamp } = JSON.parse(cached);
-          if (Date.now() - timestamp < CACHE_TTL_MS) {
-            return price; // Still fresh, use cached value
-          }
+          if (Date.now() - timestamp < CACHE_TTL_MS) return price;
         }
-      } catch (e) {
-        // If localStorage fails for any reason, just continue to fetch
-      }
-
-      // Cache miss or expired — fetch from Rainforest
+      } catch {}
       try {
         const url = `https://api.rainforestapi.com/request?api_key=${RAINFOREST_API_KEY}&type=product&amazon_domain=amazon.com&asin=${asin}&currency=usd`;
         const res = await fetch(url);
         const data = await res.json();
         const priceValue = data?.product?.buybox_winner?.price?.value
-          ?? data?.product?.price?.value
-          ?? null;
+          ?? data?.product?.price?.value ?? null;
         if (priceValue !== null) {
           const price = "$" + priceValue.toFixed(2);
-          try {
-            localStorage.setItem(cacheKey, JSON.stringify({ price, timestamp: Date.now() }));
-          } catch (e) { /* ignore storage errors */ }
+          try { localStorage.setItem(cacheKey, JSON.stringify({ price, timestamp: Date.now() })); } catch {}
           return price;
         }
         return null;
@@ -81,38 +91,37 @@
       }
     }
 
-    // After render, update price elements with live/cached data
     async function loadLivePrices() {
-      const pricePromises = items
-        .filter(item => item.asin)
-        .map(async item => {
-          const livePrice = await fetchLivePrice(item.asin);
-          const el = document.getElementById("price_" + item.id);
-          if (el && livePrice) {
-            el.textContent = livePrice;
-            el.classList.remove("price-loading");
-            el.title = "Live price from Amazon";
-          } else if (el) {
-            el.textContent = "";
-            el.classList.remove("price-loading");
-            const unavailTag = document.createElement("span");
-            unavailTag.className = "price-unavailable-tag";
-            unavailTag.textContent = "Live Price Not Available — Click \"View Item\" to see directly.";
-            el.appendChild(unavailTag);
-          }
-        });
-      await Promise.all(pricePromises);
+      await Promise.all(items.filter(i => i.asin).map(async item => {
+        const livePrice = await fetchLivePrice(item.asin);
+        const el = document.getElementById("price_" + item.id);
+        if (!el) return;
+        if (livePrice) {
+          el.textContent = livePrice;
+          el.classList.remove("price-loading");
+          el.title = "Live price from Amazon";
+        } else {
+          el.textContent = "";
+          el.classList.remove("price-loading");
+          const tag = document.createElement("span");
+          tag.className = "price-unavailable-tag";
+          tag.textContent = "Live Price Not Available — Click \"View Item\" to see directly.";
+          el.appendChild(tag);
+        }
+      }));
     }
 
-    // Claim an item (mark as claimed in Firebase, no redirect)
+    // ── Claim / unclaim ─────────────────────────────────────────────────────
     window.claimItem = async function(itemId) {
       const itemRef = ref(db, 'items/' + itemId);
+      const now = Date.now();
       try {
         const result = await runTransaction(itemRef, (currentData) => {
-          if (currentData && currentData.claimed) return; // already claimed, abort
-          return { claimed: true };
+          if (currentData && currentData.claimed) return; // abort — already claimed
+          return { claimed: true, claimedAt: now };
         });
         if (result.committed) {
+          saveMyClaim(itemId, now);
           alert("Item claimed! Head to the product link to purchase it.");
           renderItems();
         } else {
@@ -125,14 +134,21 @@
       }
     };
 
-    // Unclaim an item
     window.unclaimItem = async function(itemId) {
       if (!confirm("Are you sure you want to un-claim this item?")) return;
-      await set(ref(db, 'items/' + itemId), { claimed: false });
+      await set(ref(db, 'items/' + itemId), { claimed: false, claimedAt: null });
+      removeMyClaim(itemId);
       renderItems();
     };
 
-    function createItemCard(item, claimed) {
+    // ── Card builder ────────────────────────────────────────────────────────
+    function createItemCard(item, claimData) {
+      const claimed = claimData?.claimed || false;
+      const claimedAt = claimData?.claimedAt || null;
+      const myClaims = getMyClaims();
+      const iClaimedThis = !!myClaims[item.id];
+      const myClaimedAt = myClaims[item.id] || null;
+
       const div = document.createElement("div");
       div.className = "item-card" + (claimed ? " claimed" : "");
 
@@ -178,17 +194,23 @@
       price.title = item.asin ? "Fetching live price…" : "";
       info.appendChild(price);
 
-      // View Item link (always visible if link exists)
+      // View Item — warns if already claimed
       if (item.link) {
-        const viewLink = document.createElement("a");
-        viewLink.href = item.link;
-        viewLink.target = "_blank";
-        viewLink.className = "button view-btn";
-        viewLink.textContent = "View Item";
-        info.appendChild(viewLink);
+        const viewBtn = document.createElement("a");
+        viewBtn.href = item.link;
+        viewBtn.target = "_blank";
+        viewBtn.className = "button view-btn";
+        viewBtn.textContent = "View Item";
+        if (claimed) {
+          viewBtn.addEventListener("click", (e) => {
+            const go = confirm("⚠️ This item has already been claimed!\n\nAre you sure you want to view/buy it anyway?");
+            if (!go) e.preventDefault();
+          });
+        }
+        info.appendChild(viewBtn);
       }
 
-      // Claim row (checkbox + label)
+      // Claim row
       const claimRow = document.createElement("div");
       claimRow.className = "claim-row";
 
@@ -198,29 +220,40 @@
         checkbox.id = "claim_" + item.id;
         checkbox.className = "claim-checkbox";
         checkbox.addEventListener("change", function() {
-          if (this.checked) {
-            claimItem(item.id);
-          }
+          if (this.checked) claimItem(item.id);
         });
-
         const label = document.createElement("label");
         label.htmlFor = "claim_" + item.id;
         label.className = "claim-label";
         label.textContent = "I'm buying this!";
-
         claimRow.appendChild(checkbox);
         claimRow.appendChild(label);
       } else {
-        const claimedBadge = document.createElement("span");
-        claimedBadge.className = "claimed-badge";
-        claimedBadge.textContent = "✓ Claimed";
-        claimRow.appendChild(claimedBadge);
+        // Claimed info block (badge + timestamp)
+        const claimInfo = document.createElement("div");
+        claimInfo.className = "claim-info";
 
-        const resetBtn = document.createElement("button");
-        resetBtn.className = "unclaim-btn";
-        resetBtn.textContent = "Undo";
-        resetBtn.onclick = () => unclaimItem(item.id);
-        claimRow.appendChild(resetBtn);
+        const badge = document.createElement("span");
+        badge.className = "claimed-badge" + (iClaimedThis ? " claimed-by-me" : "");
+        badge.textContent = iClaimedThis ? "✓ You claimed this!" : "✓ Claimed";
+        claimInfo.appendChild(badge);
+
+        // Show timestamp — prefer local time, fall back to Firebase timestamp
+        const ts = myClaimedAt || claimedAt;
+        if (ts) {
+          const tsEl = document.createElement("span");
+          tsEl.className = "claim-timestamp";
+          tsEl.textContent = "🕐 " + formatTimestamp(ts);
+          claimInfo.appendChild(tsEl);
+        }
+
+        claimRow.appendChild(claimInfo);
+
+        const undoBtn = document.createElement("button");
+        undoBtn.className = "unclaim-btn";
+        undoBtn.textContent = "Undo";
+        undoBtn.onclick = () => unclaimItem(item.id);
+        claimRow.appendChild(undoBtn);
       }
 
       info.appendChild(claimRow);
@@ -228,13 +261,14 @@
       return div;
     }
 
+    // ── Render ───────────────────────────────────────────────────────────────
     async function renderItems() {
       const container = document.querySelector(".grid-container");
       container.innerHTML = "";
       for (const item of items) {
         const snapshot = await get(ref(db, 'items/' + item.id));
-        const isClaimed = snapshot.exists() ? snapshot.val().claimed : false;
-        container.appendChild(createItemCard(item, isClaimed));
+        const claimData = snapshot.exists() ? snapshot.val() : { claimed: false };
+        container.appendChild(createItemCard(item, claimData));
       }
     }
 
@@ -245,8 +279,12 @@
         const pin = prompt("Enter 4-digit admin PIN to reset all items:");
         if (pin !== "3323") return alert("Incorrect PIN / No PIN entered.");
         const updates = {};
-        items.forEach(item => { updates['items/' + item.id + '/claimed'] = false; });
+        items.forEach(item => {
+          updates['items/' + item.id + '/claimed'] = false;
+          updates['items/' + item.id + '/claimedAt'] = null;
+        });
         await update(ref(db), updates);
+        try { localStorage.removeItem(MY_CLAIMS_KEY); } catch {}
         alert("All items have been reset!");
         renderItems();
       });
@@ -269,7 +307,6 @@
       transition: opacity 0.2s;
     }
     .item-card.claimed { background: #ddd; opacity: 0.85; }
-
     .item-card img { width: 100%; height: 200px; object-fit: contain; background: #f9f9f9; }
 
     .tag-bar { display: flex; gap: 5px; padding: 5px 10px; flex-wrap: wrap; }
@@ -279,6 +316,7 @@
 
     .item-info { padding: 10px; display: flex; flex-direction: column; flex-grow: 1; gap: 6px; }
     .item-info h3 { margin: 0 0 2px 0; font-size: 1em; }
+
     .price { margin: 0; font-weight: bold; }
     .price-loading { color: #aaa; font-style: italic; font-weight: normal; }
     .price-unavailable-tag {
@@ -295,7 +333,6 @@
       content: " 🟢";
       font-size: 0.7em;
       vertical-align: middle;
-      title: "Live price";
     }
 
     .button.view-btn {
@@ -319,7 +356,6 @@
       padding-top: 8px;
       margin-top: auto;
     }
-
     .claim-checkbox {
       width: 18px;
       height: 18px;
@@ -327,7 +363,6 @@
       cursor: pointer;
       flex-shrink: 0;
     }
-
     .claim-label {
       font-size: 0.9em;
       color: #444;
@@ -335,12 +370,25 @@
       user-select: none;
     }
 
+    /* Claimed state */
+    .claim-info {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
     .claimed-badge {
       font-size: 0.9em;
       font-weight: bold;
       color: #3a7a3a;
     }
-
+    .claimed-badge.claimed-by-me {
+      color: #8f2121;
+    }
+    .claim-timestamp {
+      font-size: 0.75em;
+      color: #777;
+      font-style: italic;
+    }
     .unclaim-btn {
       background: none;
       border: 1px solid #aaa;
@@ -350,21 +398,25 @@
       color: #666;
       cursor: pointer;
       margin-left: auto;
+      flex-shrink: 0;
     }
     .unclaim-btn:hover { background: #eee; }
 
-    .footer { margin-top: 30px; text-align: center; font-size: 0.9em; color: #555; }
+    /* Reset button at bottom */
+    .reset-area {
+      margin-top: 30px;
+      margin-bottom: 10px;
+      text-align: center;
+    }
+
+    .footer { margin-top: 16px; text-align: center; font-size: 0.9em; color: #555; }
     .footer-img { max-width: 200px; margin: 12px auto 15px auto; display: block; }
   </style>
 </head>
 <body>
   <h1>Tristan's Birthday List</h1>
 
-  <div style="margin-bottom:20px;">
-    <button id="resetButton" class="button view-btn" style="display:inline-block;width:auto;padding:8px 16px;">Reset All Claims</button>
-  </div>
-
-  <p style="font-size: 14pt; color: #000; font-weight: bold; margin-top: -14px;">
+  <p style="font-size: 14pt; color: #000; font-weight: bold; margin-top: 0;">
     Howdy! Click "View Item" to see the product, then check "I'm buying this!" to claim it. If you accidentally claim something, hit Undo on that item.
   </p>
 
@@ -378,6 +430,10 @@
   <div class="grid-container"></div>
 
   <img class="footer-img" src="https://photos.tristanarbet.com/Adobe%20Express%20Photo%20project-5.png" alt="Footer image" />
+
+  <div class="reset-area">
+    <button id="resetButton" class="button view-btn" style="width:auto;padding:8px 20px;">Reset All Claims</button>
+  </div>
 
   <div class="footer">
     Thank You!!! Love from Tristan ♡ Note: All clothes sizes, or other notes, should be next to the other tags on the item.
