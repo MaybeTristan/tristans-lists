@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -7,9 +7,309 @@
   <link rel="icon" href="birthdayfavicon.ico">
   <link href="https://fonts.googleapis.com/css2?family=Lexend&display=swap" rel="stylesheet">
 
+  <style>
+    /* ── CSS Variables (light/dark) ───────────────────────────────────────── */
+    :root {
+      --bg: #f0f0f0;
+      --card-bg: #ffffff;
+      --card-claimed-bg: #dddddd;
+      --card-img-bg: #f9f9f9;
+      --text: #222;
+      --text-muted: #555;
+      --text-faint: #999;
+      --border: #ddd;
+      --claim-border: #e0e0e0;
+      --tag-bg: #b0b0b0;
+      --tag-text: #333;
+      --prime-bg: #d1f0d1;
+      --note-bg: #fff4c2;
+      --btn-bg: #8f2121;
+      --btn-text: #fff;
+      --unclaim-border: #aaa;
+      --unclaim-text: #666;
+      --unclaim-hover: #eee;
+      --skeleton-base: #e0e0e0;
+      --skeleton-shine: #f0f0f0;
+      --filter-bg: #fff;
+      --filter-border: #ccc;
+    }
+    [data-theme="dark"] {
+      --bg: #1a1a1a;
+      --card-bg: #2a2a2a;
+      --card-claimed-bg: #333;
+      --card-img-bg: #222;
+      --text: #f0f0f0;
+      --text-muted: #aaa;
+      --text-faint: #666;
+      --border: #444;
+      --claim-border: #444;
+      --tag-bg: #555;
+      --tag-text: #ddd;
+      --prime-bg: #1a3a1a;
+      --note-bg: #3a3000;
+      --btn-bg: #8f2121;
+      --btn-text: #fff;
+      --unclaim-border: #666;
+      --unclaim-text: #aaa;
+      --unclaim-hover: #444;
+      --skeleton-base: #333;
+      --skeleton-shine: #444;
+      --filter-bg: #2a2a2a;
+      --filter-border: #555;
+    }
+
+    * { box-sizing: border-box; }
+    body { font-family: 'Lexend', sans-serif; margin: 20px; background: var(--bg); color: var(--text); transition: background 0.3s, color 0.3s; }
+
+    /* ── Header ───────────────────────────────────────────────────────────── */
+    .header-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 8px; }
+    .header-row h1 { margin: 0; font-size: 1.6em; }
+
+    /* ── Dark mode toggle ─────────────────────────────────────────────────── */
+    .dark-toggle {
+      display: flex; align-items: center; gap: 8px;
+      font-size: 0.85em; color: var(--text-muted); cursor: pointer; user-select: none;
+    }
+    .toggle-track {
+      width: 42px; height: 24px; border-radius: 12px;
+      background: #ccc; position: relative; transition: background 0.3s; cursor: pointer;
+    }
+    [data-theme="dark"] .toggle-track { background: #8f2121; }
+    .toggle-thumb {
+      width: 18px; height: 18px; border-radius: 50%;
+      background: #fff; position: absolute; top: 3px; left: 3px;
+      transition: transform 0.3s; box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
+    [data-theme="dark"] .toggle-thumb { transform: translateX(18px); }
+
+    /* ── Sort / Filter bar ────────────────────────────────────────────────── */
+    .filter-bar {
+      display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+      margin-bottom: 16px; padding: 10px 14px;
+      background: var(--card-bg); border-radius: 8px;
+      border: 1px solid var(--border);
+      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
+    }
+    .filter-bar label { font-size: 0.82em; color: var(--text-muted); }
+    .filter-bar select, .filter-bar input[type=checkbox] { accent-color: #8f2121; }
+    .filter-bar select {
+      font-family: 'Lexend', sans-serif;
+      font-size: 0.82em; padding: 4px 8px;
+      border: 1px solid var(--filter-border);
+      border-radius: 5px; background: var(--filter-bg);
+      color: var(--text); cursor: pointer;
+    }
+    .filter-sep { width: 1px; height: 20px; background: var(--border); }
+
+    /* ── Grid ─────────────────────────────────────────────────────────────── */
+    .grid-container { display: flex; flex-wrap: wrap; gap: 20px; justify-content: flex-start; }
+
+    /* ── Item card ────────────────────────────────────────────────────────── */
+    .item-card {
+      width: calc(50% - 10px);
+      border: 1px solid var(--border);
+      border-radius: 8px; overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      display: flex; flex-direction: column;
+      background: var(--card-bg);
+      transition: background 0.3s, opacity 0.2s, transform 0.15s;
+    }
+    .item-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
+    .item-card.claimed { background: var(--card-claimed-bg); opacity: 0.85; }
+    .item-card img { width: 100%; height: 200px; object-fit: contain; background: var(--card-img-bg); }
+
+    /* ── Skeleton loading ─────────────────────────────────────────────────── */
+    .skeleton-card {
+      width: calc(50% - 10px);
+      border: 1px solid var(--border);
+      border-radius: 8px; overflow: hidden;
+      background: var(--card-bg);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+    }
+    .skeleton-img {
+      width: 100%; height: 200px;
+      background: linear-gradient(90deg, var(--skeleton-base) 25%, var(--skeleton-shine) 50%, var(--skeleton-base) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+    }
+    .skeleton-body { padding: 10px; display: flex; flex-direction: column; gap: 8px; }
+    .skeleton-line {
+      height: 12px; border-radius: 4px;
+      background: linear-gradient(90deg, var(--skeleton-base) 25%, var(--skeleton-shine) 50%, var(--skeleton-base) 75%);
+      background-size: 200% 100%;
+      animation: shimmer 1.4s infinite;
+    }
+    .skeleton-line.short { width: 40%; }
+    .skeleton-line.btn { width: 100%; height: 32px; border-radius: 5px; margin-top: 4px; }
+    @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+
+    /* ── Tags ─────────────────────────────────────────────────────────────── */
+    .tag-bar { display: flex; gap: 5px; padding: 5px 10px; flex-wrap: wrap; }
+    .category-tag, .prime-tag, .note-tag {
+      background-color: var(--tag-bg); padding: 2px 6px;
+      border-radius: 4px; font-size: 0.8em; color: var(--tag-text);
+    }
+    .prime-tag { background-color: var(--prime-bg); }
+    .note-tag { background-color: var(--note-bg); }
+
+    /* ── Item info ────────────────────────────────────────────────────────── */
+    .item-info { padding: 10px; display: flex; flex-direction: column; flex-grow: 1; gap: 6px; }
+    .item-info h3 { margin: 0 0 2px 0; font-size: 1em; }
+
+    .price { margin: 0; font-weight: bold; }
+    .price-loading { color: var(--text-faint); font-style: italic; font-weight: normal; }
+    .price-stale { color: #b07800; }
+    .price-unavailable { color: var(--text-faint); font-style: italic; font-weight: normal; font-size: 0.9em; }
+    .price-timestamp { font-size: 0.72em; color: var(--text-faint); font-style: italic; margin-top: -2px; }
+    .price[data-has-price="true"]:not(.price-loading)::after { content: " 🟢"; font-size: 0.7em; vertical-align: middle; }
+    .sold-out-badge {
+      display: inline-block; background-color: #fde8e8; color: #9b1c1c;
+      font-size: 0.78em; font-weight: normal; padding: 2px 6px; border-radius: 4px;
+    }
+
+    /* ── Buttons ──────────────────────────────────────────────────────────── */
+    .button.view-btn {
+      background-color: var(--btn-bg); color: var(--btn-text);
+      text-align: center; padding: 8px; border-radius: 5px;
+      text-decoration: none; font-size: 0.9em; cursor: pointer; display: block;
+      border: none; font-family: 'Lexend', sans-serif;
+    }
+
+    /* ── Claim row ────────────────────────────────────────────────────────── */
+    .claim-row {
+      display: flex; align-items: center; gap: 8px;
+      border-top: 1px solid var(--claim-border);
+      padding-top: 8px; margin-top: auto;
+    }
+    .claim-checkbox { width: 18px; height: 18px; accent-color: #8f2121; cursor: pointer; flex-shrink: 0; }
+    .claim-label { font-size: 0.9em; color: var(--text-muted); cursor: pointer; user-select: none; }
+    .claim-info { display: flex; flex-direction: column; gap: 2px; }
+    .claimed-badge { font-size: 0.9em; font-weight: bold; color: #3a7a3a; }
+    .claimed-badge.claimed-by-me { color: #8f2121; }
+    .claim-timestamp { font-size: 0.75em; color: var(--text-faint); font-style: italic; }
+    .unclaim-btn {
+      background: none; border: 1px solid var(--unclaim-border);
+      border-radius: 4px; padding: 2px 8px; font-size: 0.78em;
+      color: var(--unclaim-text); cursor: pointer; margin-left: auto; flex-shrink: 0;
+      font-family: 'Lexend', sans-serif;
+    }
+    .unclaim-btn:hover { background: var(--unclaim-hover); }
+
+    /* ── Thank you overlay ────────────────────────────────────────────────── */
+    #thankyou-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.75); z-index: 1000;
+      flex-direction: column; align-items: center; justify-content: center;
+      text-align: center;
+    }
+    #thankyou-overlay.show { display: flex; animation: fadeIn 0.3s ease; }
+    .thankyou-box {
+      background: var(--card-bg); border-radius: 16px;
+      padding: 40px 48px; max-width: 400px;
+      box-shadow: 0 8px 40px rgba(0,0,0,0.4);
+      animation: popIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+    }
+    .thankyou-box .emoji { font-size: 3.5em; margin-bottom: 12px; }
+    .thankyou-box h2 { margin: 0 0 8px 0; font-size: 1.5em; color: var(--text); }
+    .thankyou-box p { margin: 0 0 20px 0; color: var(--text-muted); font-size: 0.95em; }
+    .thankyou-close {
+      background: #8f2121; color: #fff; border: none; border-radius: 8px;
+      padding: 10px 28px; font-size: 0.95em; cursor: pointer;
+      font-family: 'Lexend', sans-serif;
+    }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+    /* ── Confetti canvas ──────────────────────────────────────────────────── */
+    #confetti-canvas {
+      position: fixed; inset: 0; pointer-events: none; z-index: 999;
+    }
+
+    /* ── Footer ───────────────────────────────────────────────────────────── */
+    .reset-area { margin-top: 30px; margin-bottom: 10px; text-align: center; }
+    .footer { margin-top: 16px; text-align: center; font-size: 0.9em; color: var(--text-muted); }
+    .footer-img { max-width: 200px; margin: 12px auto 15px auto; display: block; }
+
+    /* ── Mobile ───────────────────────────────────────────────────────────── */
+    @media (max-width: 600px) {
+      body { margin: 12px; }
+      .item-card, .skeleton-card { width: 100%; }
+      .header-row h1 { font-size: 1.3em; }
+      .filter-bar { gap: 8px; padding: 8px 10px; }
+      .thankyou-box { padding: 28px 24px; margin: 0 16px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Thank you overlay -->
+  <div id="thankyou-overlay">
+    <canvas id="confetti-canvas"></canvas>
+    <div class="thankyou-box">
+      <div class="emoji">🎉</div>
+      <h2>Thank You So Much!</h2>
+      <p>You're the best! Tristan is going to love it. 💛<br>Head to the product page to complete your purchase.</p>
+      <button class="thankyou-close" onclick="closeThankYou()">Sounds good!</button>
+    </div>
+  </div>
+
+  <!-- Header -->
+  <div class="header-row">
+    <h1>Tristan's Birthday List</h1>
+    <label class="dark-toggle" title="Toggle dark mode">
+      <span id="dark-label">🌙 Dark Mode</span>
+      <div class="toggle-track" onclick="toggleDark()">
+        <div class="toggle-thumb"></div>
+      </div>
+    </label>
+  </div>
+
+  <p style="font-size: 14pt; color: var(--text); font-weight: bold; margin-top: 0;">
+    Howdy! Click "View Item" to see the product, then check "I'm buying this!" to claim it. If you accidentally claim something, hit Undo on that item.
+  </p>
+  <p style="font-size: 1em; color: var(--text-muted); margin-top: -10px;">
+    If you notice any problems, please let me know via
+    <a href="https://forms.gle/YYmsCVazj6CR6v529" target="_blank">this link</a>.
+    For all reported issues go to
+    <a href="https://github.com/MaybeTristan/christmas-list-2025/issues" target="_blank">this link</a>.
+  </p>
+
+  <!-- Filter bar -->
+  <div class="filter-bar">
+    <label for="sortSelect">Sort:</label>
+    <select id="sortSelect">
+      <option value="default">Default</option>
+      <option value="price-asc">Price: Low → High</option>
+      <option value="price-desc">Price: High → Low</option>
+    </select>
+    <div class="filter-sep"></div>
+    <label for="categorySelect">Category:</label>
+    <select id="categorySelect">
+      <option value="all">All</option>
+      <option value="Food">Food</option>
+      <option value="Tech">Tech</option>
+      <option value="Clothes">Clothes</option>
+    </select>
+    <div class="filter-sep"></div>
+    <label>
+      <input type="checkbox" id="unclaimedOnly"> Unclaimed only
+    </label>
+  </div>
+
+  <div class="grid-container"></div>
+
+  <img class="footer-img" src="https://photos.tristanarbet.com/Adobe%20Express%20Photo%20project-5.png" alt="Footer image" />
+
+  <div class="reset-area">
+    <button id="resetButton" class="button view-btn" style="width:auto;padding:8px 20px;">Reset All Claims</button>
+  </div>
+  <div class="footer">
+    Thank You!!! Love from Tristan ♡ Note: All clothes sizes, or other notes, should be next to the other tags on the item.
+  </div>
+
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-    import { getDatabase, ref, get, set, update, runTransaction } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
+    import { getDatabase, ref, get, set, update, onValue, runTransaction } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyCvQGB7YP434Ifh1ZqqxxDfYZf8TRzG1sI",
@@ -25,7 +325,7 @@
     const db = getDatabase(app);
 
     const CANOPY_API_KEY = "16e57d61-4a2e-4a84-b6b9-75790aee93f3";
-    const CACHE_TTL_MS = 6 * 24 * 60 * 60 * 1000; // 6 days (~5 refreshes/month)
+    const CACHE_TTL_MS = 6 * 24 * 60 * 60 * 1000;
 
     const items = [
       {id:"swedish_fish_bag",name:"Swedish Fish Bag",price:"$8.00",asin:"B082F2PKQ5",img:"https://m.media-amazon.com/images/I/51Jlys2Z5vL._SS135_.jpg",link:"https://www.amazon.com/dp/B082F2PKQ5",category:"Food",prime:true,note:""},
@@ -41,13 +341,79 @@
       {id:"smartwool_medium_gray_socks",name:"Smartwool Gray Socks",price:"$18.00",asin:"B0D7Y6332B",img:"https://m.media-amazon.com/images/I/811p5W6ciUL._AC_SX679_.jpg",link:"https://www.amazon.com/dp/B0D7Y6332B",category:"Clothes, Size M",prime:true,note:""},
     ];
 
-    // ── Per-device claim tracking (localStorage) ───────────────────────────
+    // ── Dark mode ──────────────────────────────────────────────────────────
+    window.toggleDark = function() {
+      const html = document.documentElement;
+      const isDark = html.getAttribute("data-theme") === "dark";
+      const next = isDark ? "light" : "dark";
+      html.setAttribute("data-theme", next);
+      try { localStorage.setItem("theme", next); } catch {}
+      document.getElementById("dark-label").textContent = next === "dark" ? "☀️ Light Mode" : "🌙 Dark Mode";
+    };
+    (function initTheme() {
+      try {
+        const saved = localStorage.getItem("theme");
+        if (saved) {
+          document.documentElement.setAttribute("data-theme", saved);
+          if (saved === "dark") document.getElementById("dark-label").textContent = "☀️ Light Mode";
+        }
+      } catch {}
+    })();
+
+    // ── Confetti ───────────────────────────────────────────────────────────
+    function launchConfetti() {
+      const canvas = document.getElementById("confetti-canvas");
+      const ctx = canvas.getContext("2d");
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+      const pieces = Array.from({length: 120}, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * -canvas.height,
+        w: Math.random() * 10 + 6,
+        h: Math.random() * 6 + 4,
+        color: ["#8f2121","#f5c842","#4caf50","#2196f3","#ff69b4","#ff9800"][Math.floor(Math.random()*6)],
+        rot: Math.random() * 360,
+        vx: (Math.random() - 0.5) * 3,
+        vy: Math.random() * 4 + 2,
+        vr: (Math.random() - 0.5) * 6,
+      }));
+      let frame;
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        let alive = false;
+        pieces.forEach(p => {
+          p.x += p.vx; p.y += p.vy; p.rot += p.vr;
+          if (p.y < canvas.height + 20) alive = true;
+          ctx.save();
+          ctx.translate(p.x, p.y);
+          ctx.rotate(p.rot * Math.PI / 180);
+          ctx.fillStyle = p.color;
+          ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
+          ctx.restore();
+        });
+        if (alive) frame = requestAnimationFrame(draw);
+        else ctx.clearRect(0, 0, canvas.width, canvas.height);
+      }
+      if (frame) cancelAnimationFrame(frame);
+      draw();
+    }
+
+    // ── Thank you overlay ──────────────────────────────────────────────────
+    window.showThankYou = function() {
+      document.getElementById("thankyou-overlay").classList.add("show");
+      launchConfetti();
+    };
+    window.closeThankYou = function() {
+      document.getElementById("thankyou-overlay").classList.remove("show");
+    };
+
+    // ── localStorage claim tracking ────────────────────────────────────────
     const MY_CLAIMS_KEY = "my_claims";
     function getMyClaims() {
       try { return JSON.parse(localStorage.getItem(MY_CLAIMS_KEY)) || {}; } catch { return {}; }
     }
-    function saveMyClaim(itemId, timestamp) {
-      const c = getMyClaims(); c[itemId] = timestamp;
+    function saveMyClaim(itemId, ts) {
+      const c = getMyClaims(); c[itemId] = ts;
       try { localStorage.setItem(MY_CLAIMS_KEY, JSON.stringify(c)); } catch {}
     }
     function removeMyClaim(itemId) {
@@ -55,75 +421,43 @@
       try { localStorage.setItem(MY_CLAIMS_KEY, JSON.stringify(c)); } catch {}
     }
     function formatTimestamp(ts) {
-      return new Date(ts).toLocaleString(undefined, {
-        month: "short", day: "numeric", year: "numeric",
-        hour: "numeric", minute: "2-digit"
-      });
+      return new Date(ts).toLocaleString(undefined, {month:"short",day:"numeric",year:"numeric",hour:"numeric",minute:"2-digit"});
     }
 
     // ── Firebase price cache ───────────────────────────────────────────────
-    // Prices stored in Firebase under prices/<asin>/{ price, cachedAt }
-    // Refreshes every ~6 days (~5 API calls/month per item).
-    // If API fails, falls back to last known price from Firebase.
-    // Returns { price, cachedAt, stale } or null if no data at all.
     async function fetchLivePrice(asin) {
       const priceRef = ref(db, 'prices/' + asin);
-      let cachedPrice = null;
-      let cachedAt = null;
+      let cachedPrice = null, cachedAt = null, cachedStock = null;
 
-      // 1. Read Firebase cache
-      let cachedStock = null;
       try {
         const snapshot = await get(priceRef);
         if (snapshot.exists()) {
           const val = snapshot.val();
-          cachedPrice = val.price;
-          cachedAt = val.cachedAt;
-          cachedStock = val.isInStock ?? null;
+          cachedPrice = val.price; cachedAt = val.cachedAt; cachedStock = val.isInStock ?? null;
           if (Date.now() - cachedAt < CACHE_TTL_MS) {
-            // Still fresh — if price is null, we already know it's unavailable
             if (cachedPrice === null) return null;
             return { price: cachedPrice, cachedAt, stale: false, isInStock: cachedStock };
           }
         }
-      } catch (e) {
-        console.warn("Firebase cache read failed for", asin, e);
-      }
+      } catch (e) { console.warn("Firebase cache read failed", asin, e); }
 
-      // 2. Cache expired or missing — try Canopy API
       try {
-        const res = await fetch(
-          `https://rest.canopyapi.co/api/amazon/product?asin=${asin}`,
-          { headers: { "API-KEY": CANOPY_API_KEY } }
-        );
+        const res = await fetch(`https://rest.canopyapi.co/api/amazon/product?asin=${asin}`, { headers: { "API-KEY": CANOPY_API_KEY } });
         const data = await res.json();
         const priceValue = data?.data?.amazonProduct?.price?.display ?? null;
-
         const isInStock = data?.data?.amazonProduct?.isInStock ?? null;
-
         if (priceValue !== null) {
           const price = String(priceValue);
           const now = Date.now();
-          // Save fresh price + stock status to Firebase
-          try {
-            await set(priceRef, { price, cachedAt: now, isInStock });
-          } catch (e) { console.warn("Firebase cache write failed", e); }
+          try { await set(priceRef, { price, cachedAt: now, isInStock }); } catch {}
           return { price, cachedAt: now, stale: false, isInStock };
         }
-      } catch (e) {
-        console.warn("Canopy price fetch failed for", asin, e);
-      }
+      } catch (e) { console.warn("Canopy fetch failed", asin, e); }
 
-      // 3. API returned no price — save a null marker to Firebase so we
-      //    don't retry on every visit (waits 6 days before trying again)
       if (cachedPrice === null) {
-        try {
-          await set(priceRef, { price: null, cachedAt: Date.now(), isInStock: null });
-        } catch (e) { /* ignore */ }
+        try { await set(priceRef, { price: null, cachedAt: Date.now(), isInStock: null }); } catch {}
         return null;
       }
-
-      // 4. API failed but we have an old price — return it as stale
       return { price: cachedPrice, cachedAt, stale: true, isInStock: cachedStock ?? null };
     }
 
@@ -133,23 +467,17 @@
         const el = document.getElementById("price_" + item.id);
         const tsEl = document.getElementById("price_ts_" + item.id);
         if (!el) return;
-
         if (result && result.price) {
           const { price, cachedAt, stale, isInStock } = result;
           el.textContent = price;
           el.classList.remove("price-loading");
           el.title = stale ? "Last known price (API unavailable)" : "Live price from Amazon";
           if (stale) el.classList.add("price-stale");
-          // Only show green dot if we actually have a real price
           if (price) el.setAttribute("data-has-price", "true");
-
-          // Show last updated timestamp
           if (tsEl && cachedAt) {
             tsEl.textContent = (stale ? "⚠️ Last known: " : "Updated: ") + formatTimestamp(cachedAt);
             tsEl.style.display = "block";
           }
-
-          // Show sold out badge if we know it's out of stock
           if (isInStock === false) {
             const soldOut = document.getElementById("soldout_" + item.id);
             if (soldOut) soldOut.style.display = "inline-block";
@@ -158,10 +486,7 @@
           el.textContent = "Live Price Unavailable";
           el.classList.remove("price-loading");
           el.classList.add("price-unavailable");
-          if (tsEl) {
-            tsEl.textContent = "Click View Item for Live Price";
-            tsEl.style.display = "block";
-          }
+          if (tsEl) { tsEl.textContent = "Click View Item for Live Price"; tsEl.style.display = "block"; }
         }
       }));
     }
@@ -177,11 +502,9 @@
         });
         if (result.committed) {
           saveMyClaim(itemId, now);
-          alert("Item claimed! Head to the product link to purchase it.");
-          renderItems();
+          showThankYou();
         } else {
           alert("This item has already been claimed by someone else!");
-          renderItems();
         }
       } catch (error) {
         alert("Something went wrong. Please try again.");
@@ -193,7 +516,6 @@
       if (!confirm("Are you sure you want to un-claim this item?")) return;
       await set(ref(db, 'items/' + itemId), { claimed: false, claimedAt: null });
       removeMyClaim(itemId);
-      renderItems();
     };
 
     // ── Card builder ───────────────────────────────────────────────────────
@@ -206,35 +528,31 @@
 
       const div = document.createElement("div");
       div.className = "item-card" + (claimed ? " claimed" : "");
+      div.dataset.category = item.category;
+      div.dataset.claimed = claimed ? "true" : "false";
+      div.dataset.price = item.price.replace(/[^0-9.]/g, "");
 
-      // Tag bar
       const tagBar = document.createElement("div");
       tagBar.className = "tag-bar";
       const catTag = document.createElement("div");
-      catTag.className = "category-tag";
-      catTag.textContent = item.category;
+      catTag.className = "category-tag"; catTag.textContent = item.category;
       tagBar.appendChild(catTag);
       if (item.prime) {
-        const primeTag = document.createElement("div");
-        primeTag.className = "prime-tag";
-        primeTag.textContent = "Prime ✓";
-        tagBar.appendChild(primeTag);
+        const pt = document.createElement("div");
+        pt.className = "prime-tag"; pt.textContent = "Prime ✓";
+        tagBar.appendChild(pt);
       }
       if (item.note) {
-        const noteTag = document.createElement("div");
-        noteTag.className = "note-tag";
-        noteTag.textContent = item.note;
-        tagBar.appendChild(noteTag);
+        const nt = document.createElement("div");
+        nt.className = "note-tag"; nt.textContent = item.note;
+        tagBar.appendChild(nt);
       }
       div.appendChild(tagBar);
 
-      // Image
       const img = document.createElement("img");
-      img.src = item.img;
-      img.alt = item.name;
+      img.src = item.img; img.alt = item.name;
       div.appendChild(img);
 
-      // Info
       const info = document.createElement("div");
       info.className = "item-info";
 
@@ -249,7 +567,6 @@
       price.title = item.asin ? "Fetching live price…" : "";
       info.appendChild(price);
 
-      // Timestamp shown after price loads
       if (item.asin) {
         const priceTs = document.createElement("span");
         priceTs.className = "price-timestamp";
@@ -257,7 +574,6 @@
         priceTs.style.display = "none";
         info.appendChild(priceTs);
 
-        // Sold out badge — hidden until confirmed out of stock
         const soldOut = document.createElement("span");
         soldOut.className = "sold-out-badge";
         soldOut.id = "soldout_" + item.id;
@@ -266,49 +582,38 @@
         info.appendChild(soldOut);
       }
 
-      // View Item — warns if already claimed
       if (item.link) {
         const viewBtn = document.createElement("a");
-        viewBtn.href = item.link;
-        viewBtn.target = "_blank";
-        viewBtn.className = "button view-btn";
-        viewBtn.textContent = "View Item";
+        viewBtn.href = item.link; viewBtn.target = "_blank";
+        viewBtn.className = "button view-btn"; viewBtn.textContent = "View Item";
         if (claimed) {
           viewBtn.addEventListener("click", (e) => {
-            const go = confirm("⚠️ This item has already been claimed!\n\nAre you sure you want to view/buy it anyway?");
-            if (!go) e.preventDefault();
+            if (!confirm("⚠️ This item has already been claimed!\n\nAre you sure you want to view/buy it anyway?")) e.preventDefault();
           });
         }
         info.appendChild(viewBtn);
       }
 
-      // Claim row
       const claimRow = document.createElement("div");
       claimRow.className = "claim-row";
 
       if (!claimed) {
         const checkbox = document.createElement("input");
-        checkbox.type = "checkbox";
-        checkbox.id = "claim_" + item.id;
+        checkbox.type = "checkbox"; checkbox.id = "claim_" + item.id;
         checkbox.className = "claim-checkbox";
-        checkbox.addEventListener("change", function() {
-          if (this.checked) claimItem(item.id);
-        });
+        checkbox.addEventListener("change", function() { if (this.checked) claimItem(item.id); });
         const label = document.createElement("label");
         label.htmlFor = "claim_" + item.id;
-        label.className = "claim-label";
-        label.textContent = "I'm buying this!";
+        label.className = "claim-label"; label.textContent = "I'm buying this!";
         claimRow.appendChild(checkbox);
         claimRow.appendChild(label);
       } else {
         const claimInfo = document.createElement("div");
         claimInfo.className = "claim-info";
-
         const badge = document.createElement("span");
         badge.className = "claimed-badge" + (iClaimedThis ? " claimed-by-me" : "");
         badge.textContent = iClaimedThis ? "✓ You claimed this!" : "✓ Claimed";
         claimInfo.appendChild(badge);
-
         const ts = myClaimedAt || claimedAt;
         if (ts) {
           const tsEl = document.createElement("span");
@@ -316,12 +621,9 @@
           tsEl.textContent = "🕐 " + formatTimestamp(ts);
           claimInfo.appendChild(tsEl);
         }
-
         claimRow.appendChild(claimInfo);
-
         const undoBtn = document.createElement("button");
-        undoBtn.className = "unclaim-btn";
-        undoBtn.textContent = "Undo";
+        undoBtn.className = "unclaim-btn"; undoBtn.textContent = "Undo";
         undoBtn.onclick = () => unclaimItem(item.id);
         claimRow.appendChild(undoBtn);
       }
@@ -331,20 +633,83 @@
       return div;
     }
 
-    // ── Render ─────────────────────────────────────────────────────────────
-    async function renderItems() {
+    function createSkeletonCard() {
+      const div = document.createElement("div");
+      div.className = "skeleton-card";
+      div.innerHTML = `
+        <div class="skeleton-img"></div>
+        <div class="skeleton-body">
+          <div class="skeleton-line" style="width:70%"></div>
+          <div class="skeleton-line short"></div>
+          <div class="skeleton-line btn"></div>
+        </div>`;
+      return div;
+    }
+
+    // ── Filter / sort helpers ──────────────────────────────────────────────
+    function applyFilters() {
+      const sort = document.getElementById("sortSelect").value;
+      const category = document.getElementById("categorySelect").value;
+      const unclaimedOnly = document.getElementById("unclaimedOnly").checked;
+      const container = document.querySelector(".grid-container");
+      let cards = Array.from(container.querySelectorAll(".item-card"));
+
+      cards.forEach(c => {
+        const cat = c.dataset.category || "";
+        const isClaimed = c.dataset.claimed === "true";
+        const catMatch = category === "all" || cat.startsWith(category);
+        const claimMatch = !unclaimedOnly || !isClaimed;
+        c.style.display = (catMatch && claimMatch) ? "" : "none";
+      });
+
+      const visible = cards.filter(c => c.style.display !== "none");
+      visible.sort((a, b) => {
+        if (sort === "price-asc") return parseFloat(a.dataset.price) - parseFloat(b.dataset.price);
+        if (sort === "price-desc") return parseFloat(b.dataset.price) - parseFloat(a.dataset.price);
+        return 0;
+      });
+      visible.forEach(c => container.appendChild(c));
+    }
+
+    // ── Real-time render using onValue ─────────────────────────────────────
+    let pricesLoaded = false;
+
+    function renderItemsFromSnapshot(snapshot) {
       const container = document.querySelector(".grid-container");
       container.innerHTML = "";
       for (const item of items) {
-        const snapshot = await get(ref(db, 'items/' + item.id));
-        const claimData = snapshot.exists() ? snapshot.val() : { claimed: false };
+        const claimData = snapshot[item.id] || { claimed: false };
         container.appendChild(createItemCard(item, claimData));
+      }
+      applyFilters();
+      if (!pricesLoaded) {
+        pricesLoaded = true;
+        loadLivePrices();
       }
     }
 
-    window.addEventListener("DOMContentLoaded", () => {
-      renderItems().then(() => loadLivePrices());
+    function showSkeletons() {
+      const container = document.querySelector(".grid-container");
+      container.innerHTML = "";
+      for (let i = 0; i < 6; i++) container.appendChild(createSkeletonCard());
+    }
 
+    window.addEventListener("DOMContentLoaded", () => {
+      showSkeletons();
+
+      // Real-time listener — auto-updates when any item is claimed
+      const itemsRef = ref(db, 'items');
+      onValue(itemsRef, (snapshot) => {
+        const data = snapshot.val() || {};
+        renderItemsFromSnapshot(data);
+      });
+
+      // Filter/sort listeners
+      ["sortSelect","categorySelect","unclaimedOnly"].forEach(id => {
+        document.getElementById(id).addEventListener("change", applyFilters);
+      });
+
+      // Reset all
       document.getElementById("resetButton").addEventListener("click", async () => {
         const pin = prompt("Enter 4-digit admin PIN to reset all items:");
         if (pin !== "3323") return alert("Incorrect PIN / No PIN entered.");
@@ -356,151 +721,8 @@
         await update(ref(db), updates);
         try { localStorage.removeItem(MY_CLAIMS_KEY); } catch {}
         alert("All items have been reset!");
-        renderItems();
       });
     });
   </script>
-
-  <style>
-    body { font-family: 'Lexend', sans-serif; margin: 20px; background: #f0f0f0; }
-    .grid-container { display: flex; flex-wrap: wrap; gap: 20px; justify-content: flex-start; }
-
-    .item-card {
-      width: calc(50% - 20px);
-      border: 1px solid #ddd;
-      border-radius: 8px;
-      overflow: hidden;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      display: flex;
-      flex-direction: column;
-      background: #fff;
-      transition: opacity 0.2s;
-    }
-    .item-card.claimed { background: #ddd; opacity: 0.85; }
-    .item-card img { width: 100%; height: 200px; object-fit: contain; background: #f9f9f9; }
-
-    .tag-bar { display: flex; gap: 5px; padding: 5px 10px; flex-wrap: wrap; }
-    .category-tag, .prime-tag, .note-tag { background-color: #b0b0b0; padding: 2px 6px; border-radius: 4px; font-size: 0.8em; color: #333; }
-    .prime-tag { background-color: #d1f0d1; }
-    .note-tag { background-color: #fff4c2; }
-
-    .item-info { padding: 10px; display: flex; flex-direction: column; flex-grow: 1; gap: 6px; }
-    .item-info h3 { margin: 0 0 2px 0; font-size: 1em; }
-
-    .price { margin: 0; font-weight: bold; }
-    .price-stale { color: #b07800; }
-    .price-unavailable { color: #aaa; font-style: italic; font-weight: normal; font-size: 0.9em; }
-    .sold-out-badge {
-      display: inline-block;
-      background-color: #fde8e8;
-      color: #9b1c1c;
-      font-size: 0.78em;
-      font-weight: normal;
-      padding: 2px 6px;
-      border-radius: 4px;
-    }
-    .price-timestamp {
-      font-size: 0.72em;
-      color: #999;
-      font-style: italic;
-      margin-top: -2px;
-    }
-    .price-loading { color: #aaa; font-style: italic; font-weight: normal; }
-    .price-unavailable-tag {
-      display: inline-block;
-      background-color: #fff4c2;
-      color: #7a6000;
-      font-size: 0.78em;
-      font-weight: normal;
-      font-style: italic;
-      padding: 2px 6px;
-      border-radius: 4px;
-    }
-    .price[data-has-price="true"]:not(.price-loading)::after {
-      content: " 🟢";
-      font-size: 0.7em;
-      vertical-align: middle;
-    }
-
-    .button.view-btn {
-      background-color: #8f2121;
-      color: #fff;
-      text-align: center;
-      padding: 8px;
-      border-radius: 5px;
-      text-decoration: none;
-      font-size: 0.9em;
-      cursor: pointer;
-      display: block;
-    }
-
-    .claim-row {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      border-top: 1px solid #e0e0e0;
-      padding-top: 8px;
-      margin-top: auto;
-    }
-    .claim-checkbox {
-      width: 18px;
-      height: 18px;
-      accent-color: #8f2121;
-      cursor: pointer;
-      flex-shrink: 0;
-    }
-    .claim-label {
-      font-size: 0.9em;
-      color: #444;
-      cursor: pointer;
-      user-select: none;
-    }
-    .claim-info { display: flex; flex-direction: column; gap: 2px; }
-    .claimed-badge { font-size: 0.9em; font-weight: bold; color: #3a7a3a; }
-    .claimed-badge.claimed-by-me { color: #8f2121; }
-    .claim-timestamp { font-size: 0.75em; color: #777; font-style: italic; }
-    .unclaim-btn {
-      background: none;
-      border: 1px solid #aaa;
-      border-radius: 4px;
-      padding: 2px 8px;
-      font-size: 0.78em;
-      color: #666;
-      cursor: pointer;
-      margin-left: auto;
-      flex-shrink: 0;
-    }
-    .unclaim-btn:hover { background: #eee; }
-
-    .reset-area { margin-top: 30px; margin-bottom: 10px; text-align: center; }
-    .footer { margin-top: 16px; text-align: center; font-size: 0.9em; color: #555; }
-    .footer-img { max-width: 200px; margin: 12px auto 15px auto; display: block; }
-  </style>
-</head>
-<body>
-  <h1>Tristan's Birthday List</h1>
-
-  <p style="font-size: 14pt; color: #000; font-weight: bold; margin-top: 0;">
-    Howdy! Click "View Item" to see the product, then check "I'm buying this!" to claim it. If you accidentally claim something, hit Undo on that item.
-  </p>
-
-  <p style="font-size: 1em; color: #555; margin-top: -10px;">
-    If you notice any problems, please let me know via
-    <a href="https://forms.gle/YYmsCVazj6CR6v529" target="_blank">this link</a>.
-    For all reported issues and their statuses go to
-    <a href="https://github.com/MaybeTristan/christmas-list-2025/issues" target="_blank">this link</a>.
-  </p>
-
-  <div class="grid-container"></div>
-
-  <img class="footer-img" src="https://photos.tristanarbet.com/Adobe%20Express%20Photo%20project-5.png" alt="Footer image" />
-
-  <div class="reset-area">
-    <button id="resetButton" class="button view-btn" style="width:auto;padding:8px 20px;">Reset All Claims</button>
-  </div>
-
-  <div class="footer">
-    Thank You!!! Love from Tristan ♡ Note: All clothes sizes, or other notes, should be next to the other tags on the item.
-  </div>
 </body>
 </html>
