@@ -155,12 +155,13 @@
             if (soldOut) soldOut.style.display = "inline-block";
           }
         } else {
-          el.textContent = "";
+          el.textContent = "Live Price Unavailable";
           el.classList.remove("price-loading");
-          const tag = document.createElement("span");
-          tag.className = "price-unavailable-tag";
-          tag.textContent = "Live Price Not Available — Click \"View Item\" to see directly.";
-          el.appendChild(tag);
+          el.classList.add("price-unavailable");
+          if (tsEl) {
+            tsEl.textContent = "Click View Item for Live Price";
+            tsEl.style.display = "block";
+          }
         }
       }));
     }
@@ -388,6 +389,7 @@
 
     .price { margin: 0; font-weight: bold; }
     .price-stale { color: #b07800; }
+    .price-unavailable { color: #aaa; font-style: italic; font-weight: normal; font-size: 0.9em; }
     .sold-out-badge {
       display: inline-block;
       background-color: #fde8e8;
