@@ -670,10 +670,7 @@
               <span class="quick-info-item-label">🎁 Items Claimed</span>
               <span class="quick-info-item-value" id="quickInfoClaimed">Loading…</span>
             </div>
-            <div class="quick-info-item">
-              <span class="quick-info-item-label">❓ Need Help?</span>
-              <button class="quick-info-need-help" id="quickInfoHelpBtn">Report a problem →</button>
-            </div>
+
             <div class="quick-info-item" style="flex-basis:100%;">
               <span class="quick-info-item-label">ℹ️ How It Works</span>
               <span class="quick-info-item-value" style="font-size:0.82em;font-weight:normal;color:var(--text-muted);">Click "View Item" to see the product, then check "I'm buying this!" to claim it. Hit Undo if you accidentally claim something.</span>
@@ -1609,11 +1606,7 @@
         strip.classList.toggle("open");
       });
 
-      // Quick info help button scrolls to gift cards section
-      const helpBtn = document.getElementById("quickInfoHelpBtn");
-      if (helpBtn) helpBtn.addEventListener("click", () => {
-        document.querySelector(".giftcard-section")?.scrollIntoView({ behavior: "smooth", block: "start" });
-      });
+
 
       // Set last updated in quick info
       const updatedEl = document.getElementById("quickInfoUpdated");
