@@ -480,43 +480,6 @@
     </div>
   </div>
 
-  <!-- Quick Info Strip -->
-  <div class="quick-info-strip" id="quickInfoStrip">
-    <div class="quick-info-header" id="quickInfoHeader">
-      <span class="quick-info-title">🎂 Quick Info!</span>
-      <div class="quick-info-pills">
-        <span class="quick-info-pill">🎂 Birthday: June 17th</span>
-        <span class="quick-info-pill-sep">·</span>
-        <span class="quick-info-pill" id="lastUpdatedPill"><span class="quick-info-pill-dot"></span> Last updated March 13, 2026</span>
-        <span class="quick-info-pill-sep">·</span>
-        <span class="quick-info-pill" id="claimedCountPill">Loading…</span>
-      </div>
-      <span class="quick-info-arrow">▾</span>
-    </div>
-    <div class="quick-info-body">
-      <div class="quick-info-body-inner">
-        <div class="quick-info-body-content">
-          <div class="quick-info-item">
-            <span class="quick-info-item-label">🎂 Birthday</span>
-            <span class="quick-info-item-value">June 17th</span>
-          </div>
-          <div class="quick-info-item">
-            <span class="quick-info-item-label">📅 Last Updated</span>
-            <span class="quick-info-item-value" id="quickInfoUpdated">March 13, 2026</span>
-          </div>
-          <div class="quick-info-item">
-            <span class="quick-info-item-label">🎁 Items Claimed</span>
-            <span class="quick-info-item-value" id="quickInfoClaimed">Loading…</span>
-          </div>
-          <div class="quick-info-item">
-            <span class="quick-info-item-label">❓ Need Help?</span>
-            <button class="quick-info-need-help" id="quickInfoHelpBtn">Report a problem →</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
   <!-- Banner -->
   <div class="banner-wrapper">
     <div class="banner">
@@ -545,30 +508,54 @@
       </div>
     </div>
 
-    <!-- Howdy text -->
-    <p class="howdy">Howdy! Click "View Item" to see the product, then check "I'm buying this!" to claim it. If you accidentally claim something, hit Undo on that item.</p>
 
-    <!-- Help dropdown -->
-    <div class="help-dropdown-wrapper" id="helpWrapper">
-      <button class="help-toggle" id="helpToggleBtn">
-        ❓ Need help or found a problem?
-        <i class="help-toggle-arrow">▾</i>
-      </button>
-      <div class="help-panel" id="helpPanel">
-        <div class="help-panel-inner">
-          <div class="help-panel-content">
-            <p>Found a bug or have feedback? Let Tristan know — or check the issue tracker for known problems.</p>
-            <a href="https://forms.gle/YYmsCVazj6CR6v529" target="_blank" class="help-link-btn">
-              📝 Report a Problem
-            </a>
-            <a href="https://github.com/MaybeTristan/christmas-list-2025/issues" target="_blank" class="help-link-btn">
-              🐛 View Known Issues
-            </a>
+    <!-- Quick Info Strip -->
+    <div class="quick-info-strip" id="quickInfoStrip" style="margin: 14px 0 16px 0;">
+      <div class="quick-info-header" id="quickInfoHeader">
+        <span class="quick-info-title">🎂 Quick Info!</span>
+        <div class="quick-info-pills">
+          <span class="quick-info-pill">🎂 Birthday: June 17th</span>
+          <span class="quick-info-pill-sep">·</span>
+          <span class="quick-info-pill" id="lastUpdatedPill"><span class="quick-info-pill-dot"></span> Last updated March 13, 2026</span>
+          <span class="quick-info-pill-sep">·</span>
+          <span class="quick-info-pill" id="claimedCountPill">Loading…</span>
+        </div>
+        <span class="quick-info-arrow">▾</span>
+      </div>
+      <div class="quick-info-body">
+        <div class="quick-info-body-inner">
+          <div class="quick-info-body-content">
+            <div class="quick-info-item">
+              <span class="quick-info-item-label">🎂 Birthday</span>
+              <span class="quick-info-item-value">June 17th</span>
+            </div>
+            <div class="quick-info-item">
+              <span class="quick-info-item-label">📅 Last Updated</span>
+              <span class="quick-info-item-value" id="quickInfoUpdated">March 13, 2026</span>
+            </div>
+            <div class="quick-info-item">
+              <span class="quick-info-item-label">🎁 Items Claimed</span>
+              <span class="quick-info-item-value" id="quickInfoClaimed">Loading…</span>
+            </div>
+            <div class="quick-info-item">
+              <span class="quick-info-item-label">❓ Need Help?</span>
+              <button class="quick-info-need-help" id="quickInfoHelpBtn">Report a problem →</button>
+            </div>
+            <div class="quick-info-item" style="flex-basis:100%;">
+              <span class="quick-info-item-label">ℹ️ How It Works</span>
+              <span class="quick-info-item-value" style="font-size:0.82em;font-weight:normal;color:var(--text-muted);">Click "View Item" to see the product, then check "I'm buying this!" to claim it. Hit Undo if you accidentally claim something.</span>
+            </div>
+            <div class="quick-info-item" style="flex-basis:100%;">
+              <span class="quick-info-item-label">❓ Need Help?</span>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:2px;">
+                <a href="https://forms.gle/YYmsCVazj6CR6v529" target="_blank" class="help-link-btn" style="font-size:0.78em;">📝 Report a Problem</a>
+                <a href="https://github.com/MaybeTristan/christmas-list-2025/issues" target="_blank" class="help-link-btn" style="font-size:0.78em;">🐛 View Known Issues</a>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
-
 
     <!-- Filter bar -->
     <div class="filter-bar">
@@ -1220,10 +1207,10 @@
         strip.classList.toggle("open");
       });
 
-      // Quick info help button opens help panel
-      document.getElementById("quickInfoHelpBtn").addEventListener("click", () => {
-        document.getElementById("helpWrapper").classList.add("open");
-        document.getElementById("helpWrapper").scrollIntoView({ behavior: "smooth", block: "center" });
+      // Quick info help button scrolls to gift cards section
+      const helpBtn = document.getElementById("quickInfoHelpBtn");
+      if (helpBtn) helpBtn.addEventListener("click", () => {
+        document.querySelector(".giftcard-section")?.scrollIntoView({ behavior: "smooth", block: "start" });
       });
 
       // Set last updated in quick info
@@ -1245,9 +1232,7 @@
         renderItemsFromSnapshot(data);
       });
 
-      document.getElementById("helpToggleBtn").addEventListener("click", () => {
-        document.getElementById("helpWrapper").classList.toggle("open");
-      });
+
       ["sortSelect","categorySelect","unclaimedOnly"].forEach(id => { document.getElementById(id).addEventListener("change", applyFilters); });
 
       document.getElementById("resetButton").addEventListener("click", async () => {
