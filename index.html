@@ -530,25 +530,19 @@
     <!-- Header row -->
     <div class="header-row">
       <h1>Tristan's Birthday List</h1>
-      <label class="dark-toggle" title="Toggle dark mode">
-        <span id="dark-label">🌙 Dark Mode</span>
-        <div class="toggle-track" onclick="toggleDark()"><div class="toggle-thumb"></div></div>
-      </label>
-    </div>
-
-    <!-- Last updated + share -->
-    <div class="meta-row">
-      <div class="last-updated">
-        <span class="last-updated-dot"></span>
-        <span>Last updated March 13, 2026</span>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <button class="share-btn" id="shareListBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+          </svg>
+          Share List
+        </button>
+        <label class="dark-toggle" title="Toggle dark mode">
+          <span id="dark-label">🌙 Dark Mode</span>
+          <div class="toggle-track" onclick="toggleDark()"><div class="toggle-thumb"></div></div>
+        </label>
       </div>
-      <button class="share-btn" id="shareListBtn">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
-          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
-        </svg>
-        Share List
-      </button>
     </div>
 
     <!-- Howdy text -->
@@ -574,6 +568,7 @@
         </div>
       </div>
     </div>
+
 
     <!-- Filter bar -->
     <div class="filter-bar">
@@ -720,14 +715,28 @@
 
     // ── Share list button ──────────────────────────────────────────────────
     document.getElementById("shareListBtn").addEventListener("click", async () => {
-      const shareText = "Tristan has this on his list! 🎁 " + window.location.href;
+      const url = window.location.href;
+      const title = "This is Tristan's Birthday List! 🎁";
       const btn = document.getElementById("shareListBtn");
+      const shareSVG = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> Share List`;
+
+      // Use native Web Share API on mobile (iOS share sheet, Android share menu)
+      if (navigator.share) {
+        try {
+          await navigator.share({ title, text: title, url });
+          return; // native share handled it, no need for clipboard fallback
+        } catch (e) {
+          if (e.name === 'AbortError') return; // user cancelled, do nothing
+        }
+      }
+
+      // Desktop fallback — copy to clipboard
       try {
-        await navigator.clipboard.writeText(shareText);
+        await navigator.clipboard.writeText(title + "\n" + url);
         btn.textContent = "✓ Copied!";
         btn.classList.add("copied");
-        setTimeout(() => { btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> Share List`; btn.classList.remove("copied"); }, 2000);
-      } catch { /* fallback for older browsers */ }
+        setTimeout(() => { btn.innerHTML = shareSVG; btn.classList.remove("copied"); }, 2000);
+      } catch {}
     });
 
     // ── Set last updated date ──────────────────────────────────────────────
@@ -1201,9 +1210,16 @@
 
     window.addEventListener("DOMContentLoaded", () => {
       showSkeletons();
-      // Quick info strip toggle
+      // Quick info strip — starts open, auto-closes after 5s
+      const strip = document.getElementById("quickInfoStrip");
+      strip.classList.add("open");
+      let autoCloseTimer = setTimeout(() => {
+        strip.classList.remove("open");
+      }, 5000);
+      // If user interacts (clicks to close or re-open), cancel auto-close
       document.getElementById("quickInfoHeader").addEventListener("click", () => {
-        document.getElementById("quickInfoStrip").classList.toggle("open");
+        clearTimeout(autoCloseTimer);
+        strip.classList.toggle("open");
       });
 
       // Quick info help button opens help panel
