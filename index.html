@@ -134,7 +134,7 @@
         const tsEl = document.getElementById("price_ts_" + item.id);
         if (!el) return;
 
-        if (result) {
+        if (result && result.price) {
           const { price, cachedAt, stale, isInStock } = result;
           el.textContent = price;
           el.classList.remove("price-loading");
