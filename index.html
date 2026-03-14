@@ -72,14 +72,18 @@
       let cachedAt = null;
 
       // 1. Read Firebase cache
+      let cachedStock = null;
       try {
         const snapshot = await get(priceRef);
         if (snapshot.exists()) {
-          ({ price: cachedPrice, cachedAt } = snapshot.val());
+          const val = snapshot.val();
+          cachedPrice = val.price;
+          cachedAt = val.cachedAt;
+          cachedStock = val.isInStock ?? null;
           if (Date.now() - cachedAt < CACHE_TTL_MS) {
             // Still fresh — if price is null, we already know it's unavailable
             if (cachedPrice === null) return null;
-            return { price: cachedPrice, cachedAt, stale: false };
+            return { price: cachedPrice, cachedAt, stale: false, isInStock: cachedStock };
           }
         }
       } catch (e) {
@@ -95,14 +99,16 @@
         const data = await res.json();
         const priceValue = data?.data?.amazonProduct?.price?.display ?? null;
 
+        const isInStock = data?.data?.amazonProduct?.isInStock ?? null;
+
         if (priceValue !== null) {
           const price = String(priceValue);
           const now = Date.now();
-          // Save fresh price to Firebase
+          // Save fresh price + stock status to Firebase
           try {
-            await set(priceRef, { price, cachedAt: now });
+            await set(priceRef, { price, cachedAt: now, isInStock });
           } catch (e) { console.warn("Firebase cache write failed", e); }
-          return { price, cachedAt: now, stale: false };
+          return { price, cachedAt: now, stale: false, isInStock };
         }
       } catch (e) {
         console.warn("Canopy price fetch failed for", asin, e);
@@ -112,13 +118,14 @@
       //    don't retry on every visit (waits 6 days before trying again)
       if (cachedPrice === null) {
         try {
-          await set(priceRef, { price: null, cachedAt: Date.now() });
+          await set(priceRef, { price: null, cachedAt: Date.now(), isInStock: null });
         } catch (e) { /* ignore */ }
         return null;
       }
 
       // 4. API failed but we have an old price — return it as stale
-      return { price: cachedPrice, cachedAt, stale: true };
+      const cachedStock = (() => { try { return JSON.parse(localStorage.getItem('stock_' + asin)); } catch { return null; } })();
+      return { price: cachedPrice, cachedAt, stale: true, isInStock: cachedStock ?? null };
     }
 
     async function loadLivePrices() {
@@ -129,16 +136,24 @@
         if (!el) return;
 
         if (result) {
-          const { price, cachedAt, stale } = result;
+          const { price, cachedAt, stale, isInStock } = result;
           el.textContent = price;
           el.classList.remove("price-loading");
           el.title = stale ? "Last known price (API unavailable)" : "Live price from Amazon";
           if (stale) el.classList.add("price-stale");
+          // Only show green dot if we actually have a real price
+          if (price) el.setAttribute("data-has-price", "true");
 
           // Show last updated timestamp
           if (tsEl && cachedAt) {
             tsEl.textContent = (stale ? "⚠️ Last known: " : "Updated: ") + formatTimestamp(cachedAt);
             tsEl.style.display = "block";
+          }
+
+          // Show sold out badge if we know it's out of stock
+          if (isInStock === false) {
+            const soldOut = document.getElementById("soldout_" + item.id);
+            if (soldOut) soldOut.style.display = "inline-block";
           }
         } else {
           el.textContent = "";
@@ -241,6 +256,14 @@
         priceTs.id = "price_ts_" + item.id;
         priceTs.style.display = "none";
         info.appendChild(priceTs);
+
+        // Sold out badge — hidden until confirmed out of stock
+        const soldOut = document.createElement("span");
+        soldOut.className = "sold-out-badge";
+        soldOut.id = "soldout_" + item.id;
+        soldOut.textContent = "⚠️ Currently Out of Stock";
+        soldOut.style.display = "none";
+        info.appendChild(soldOut);
       }
 
       // View Item — warns if already claimed
@@ -366,6 +389,15 @@
 
     .price { margin: 0; font-weight: bold; }
     .price-stale { color: #b07800; }
+    .sold-out-badge {
+      display: inline-block;
+      background-color: #fde8e8;
+      color: #9b1c1c;
+      font-size: 0.78em;
+      font-weight: normal;
+      padding: 2px 6px;
+      border-radius: 4px;
+    }
     .price-timestamp {
       font-size: 0.72em;
       color: #999;
@@ -383,7 +415,7 @@
       padding: 2px 6px;
       border-radius: 4px;
     }
-    .price:not(.price-loading)[title="Live price from Amazon"]::after {
+    .price[data-has-price="true"]:not(.price-loading)::after {
       content: " 🟢";
       font-size: 0.7em;
       vertical-align: middle;
