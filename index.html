@@ -31,6 +31,7 @@
       --skeleton-shine: #f0f0f0;
       --filter-bg: #fff;
       --filter-border: #ccc;
+      --modal-overlay: rgba(0,0,0,0.6);
     }
     [data-theme="dark"] {
       --bg: #1a1a1a;
@@ -55,37 +56,22 @@
       --skeleton-shine: #444;
       --filter-bg: #2a2a2a;
       --filter-border: #555;
+      --modal-overlay: rgba(0,0,0,0.8);
     }
 
     * { box-sizing: border-box; }
     body { font-family: 'Lexend', sans-serif; margin: 0; background: var(--bg); color: var(--text); transition: background 0.3s, color 0.3s; }
-
-    /* ── Merriweather for all headings ───────────────────────────────────── */
     h1, h2, h3, h4 { font-family: 'Merriweather', serif; }
 
-    /* ── Banner image ────────────────────────────────────────────────────── */
-    .banner {
-      width: 100%;
-      max-height: 220px;
-      overflow: hidden;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #1a1a1a;
-    }
-    .banner img {
-      width: 100%;
-      max-width: 900px;
-      height: 220px;
-      object-fit: cover;
-      object-position: center 40%;
-      display: block;
-    }
+    /* ── Banner ──────────────────────────────────────────────────────────── */
+    .banner-wrapper { padding: 20px 20px 0 20px; }
+    .banner { width: 100%; max-height: 220px; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #1a1a1a; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
+    .banner img { width: 100%; max-width: 100%; height: 220px; object-fit: cover; object-position: center 40%; display: block; border-radius: 12px; }
 
-    /* ── Page content wrapper ────────────────────────────────────────────── */
+    /* ── Page content ────────────────────────────────────────────────────── */
     .page-content { padding: 20px; }
 
-    /* ── Header row ──────────────────────────────────────────────────────── */
+    /* ── Header ──────────────────────────────────────────────────────────── */
     .header-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 8px; }
     .header-row h1 { margin: 0; font-size: 1.6em; }
 
@@ -97,35 +83,18 @@
     [data-theme="dark"] .toggle-thumb { transform: translateX(18px); }
 
     /* ── Filter bar ──────────────────────────────────────────────────────── */
-    .filter-bar {
-      display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
-      margin-bottom: 16px; padding: 10px 14px;
-      background: var(--card-bg); border-radius: 8px;
-      border: 1px solid var(--border);
-      box-shadow: 0 1px 4px rgba(0,0,0,0.06);
-    }
+    .filter-bar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 16px; padding: 10px 14px; background: var(--card-bg); border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
     .filter-group { display: flex; align-items: center; gap: 6px; flex-wrap: nowrap; }
     .filter-bar label { font-size: 0.82em; color: var(--text-muted); white-space: nowrap; }
     .filter-bar select, .filter-bar input[type=checkbox] { accent-color: #8f2121; }
-    .filter-bar select {
-      font-family: 'Lexend', sans-serif; font-size: 0.82em; padding: 4px 8px;
-      border: 1px solid var(--filter-border); border-radius: 5px;
-      background: var(--filter-bg); color: var(--text); cursor: pointer;
-    }
+    .filter-bar select { font-family: 'Lexend', sans-serif; font-size: 0.82em; padding: 4px 8px; border: 1px solid var(--filter-border); border-radius: 5px; background: var(--filter-bg); color: var(--text); cursor: pointer; }
     .filter-sep { width: 1px; height: 20px; background: var(--border); flex-shrink: 0; }
 
     /* ── Grid ────────────────────────────────────────────────────────────── */
     .grid-container { display: flex; flex-wrap: wrap; gap: 20px; justify-content: flex-start; }
 
     /* ── Item card ───────────────────────────────────────────────────────── */
-    .item-card {
-      width: calc(50% - 10px);
-      border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
-      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-      display: flex; flex-direction: column;
-      background: var(--card-bg);
-      transition: background 0.3s, opacity 0.2s, transform 0.15s;
-    }
+    .item-card { width: calc(50% - 10px); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.1); display: flex; flex-direction: column; background: var(--card-bg); transition: background 0.3s, opacity 0.2s, transform 0.15s; }
     .item-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
     .item-card.claimed { background: var(--card-claimed-bg); opacity: 0.85; }
     .item-card img { width: 100%; height: 200px; object-fit: contain; background: var(--card-img-bg); }
@@ -157,12 +126,7 @@
     .sold-out-badge { display: inline-block; background-color: #fde8e8; color: #9b1c1c; font-size: 0.78em; font-weight: normal; padding: 2px 6px; border-radius: 4px; }
 
     /* ── Buttons ─────────────────────────────────────────────────────────── */
-    .button.view-btn {
-      background-color: var(--btn-bg); color: var(--btn-text);
-      text-align: center; padding: 8px; border-radius: 5px;
-      text-decoration: none; font-size: 0.9em; cursor: pointer; display: block;
-      border: none; font-family: 'Lexend', sans-serif;
-    }
+    .button.view-btn { background-color: var(--btn-bg); color: var(--btn-text); text-align: center; padding: 8px; border-radius: 5px; text-decoration: none; font-size: 0.9em; cursor: pointer; display: block; border: none; font-family: 'Lexend', sans-serif; }
 
     /* ── Claim row ───────────────────────────────────────────────────────── */
     .claim-row { display: flex; align-items: center; gap: 8px; border-top: 1px solid var(--claim-border); padding-top: 8px; margin-top: auto; }
@@ -175,23 +139,105 @@
     .unclaim-btn { background: none; border: 1px solid var(--unclaim-border); border-radius: 4px; padding: 2px 8px; font-size: 0.78em; color: var(--unclaim-text); cursor: pointer; margin-left: auto; flex-shrink: 0; font-family: 'Lexend', sans-serif; }
     .unclaim-btn:hover { background: var(--unclaim-hover); }
 
+    /* ══════════════════════════════════════════════════════════════════════
+       CUSTOM MODAL SYSTEM
+       ══════════════════════════════════════════════════════════════════════ */
+    .modal-backdrop {
+      display: none;
+      position: fixed; inset: 0;
+      background: var(--modal-overlay);
+      z-index: 900;
+      align-items: center; justify-content: center;
+      padding: 20px;
+      backdrop-filter: blur(3px);
+      -webkit-backdrop-filter: blur(3px);
+    }
+    .modal-backdrop.open { display: flex; animation: backdropIn 0.2s ease; }
+    @keyframes backdropIn { from { opacity: 0; } to { opacity: 1; } }
+
+    .modal-box {
+      background: var(--card-bg);
+      border-radius: 16px;
+      padding: 32px 36px;
+      max-width: 400px; width: 100%;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.05);
+      animation: modalIn 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+      position: relative;
+    }
+    @keyframes modalIn { from { transform: scale(0.88) translateY(12px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
+
+    .modal-icon { font-size: 2.6em; margin-bottom: 10px; line-height: 1; }
+    .modal-title { font-family: 'Merriweather', serif; font-size: 1.2em; margin: 0 0 8px 0; color: var(--text); }
+    .modal-body { font-size: 0.92em; color: var(--text-muted); margin: 0 0 24px 0; line-height: 1.55; }
+
+    /* PIN input for admin modal */
+    .modal-pin-input {
+      width: 100%; padding: 10px 14px; font-size: 1.1em;
+      font-family: 'Lexend', sans-serif; letter-spacing: 0.3em;
+      border: 1px solid var(--border); border-radius: 8px;
+      background: var(--bg); color: var(--text);
+      margin-bottom: 20px; text-align: center;
+      transition: border-color 0.2s;
+    }
+    .modal-pin-input:focus { outline: none; border-color: #8f2121; }
+    .modal-pin-input.shake {
+      animation: shake 0.4s ease;
+      border-color: #c0392b;
+    }
+    @keyframes shake {
+      0%,100% { transform: translateX(0); }
+      20% { transform: translateX(-8px); }
+      40% { transform: translateX(8px); }
+      60% { transform: translateX(-5px); }
+      80% { transform: translateX(5px); }
+    }
+
+    .modal-buttons { display: flex; gap: 10px; justify-content: flex-end; }
+    .modal-btn {
+      font-family: 'Lexend', sans-serif; font-size: 0.88em;
+      padding: 9px 20px; border-radius: 8px; cursor: pointer;
+      border: none; transition: opacity 0.15s, transform 0.1s;
+    }
+    .modal-btn:active { transform: scale(0.97); }
+    .modal-btn.primary { background: #8f2121; color: #fff; }
+    .modal-btn.primary:hover { opacity: 0.88; }
+    .modal-btn.secondary { background: none; color: var(--text-muted); border: 1px solid var(--border); }
+    .modal-btn.secondary:hover { background: var(--unclaim-hover); }
+    .modal-btn.danger { background: #c0392b; color: #fff; }
+    .modal-btn.danger:hover { opacity: 0.88; }
+
+    /* colour accent strip at top of modal box */
+    .modal-box::before {
+      content: '';
+      display: block;
+      height: 4px;
+      border-radius: 16px 16px 0 0;
+      position: absolute; top: 0; left: 0; right: 0;
+      background: linear-gradient(90deg, #8f2121, #c0392b);
+    }
+    .modal-box.warning::before { background: linear-gradient(90deg, #e67e22, #f39c12); }
+    .modal-box.info::before    { background: linear-gradient(90deg, #2980b9, #3498db); }
+    .modal-box.success::before { background: linear-gradient(90deg, #27ae60, #2ecc71); }
+    .modal-box.admin::before   { background: linear-gradient(90deg, #8f2121, #c0392b); }
+
     /* ── Thank you overlay ───────────────────────────────────────────────── */
-    #thankyou-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 1000; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
-    #thankyou-overlay.show { display: flex; animation: fadeIn 0.3s ease; }
-    .thankyou-box { background: var(--card-bg); border-radius: 16px; padding: 40px 48px; max-width: 420px; width: 100%; box-shadow: 0 8px 40px rgba(0,0,0,0.4); animation: popIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
+    #thankyou-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 1000; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; backdrop-filter: blur(3px); }
+    #thankyou-overlay.show { display: flex; animation: backdropIn 0.3s ease; }
+    .thankyou-box { background: var(--card-bg); border-radius: 16px; padding: 40px 48px; max-width: 420px; width: 100%; box-shadow: 0 8px 40px rgba(0,0,0,0.4); animation: modalIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); position: relative; }
+    .thankyou-box::before { content: ''; display: block; height: 4px; border-radius: 16px 16px 0 0; position: absolute; top: 0; left: 0; right: 0; background: linear-gradient(90deg, #27ae60, #2ecc71); }
     .thankyou-box .emoji { font-size: 3.5em; margin-bottom: 12px; }
     .thankyou-box h2 { margin: 0 0 10px 0; font-size: 1.4em; color: var(--text); }
     .thankyou-box p { margin: 0 0 20px 0; color: var(--text-muted); font-size: 0.93em; line-height: 1.5; }
     .thankyou-buttons { display: flex; flex-direction: column; gap: 10px; }
     .thankyou-buy { background: #8f2121; color: #fff; border: none; border-radius: 8px; padding: 11px 28px; font-size: 0.95em; cursor: pointer; font-family: 'Lexend', sans-serif; text-decoration: none; display: block; text-align: center; }
+    .thankyou-undo { background: none; border: 1px solid var(--unclaim-border); border-radius: 8px; padding: 9px 28px; font-size: 0.88em; cursor: pointer; font-family: 'Lexend', sans-serif; color: var(--text-muted); }
+    .thankyou-undo:hover { background: var(--unclaim-hover); }
     .thankyou-close-link { font-size: 0.82em; color: var(--text-faint); cursor: pointer; background: none; border: none; font-family: 'Lexend', sans-serif; text-decoration: underline; }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
     /* ── Confetti ────────────────────────────────────────────────────────── */
     #confetti-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 999; }
 
-    /* ── Footer image — swaps on dark mode ───────────────────────────────── */
+    /* ── Footer images ───────────────────────────────────────────────────── */
     .footer-img-light { display: block; }
     .footer-img-dark  { display: none; }
     [data-theme="dark"] .footer-img-light { display: none; }
@@ -206,6 +252,7 @@
     /* ── Mobile ──────────────────────────────────────────────────────────── */
     @media (max-width: 600px) {
       .page-content { padding: 12px; }
+      .banner-wrapper { padding: 12px 12px 0 12px; }
       .item-card, .skeleton-card { width: 100%; }
       .header-row h1 { font-size: 1.25em; }
       .banner img { height: 140px; }
@@ -213,42 +260,54 @@
       .filter-group { flex-wrap: wrap; }
       .filter-sep { display: none; }
       .thankyou-box { padding: 28px 20px; }
+      .modal-box { padding: 28px 20px; }
+      .modal-buttons { flex-direction: column-reverse; }
+      .modal-btn { width: 100%; text-align: center; padding: 11px; }
     }
   </style>
 </head>
 <body>
 
-  <!-- Banner -->
-  <div class="banner">
-    <img src="https://upload.wikimedia.org/wikipedia/commons/d/dd/Birthday_candles.jpg" alt="Birthday candles banner" />
+  <!-- ── Custom modal ── -->
+  <div class="modal-backdrop" id="modal-backdrop">
+    <div class="modal-box" id="modal-box">
+      <div class="modal-icon" id="modal-icon"></div>
+      <h2 class="modal-title" id="modal-title"></h2>
+      <p class="modal-body" id="modal-body"></p>
+      <input class="modal-pin-input" id="modal-pin" type="password" maxlength="4" placeholder="• • • •" style="display:none" />
+      <div class="modal-buttons" id="modal-buttons"></div>
+    </div>
   </div>
 
-  <!-- Confetti canvas -->
-  <canvas id="confetti-canvas"></canvas>
-
-  <!-- Thank you overlay -->
+  <!-- ── Thank you overlay ── -->
   <div id="thankyou-overlay">
+    <canvas id="confetti-canvas"></canvas>
     <div class="thankyou-box">
       <div class="emoji">🎉</div>
       <h2>Thank You So, So Much!!!</h2>
       <p>Head to the product page to complete your purchase if you have not already.</p>
       <div class="thankyou-buttons">
         <a id="thankyou-product-link" href="#" target="_blank" class="thankyou-buy">Go to Product Page</a>
+        <button class="thankyou-undo" onclick="undoFromThankYou()">↩ Undo Claim</button>
         <button class="thankyou-close-link" onclick="closeThankYou()">I've already purchased it</button>
       </div>
     </div>
   </div>
 
-  <!-- Page content -->
-  <div class="page-content">
+  <!-- ── Banner ── -->
+  <div class="banner-wrapper">
+    <div class="banner">
+      <img src="https://upload.wikimedia.org/wikipedia/commons/d/dd/Birthday_candles.jpg" alt="Birthday candles banner" />
+    </div>
+  </div>
 
+  <!-- ── Page content ── -->
+  <div class="page-content">
     <div class="header-row">
       <h1>Tristan's Birthday List</h1>
       <label class="dark-toggle" title="Toggle dark mode">
         <span id="dark-label">🌙 Dark Mode</span>
-        <div class="toggle-track" onclick="toggleDark()">
-          <div class="toggle-thumb"></div>
-        </div>
+        <div class="toggle-track" onclick="toggleDark()"><div class="toggle-thumb"></div></div>
       </label>
     </div>
 
@@ -262,7 +321,6 @@
       <a href="https://github.com/MaybeTristan/christmas-list-2025/issues" target="_blank">this link</a>.
     </p>
 
-    <!-- Filter bar -->
     <div class="filter-bar">
       <div class="filter-group">
         <label for="sortSelect">Sort:</label>
@@ -291,18 +349,16 @@
 
     <div class="grid-container"></div>
 
-    <!-- Footer images (light + dark) -->
     <img class="footer-img-light" src="https://photos.tristanarbet.com/Adobe%20Express%20Photo%20project-5.png" alt="Footer image" />
     <img class="footer-img-dark"  src="https://photos.tristanarbet.com/Adobe%20Express%20Photo%20project-6.png" alt="Footer image dark" />
 
     <div class="reset-area">
       <button id="resetButton" class="button view-btn" style="width:auto;padding:8px 20px;">Reset All Claims</button>
     </div>
-
     <div class="footer">
       Thank You!!! Love from Tristan ♡ Note: All clothes sizes, or other notes, should be next to the other tags on the item.
     </div>
-  </div><!-- end .page-content -->
+  </div>
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
@@ -338,6 +394,97 @@
       {id:"smartwool_medium_gray_socks",name:"Smartwool Gray Socks",price:"$18.00",asin:"B0D7Y6332B",img:"https://m.media-amazon.com/images/I/811p5W6ciUL._AC_SX679_.jpg",link:"https://www.amazon.com/dp/B0D7Y6332B",category:"Clothes, Size M",prime:true,note:""},
     ];
 
+    // ══════════════════════════════════════════════════════════════════════
+    // MODAL SYSTEM
+    // showModal(options) — returns a Promise that resolves with the button
+    // label the user clicked, or null if dismissed.
+    //
+    // options: {
+    //   icon, title, body, type,   // type: 'default'|'warning'|'info'|'success'|'admin'
+    //   buttons: [{ label, style }] // style: 'primary'|'secondary'|'danger'
+    //   pin: boolean                // show PIN input field
+    // }
+    // ══════════════════════════════════════════════════════════════════════
+    function showModal({ icon = '', title = '', body = '', type = 'default', buttons = [], pin = false }) {
+      return new Promise((resolve) => {
+        const backdrop = document.getElementById('modal-backdrop');
+        const box      = document.getElementById('modal-box');
+        const iconEl   = document.getElementById('modal-icon');
+        const titleEl  = document.getElementById('modal-title');
+        const bodyEl   = document.getElementById('modal-body');
+        const pinEl    = document.getElementById('modal-pin');
+        const btnsEl   = document.getElementById('modal-buttons');
+
+        // Set content
+        iconEl.textContent  = icon;
+        titleEl.textContent = title;
+        bodyEl.innerHTML    = body;
+        box.className = 'modal-box ' + (type || 'default');
+
+        // PIN field
+        pinEl.style.display = pin ? 'block' : 'none';
+        pinEl.value = '';
+        pinEl.classList.remove('shake');
+
+        // Build buttons
+        btnsEl.innerHTML = '';
+        buttons.forEach(btn => {
+          const b = document.createElement('button');
+          b.className = 'modal-btn ' + (btn.style || 'secondary');
+          b.textContent = btn.label;
+          b.addEventListener('click', () => {
+            close();
+            resolve({ action: btn.label, pinValue: pinEl.value });
+          });
+          btnsEl.appendChild(b);
+        });
+
+        // Open
+        backdrop.classList.add('open');
+        if (pin) setTimeout(() => pinEl.focus(), 100);
+
+        function close() { backdrop.classList.remove('open'); }
+
+        // Close on backdrop click
+        backdrop.addEventListener('click', (e) => {
+          if (e.target === backdrop) { close(); resolve(null); }
+        }, { once: true });
+
+        // Close on Escape
+        function onKey(e) {
+          if (e.key === 'Escape') { close(); resolve(null); document.removeEventListener('keydown', onKey); }
+        }
+        document.addEventListener('keydown', onKey);
+      });
+    }
+
+    // Convenience wrappers that mirror the old alert/confirm/prompt API
+    async function showAlert({ icon, title, body, type = 'info' }) {
+      await showModal({ icon, title, body, type, buttons: [{ label: 'OK', style: 'primary' }] });
+    }
+
+    async function showConfirm({ icon, title, body, type = 'warning', confirmLabel = 'Yes', cancelLabel = 'Cancel' }) {
+      const result = await showModal({ icon, title, body, type, buttons: [
+        { label: cancelLabel, style: 'secondary' },
+        { label: confirmLabel, style: 'danger' }
+      ]});
+      return result?.action === confirmLabel;
+    }
+
+    async function showPinPrompt() {
+      const result = await showModal({
+        icon: '🔐', title: 'Admin Reset', type: 'admin',
+        body: 'Enter the 4-digit PIN to reset all claimed items.',
+        pin: true,
+        buttons: [
+          { label: 'Cancel', style: 'secondary' },
+          { label: 'Reset', style: 'danger' }
+        ]
+      });
+      if (result?.action === 'Reset') return result.pinValue;
+      return null;
+    }
+
     // ── Dark mode ──────────────────────────────────────────────────────────
     window.toggleDark = function() {
       const html = document.documentElement;
@@ -360,35 +507,34 @@
     function launchConfetti() {
       const canvas = document.getElementById("confetti-canvas");
       const ctx = canvas.getContext("2d");
-      canvas.width = window.innerWidth;
-      canvas.height = window.innerHeight;
+      canvas.width = window.innerWidth; canvas.height = window.innerHeight;
       const pieces = Array.from({length: 120}, () => ({
-        x: Math.random() * canvas.width,
-        y: Math.random() * -canvas.height,
+        x: Math.random() * canvas.width, y: Math.random() * -canvas.height,
         w: Math.random() * 10 + 6, h: Math.random() * 6 + 4,
         color: ["#8f2121","#f5c842","#4caf50","#2196f3","#ff69b4","#ff9800"][Math.floor(Math.random()*6)],
-        rot: Math.random() * 360,
-        vx: (Math.random() - 0.5) * 3, vy: Math.random() * 4 + 2, vr: (Math.random() - 0.5) * 6,
+        rot: Math.random() * 360, vx: (Math.random()-0.5)*3, vy: Math.random()*4+2, vr: (Math.random()-0.5)*6,
       }));
       let frame;
       function draw() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        let alive = false;
+        ctx.clearRect(0,0,canvas.width,canvas.height); let alive = false;
         pieces.forEach(p => {
-          p.x += p.vx; p.y += p.vy; p.rot += p.vr;
-          if (p.y < canvas.height + 20) alive = true;
-          ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot * Math.PI / 180);
-          ctx.fillStyle = p.color; ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h); ctx.restore();
+          p.x+=p.vx; p.y+=p.vy; p.rot+=p.vr;
+          if (p.y < canvas.height+20) alive = true;
+          ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot*Math.PI/180);
+          ctx.fillStyle=p.color; ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h); ctx.restore();
         });
         if (alive) frame = requestAnimationFrame(draw);
-        else ctx.clearRect(0, 0, canvas.width, canvas.height);
+        else ctx.clearRect(0,0,canvas.width,canvas.height);
       }
       if (frame) cancelAnimationFrame(frame);
       draw();
     }
 
     // ── Thank you overlay ──────────────────────────────────────────────────
-    window.showThankYou = function(productLink) {
+    let _lastClaimedItemId = null;
+
+    window.showThankYou = function(productLink, itemId) {
+      _lastClaimedItemId = itemId || null;
       const linkEl = document.getElementById("thankyou-product-link");
       if (linkEl) linkEl.href = productLink || "#";
       document.getElementById("thankyou-overlay").classList.add("show");
@@ -396,6 +542,13 @@
     };
     window.closeThankYou = function() {
       document.getElementById("thankyou-overlay").classList.remove("show");
+    };
+    window.undoFromThankYou = async function() {
+      if (!_lastClaimedItemId) { closeThankYou(); return; }
+      await set(ref(db, 'items/' + _lastClaimedItemId), { claimed: false, claimedAt: null });
+      removeMyClaim(_lastClaimedItemId);
+      _lastClaimedItemId = null;
+      closeThankYou();
     };
 
     // ── localStorage claim tracking ────────────────────────────────────────
@@ -424,7 +577,7 @@
         const res = await fetch(`https://rest.canopyapi.co/api/amazon/product?asin=${asin}`, { headers: { "API-KEY": CANOPY_API_KEY } });
         const data = await res.json();
         const priceValue = data?.data?.amazonProduct?.price?.display ?? null;
-        const isInStock = data?.data?.amazonProduct?.isInStock ?? null;
+        const isInStock  = data?.data?.amazonProduct?.isInStock ?? null;
         if (priceValue !== null) {
           const price = String(priceValue); const now = Date.now();
           try { await set(priceRef, { price, cachedAt: now, isInStock }); } catch {}
@@ -442,7 +595,7 @@
     async function loadLivePrices() {
       await Promise.all(items.filter(i => i.asin).map(async item => {
         const result = await fetchLivePrice(item.asin);
-        const el = document.getElementById("price_" + item.id);
+        const el   = document.getElementById("price_" + item.id);
         const tsEl = document.getElementById("price_ts_" + item.id);
         if (!el) return;
         if (result && result.price) {
@@ -462,8 +615,8 @@
 
     // ── Claim / unclaim ────────────────────────────────────────────────────
     window.claimItem = async function(itemId) {
-      const itemRef = ref(db, 'items/' + itemId);
-      const now = Date.now();
+      const itemRef  = ref(db, 'items/' + itemId);
+      const now      = Date.now();
       const itemData = items.find(i => i.id === itemId);
       try {
         const result = await runTransaction(itemRef, (currentData) => {
@@ -472,39 +625,49 @@
         });
         if (result.committed) {
           saveMyClaim(itemId, now);
-          showThankYou(itemData?.link || "#");
+          showThankYou(itemData?.link || "#", itemId);
         } else {
-          alert("This item has already been claimed by someone else!");
+          await showAlert({
+            icon: '😬', title: 'Already Claimed',
+            body: 'Someone else just claimed this item! Check another one.',
+            type: 'warning'
+          });
         }
       } catch (error) {
-        alert("Something went wrong. Please try again."); console.error(error);
+        await showAlert({ icon: '⚠️', title: 'Something Went Wrong', body: 'Please try again in a moment.', type: 'warning' });
+        console.error(error);
       }
     };
 
     window.unclaimItem = async function(itemId) {
-      if (!confirm("Are you sure you want to un-claim this item?")) return;
+      const confirmed = await showConfirm({
+        icon: '↩️', title: 'Undo Claim',
+        body: 'Are you sure you want to un-claim this item? Someone else will be able to claim it.',
+        type: 'warning', confirmLabel: 'Yes, Undo', cancelLabel: 'Keep It'
+      });
+      if (!confirmed) return;
       await set(ref(db, 'items/' + itemId), { claimed: false, claimedAt: null });
       removeMyClaim(itemId);
     };
 
     // ── Card builder ───────────────────────────────────────────────────────
     function createItemCard(item, claimData) {
-      const claimed = claimData?.claimed || false;
-      const claimedAt = claimData?.claimedAt || null;
-      const myClaims = getMyClaims();
+      const claimed      = claimData?.claimed || false;
+      const claimedAt    = claimData?.claimedAt || null;
+      const myClaims     = getMyClaims();
       const iClaimedThis = !!myClaims[item.id];
-      const myClaimedAt = myClaims[item.id] || null;
+      const myClaimedAt  = myClaims[item.id] || null;
 
       const div = document.createElement("div");
       div.className = "item-card" + (claimed ? " claimed" : "");
       div.dataset.category = item.category;
-      div.dataset.claimed = claimed ? "true" : "false";
-      div.dataset.price = item.price.replace(/[^0-9.]/g, "");
+      div.dataset.claimed  = claimed ? "true" : "false";
+      div.dataset.price    = item.price.replace(/[^0-9.]/g, "");
 
       const tagBar = document.createElement("div"); tagBar.className = "tag-bar";
       const catTag = document.createElement("div"); catTag.className = "category-tag"; catTag.textContent = item.category; tagBar.appendChild(catTag);
       if (item.prime) { const pt = document.createElement("div"); pt.className = "prime-tag"; pt.textContent = "Prime ✓"; tagBar.appendChild(pt); }
-      if (item.note) { const nt = document.createElement("div"); nt.className = "note-tag"; nt.textContent = item.note; tagBar.appendChild(nt); }
+      if (item.note)  { const nt = document.createElement("div"); nt.className = "note-tag";  nt.textContent = item.note;  tagBar.appendChild(nt); }
       div.appendChild(tagBar);
 
       const img = document.createElement("img"); img.src = item.img; img.alt = item.name; div.appendChild(img);
@@ -526,7 +689,17 @@
 
       if (item.link) {
         const viewBtn = document.createElement("a"); viewBtn.href = item.link; viewBtn.target = "_blank"; viewBtn.className = "button view-btn"; viewBtn.textContent = "View Item";
-        if (claimed) { viewBtn.addEventListener("click", (e) => { if (!confirm("⚠️ This item has already been claimed!\n\nAre you sure you want to view/buy it anyway?")) e.preventDefault(); }); }
+        if (claimed) {
+          viewBtn.addEventListener("click", async (e) => {
+            e.preventDefault();
+            const go = await showConfirm({
+              icon: '⚠️', title: 'Already Claimed',
+              body: `<strong>${item.name}</strong> has already been claimed by someone.<br><br>Are you sure you want to view/buy it anyway?`,
+              type: 'warning', confirmLabel: 'View Anyway', cancelLabel: 'Go Back'
+            });
+            if (go) window.open(item.link, '_blank');
+          });
+        }
         info.appendChild(viewBtn);
       }
 
@@ -562,13 +735,13 @@
       const container = document.querySelector(".grid-container");
       let cards = Array.from(container.querySelectorAll(".item-card"));
       cards.forEach(c => {
-        const catMatch = category === "all" || (c.dataset.category || "").startsWith(category);
+        const catMatch   = category === "all" || (c.dataset.category || "").startsWith(category);
         const claimMatch = !unclaimedOnly || c.dataset.claimed !== "true";
-        c.style.display = (catMatch && claimMatch) ? "" : "none";
+        c.style.display  = (catMatch && claimMatch) ? "" : "none";
       });
       const visible = cards.filter(c => c.style.display !== "none");
       visible.sort((a, b) => {
-        if (sort === "price-asc") return parseFloat(a.dataset.price) - parseFloat(b.dataset.price);
+        if (sort === "price-asc")  return parseFloat(a.dataset.price) - parseFloat(b.dataset.price);
         if (sort === "price-desc") return parseFloat(b.dataset.price) - parseFloat(a.dataset.price);
         return 0;
       });
@@ -595,14 +768,24 @@
       showSkeletons();
       onValue(ref(db, 'items'), (snapshot) => { renderItemsFromSnapshot(snapshot.val() || {}); });
       ["sortSelect","categorySelect","unclaimedOnly"].forEach(id => { document.getElementById(id).addEventListener("change", applyFilters); });
+
       document.getElementById("resetButton").addEventListener("click", async () => {
-        const pin = prompt("Enter 4-digit admin PIN to reset all items:");
-        if (pin !== "3323") return alert("Incorrect PIN / No PIN entered.");
+        const pin = await showPinPrompt();
+        if (pin === null) return; // cancelled
+
+        // Validate PIN — shake if wrong
+        if (pin !== "3323") {
+          const pinEl = document.getElementById("modal-pin");
+          // Re-open with error since the modal is already closed
+          await showAlert({ icon: '🔒', title: 'Incorrect PIN', body: 'The PIN you entered was incorrect. Please try again.', type: 'warning' });
+          return;
+        }
+
         const updates = {};
         items.forEach(item => { updates['items/' + item.id + '/claimed'] = false; updates['items/' + item.id + '/claimedAt'] = null; });
         await update(ref(db), updates);
         try { localStorage.removeItem(MY_CLAIMS_KEY); } catch {}
-        alert("All items have been reset!");
+        await showAlert({ icon: '✅', title: 'All Reset!', body: 'All claimed items have been cleared.', type: 'success' });
       });
     });
   </script>
