@@ -25,7 +25,7 @@
     const db = getDatabase(app);
 
     const CANOPY_API_KEY = "16e57d61-4a2e-4a84-b6b9-75790aee93f3";
-    const CACHE_TTL_MS = 24 * 60 * 60 * 1000; // 24 hours
+    const CACHE_TTL_MS = 6 * 24 * 60 * 60 * 1000; // 6 days (~5 refreshes/month)
 
     const items = [
       {id:"swedish_fish_bag",name:"Swedish Fish Bag",price:"$8.00",asin:"B082F2PKQ5",img:"https://m.media-amazon.com/images/I/51Jlys2Z5vL._SS135_.jpg",link:"https://www.amazon.com/dp/B082F2PKQ5",category:"Food",prime:true,note:""},
@@ -62,61 +62,78 @@
     }
 
     // ── Firebase price cache ───────────────────────────────────────────────
-    // Prices are stored in Firebase under prices/<asin>/{ price, cachedAt }
-    // All visitors share this cache — only fetches from Canopy if >24hrs old.
+    // Prices stored in Firebase under prices/<asin>/{ price, cachedAt }
+    // Refreshes every ~6 days (~5 API calls/month per item).
+    // If API fails, falls back to last known price from Firebase.
+    // Returns { price, cachedAt, stale } or null if no data at all.
     async function fetchLivePrice(asin) {
       const priceRef = ref(db, 'prices/' + asin);
+      let cachedPrice = null;
+      let cachedAt = null;
 
-      // 1. Check Firebase cache first
+      // 1. Read Firebase cache
       try {
         const snapshot = await get(priceRef);
         if (snapshot.exists()) {
-          const { price, cachedAt } = snapshot.val();
+          ({ price: cachedPrice, cachedAt } = snapshot.val());
+          // Still fresh — return immediately, no API call
           if (Date.now() - cachedAt < CACHE_TTL_MS) {
-            return price; // Fresh — use cached value, no API call
+            return { price: cachedPrice, cachedAt, stale: false };
           }
         }
       } catch (e) {
         console.warn("Firebase cache read failed for", asin, e);
       }
 
-      // 2. Cache miss or expired — call Canopy API
+      // 2. Cache expired or missing — try Canopy API
       try {
         const res = await fetch(
           `https://rest.canopyapi.co/api/amazon/product?asin=${asin}`,
           { headers: { "API-KEY": CANOPY_API_KEY } }
         );
         const data = await res.json();
-
-        // Canopy returns price at data.data.amazonProduct.price.display
-        let priceValue = data?.data?.amazonProduct?.price?.display ?? null;
+        const priceValue = data?.data?.amazonProduct?.price?.display ?? null;
 
         if (priceValue !== null) {
           const price = String(priceValue);
-
-          // 3. Save to Firebase cache so all visitors benefit
+          const now = Date.now();
+          // Save fresh price to Firebase
           try {
-            await set(priceRef, { price, cachedAt: Date.now() });
+            await set(priceRef, { price, cachedAt: now });
           } catch (e) { console.warn("Firebase cache write failed", e); }
-
-          return price;
+          return { price, cachedAt: now, stale: false };
         }
-        return null;
       } catch (e) {
         console.warn("Canopy price fetch failed for", asin, e);
-        return null;
       }
+
+      // 3. API failed — fall back to last known Firebase price if available
+      if (cachedPrice !== null) {
+        return { price: cachedPrice, cachedAt, stale: true };
+      }
+
+      return null; // No data at all
     }
 
     async function loadLivePrices() {
       await Promise.all(items.filter(i => i.asin).map(async item => {
-        const livePrice = await fetchLivePrice(item.asin);
+        const result = await fetchLivePrice(item.asin);
         const el = document.getElementById("price_" + item.id);
+        const tsEl = document.getElementById("price_ts_" + item.id);
         if (!el) return;
-        if (livePrice) {
-          el.textContent = livePrice;
+
+        if (result) {
+          const { price, cachedAt, stale } = result;
+          el.textContent = price;
           el.classList.remove("price-loading");
-          el.title = "Live price from Amazon";
+          el.title = stale ? "Last known price (API unavailable)" : "Live price from Amazon";
+          if (stale) el.classList.add("price-stale");
+
+          // Show last updated timestamp
+          if (tsEl && cachedAt) {
+            tsEl.textContent = (stale ? "⚠️ Last known: " : "Updated: ") + formatTimestamp(cachedAt);
+            tsEl.style.display = "block";
+          }
         } else {
           el.textContent = "";
           el.classList.remove("price-loading");
@@ -210,6 +227,15 @@
       price.textContent = item.asin ? "Live Price Loading…" : item.price;
       price.title = item.asin ? "Fetching live price…" : "";
       info.appendChild(price);
+
+      // Timestamp shown after price loads
+      if (item.asin) {
+        const priceTs = document.createElement("span");
+        priceTs.className = "price-timestamp";
+        priceTs.id = "price_ts_" + item.id;
+        priceTs.style.display = "none";
+        info.appendChild(priceTs);
+      }
 
       // View Item — warns if already claimed
       if (item.link) {
@@ -333,6 +359,13 @@
     .item-info h3 { margin: 0 0 2px 0; font-size: 1em; }
 
     .price { margin: 0; font-weight: bold; }
+    .price-stale { color: #b07800; }
+    .price-timestamp {
+      font-size: 0.72em;
+      color: #999;
+      font-style: italic;
+      margin-top: -2px;
+    }
     .price-loading { color: #aaa; font-style: italic; font-weight: normal; }
     .price-unavailable-tag {
       display: inline-block;
