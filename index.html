@@ -199,6 +199,11 @@
     /* ── Header ──────────────────────────────────────────────────────────── */
     .header-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 4px; }
     .header-row h1 { margin: 0; font-size: 1.6em; }
+    .header-logo { display: flex; align-items: center; }
+    .header-logo-light { display: block; height: 48px; width: auto; object-fit: contain; }
+    .header-logo-dark  { display: none;  height: 48px; width: auto; object-fit: contain; }
+    [data-theme="dark"] .header-logo-light { display: none; }
+    [data-theme="dark"] .header-logo-dark  { display: block; }
 
     /* ── Last updated + share row ────────────────────────────────────────── */
     .meta-row {
@@ -548,7 +553,7 @@
     #confetti-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 999; }
 
     /* ── Footer images ───────────────────────────────────────────────────── */
-    .footer-img-light, .footer-img-dark { max-width: 200px; margin: 12px auto 15px auto; display: block; }
+    .footer-img-light, .footer-img-dark { max-width: 200px; margin: 28px auto 6px auto; display: block; }
     .footer-img-dark  { display: none; }
     [data-theme="dark"] .footer-img-light { display: none; }
     [data-theme="dark"] .footer-img-dark  { display: block; }
@@ -614,7 +619,10 @@
 
     <!-- Header row -->
     <div class="header-row">
-      <h1>Tristan's Birthday List</h1>
+      <div class="header-logo">
+        <img class="header-logo-light" src="https://photos.tristanarbet.com/Adobe%20Express%20Photo%20project-5.png" alt="Tristan's Birthday List" />
+        <img class="header-logo-dark"  src="https://photos.tristanarbet.com/Adobe%20Express%20Photo%20project-6.png" alt="Tristan's Birthday List" />
+      </div>
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
         <button class="list-mode-toggle" id="listModeBtn" title="Toggle list mode">
           ☰ List Mode
@@ -669,6 +677,10 @@
             <div class="quick-info-item" style="flex-basis:100%;">
               <span class="quick-info-item-label">ℹ️ How It Works</span>
               <span class="quick-info-item-value" style="font-size:0.82em;font-weight:normal;color:var(--text-muted);">Click "View Item" to see the product, then check "I'm buying this!" to claim it. Hit Undo if you accidentally claim something.</span>
+            </div>
+            <div class="quick-info-item" style="flex-basis:100%;">
+              <span class="quick-info-item-label">👕 Sizing Note</span>
+              <span class="quick-info-item-value" style="font-size:0.82em;font-weight:normal;color:var(--text-muted);">All clothes sizes and other item notes are shown next to the tags on each card.</span>
             </div>
             <div class="quick-info-item" style="flex-basis:100%;">
               <span class="quick-info-item-label">❓ Need Help?</span>
@@ -779,11 +791,12 @@
     <img class="footer-img-light" src="https://photos.tristanarbet.com/Adobe%20Express%20Photo%20project-5.png" alt="Footer image" />
     <img class="footer-img-dark"  src="https://photos.tristanarbet.com/Adobe%20Express%20Photo%20project-6.png" alt="Footer image dark" />
 
-    <div class="reset-area">
+    <div class="reset-area" style="flex-direction:column; gap:10px;">
+      <a href="https://www.tristanarbet.com" target="_blank" class="button view-btn" style="width:auto;padding:8px 20px;background:var(--card-bg);color:var(--text-muted);border:1px solid var(--border);text-decoration:none;">🌐 Personal Website</a>
       <button id="resetButton" class="button view-btn" style="width:auto;padding:8px 20px;">Reset All Claims</button>
     </div>
     <div class="footer">
-      Thank You!!! Love from Tristan ♡ Note: All clothes sizes, or other notes, should be next to the other tags on the item.
+      Thank You!!! Love from Tristan ♡
     </div>
   </div>
 
