@@ -382,9 +382,12 @@
     .grid-container.list-view .item-card,
     .claimed-grid.list-view .item-card { display: none !important; }
 
-    /* Hide list rows in grid mode */
-    .grid-container:not(.list-view) .list-row,
-    .claimed-grid:not(.list-view) .list-row { display: none !important; }
+    /* Hide list row wrappers in grid mode */
+    .grid-container:not(.list-view) .list-row-wrapper,
+    .claimed-grid:not(.list-view) .list-row-wrapper { display: none !important; }
+    /* Hide cards in list mode */
+    .grid-container.list-view .item-card,
+    .claimed-grid.list-view .item-card { display: none !important; }
 
     @media (max-width: 600px) {
       .list-row-thumb { width: 48px; height: 48px; }
@@ -998,6 +1001,7 @@
     async function loadLivePrices() {
       await Promise.all(items.filter(i => i.asin).map(async item => {
         const result = await fetchLivePrice(item.asin);
+        priceResultCache[item.id] = result; // cache for expand-on-demand
         const el   = document.getElementById("price_" + item.id);
         const tsEl = document.getElementById("price_ts_" + item.id);
         if (!el) return;
@@ -1174,7 +1178,10 @@
         const isClaimed = c.dataset.claimed === "true";
         const catMatch   = category === "all" || cat.startsWith(category);
         const claimMatch = !unclaimedOnly || !isClaimed;
-        c.style.display  = (catMatch && claimMatch) ? "" : "none";
+        // Only apply filter display logic to cards and list row wrappers, not other elements
+        if (c.classList.contains('item-card') || c.classList.contains('list-row-wrapper')) {
+          c.style.display = (catMatch && claimMatch) ? "" : "none";
+        }
       });
 
       // Sort visible item cards (grid mode) and list rows (list mode) together by price
@@ -1348,6 +1355,9 @@
     };
 
 
+    // ── Price result cache (populated by loadLivePrices) ──────────────────
+    const priceResultCache = {};
+
     // ── List mode ──────────────────────────────────────────────────────────
     let isListMode = false;
     try { isListMode = localStorage.getItem("listMode") === "true"; } catch {}
@@ -1369,11 +1379,11 @@
       const myClaimedAt  = myClaims[item.id] || null;
 
       const wrapper = document.createElement("div");
+      wrapper.className = "list-row-wrapper";
       wrapper.dataset.id       = item.id;
       wrapper.dataset.category = item.category;
       wrapper.dataset.claimed  = claimed ? "true" : "false";
       wrapper.dataset.price    = item.price.replace(/[^0-9.]/g, "");
-      wrapper.style.width = "100%";
 
       // Main row
       const row = document.createElement("div");
@@ -1501,11 +1511,36 @@
       expanded.appendChild(expandedInner);
       wrapper.appendChild(expanded);
 
-      // Toggle expand
+      // Toggle expand — populate price from cache when opening
       expandBtn.addEventListener("click", (e) => {
         e.stopPropagation();
         const isOpen = expanded.classList.toggle("open");
         expandBtn.classList.toggle("open", isOpen);
+        if (isOpen && item.asin) {
+          const cachedResult = priceResultCache[item.id];
+          const expandPriceEl = expanded.querySelector("#price_" + item.id);
+          const expandTsEl    = expanded.querySelector("#price_ts_" + item.id);
+          if (expandPriceEl && cachedResult) {
+            if (cachedResult.price) {
+              expandPriceEl.textContent = cachedResult.price;
+              expandPriceEl.classList.remove("price-loading");
+              expandPriceEl.setAttribute("data-has-price", "true");
+              if (cachedResult.stale) expandPriceEl.classList.add("price-stale");
+              if (expandTsEl && cachedResult.cachedAt) {
+                expandTsEl.textContent = (cachedResult.stale ? "⚠️ Last known: " : "Updated: ") + formatTimestamp(cachedResult.cachedAt);
+                expandTsEl.style.display = "block";
+              }
+            } else {
+              expandPriceEl.textContent = "Live Price Unavailable";
+              expandPriceEl.classList.remove("price-loading");
+              expandPriceEl.classList.add("price-unavailable");
+              if (expandTsEl) { expandTsEl.textContent = "Click View Item for Live Price"; expandTsEl.style.display = "block"; }
+            }
+          } else if (expandPriceEl && !item.asin) {
+            expandPriceEl.textContent = item.price;
+            expandPriceEl.classList.remove("price-loading");
+          }
+        }
       });
 
       return wrapper;
