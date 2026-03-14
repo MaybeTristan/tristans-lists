@@ -32,6 +32,8 @@
       --filter-bg: #fff;
       --filter-border: #ccc;
       --modal-overlay: rgba(0,0,0,0.6);
+      --help-bg: #fff8f0;
+      --help-border: #f0d8b0;
     }
     [data-theme="dark"] {
       --bg: #1a1a1a;
@@ -57,6 +59,8 @@
       --filter-bg: #2a2a2a;
       --filter-border: #555;
       --modal-overlay: rgba(0,0,0,0.8);
+      --help-bg: #2a2218;
+      --help-border: #5a4020;
     }
 
     * { box-sizing: border-box; }
@@ -72,8 +76,77 @@
     .page-content { padding: 20px; }
 
     /* ── Header ──────────────────────────────────────────────────────────── */
-    .header-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 8px; }
+    .header-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 4px; }
     .header-row h1 { margin: 0; font-size: 1.6em; }
+
+    /* ── Last updated + share row ────────────────────────────────────────── */
+    .meta-row {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: 8px;
+      margin-bottom: 12px;
+    }
+    .last-updated {
+      font-size: 0.78em; color: var(--text-faint);
+      display: flex; align-items: center; gap: 5px;
+    }
+    .last-updated-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: #4caf50; display: inline-block; flex-shrink: 0;
+    }
+
+    /* ── Share button ────────────────────────────────────────────────────── */
+    .share-btn {
+      display: flex; align-items: center; gap: 6px;
+      font-family: 'Lexend', sans-serif; font-size: 0.8em;
+      padding: 5px 12px; border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--card-bg); color: var(--text-muted);
+      cursor: pointer; transition: background 0.15s, color 0.15s, border-color 0.15s;
+      white-space: nowrap;
+    }
+    .share-btn:hover { background: #8f2121; color: #fff; border-color: #8f2121; }
+    .share-btn svg { width: 13px; height: 13px; flex-shrink: 0; }
+    .share-btn.copied { background: #27ae60; color: #fff; border-color: #27ae60; }
+
+    /* ── Help / feedback dropdown ────────────────────────────────────────── */
+    .help-dropdown-wrapper { position: relative; margin-bottom: 14px; }
+    .help-toggle {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-size: 0.82em; color: var(--text-muted);
+      background: none; border: none; cursor: pointer;
+      font-family: 'Lexend', sans-serif; padding: 0;
+    }
+    .help-toggle:hover { color: var(--text); }
+    .help-toggle-arrow { transition: transform 0.25s; display: inline-block; font-style: normal; }
+    .help-dropdown-wrapper.open .help-toggle-arrow { transform: rotate(180deg); }
+    .help-panel {
+      display: grid; grid-template-rows: 0fr;
+      transition: grid-template-rows 0.28s ease;
+    }
+    .help-dropdown-wrapper.open .help-panel { grid-template-rows: 1fr; }
+    .help-panel-inner {
+      overflow: hidden;
+    }
+    .help-panel-content {
+      margin-top: 8px;
+      background: var(--help-bg);
+      border: 1px solid var(--help-border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      display: flex; flex-wrap: wrap; gap: 10px; align-items: center;
+    }
+    .help-panel-content p {
+      margin: 0; font-size: 0.84em; color: var(--text-muted); flex: 1; min-width: 160px;
+    }
+    .help-link-btn {
+      display: inline-flex; align-items: center; gap: 6px;
+      font-family: 'Lexend', sans-serif; font-size: 0.82em;
+      padding: 6px 14px; border-radius: 20px; text-decoration: none;
+      border: 1px solid var(--border); background: var(--card-bg);
+      color: var(--text-muted); white-space: nowrap;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+    }
+    .help-link-btn:hover { background: #8f2121; color: #fff; border-color: #8f2121; }
 
     /* ── Dark mode toggle ────────────────────────────────────────────────── */
     .dark-toggle { display: flex; align-items: center; gap: 8px; font-size: 0.85em; color: var(--text-muted); cursor: pointer; user-select: none; }
@@ -81,6 +154,9 @@
     [data-theme="dark"] .toggle-track { background: #8f2121; }
     .toggle-thumb { width: 18px; height: 18px; border-radius: 50%; background: #fff; position: absolute; top: 3px; left: 3px; transition: transform 0.3s; box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
     [data-theme="dark"] .toggle-thumb { transform: translateX(18px); }
+
+    /* ── Howdy text ──────────────────────────────────────────────────────── */
+    .howdy { font-size: 14pt; font-weight: bold; margin: 0 0 14px 0; }
 
     /* ── Filter bar ──────────────────────────────────────────────────────── */
     .filter-bar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 16px; padding: 10px 14px; background: var(--card-bg); border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
@@ -90,14 +166,43 @@
     .filter-bar select { font-family: 'Lexend', sans-serif; font-size: 0.82em; padding: 4px 8px; border: 1px solid var(--filter-border); border-radius: 5px; background: var(--filter-bg); color: var(--text); cursor: pointer; }
     .filter-sep { width: 1px; height: 20px; background: var(--border); flex-shrink: 0; }
 
-    /* ── Grid ────────────────────────────────────────────────────────────── */
+    /* ── Grids ───────────────────────────────────────────────────────────── */
     .grid-container { display: flex; flex-wrap: wrap; gap: 20px; justify-content: flex-start; }
 
+    /* ── Claimed section divider ─────────────────────────────────────────── */
+    .claimed-section {
+      width: 100%;
+      margin-top: 8px;
+    }
+    .claimed-divider {
+      display: flex; align-items: center; gap: 12px;
+      margin: 24px 0 16px 0;
+    }
+    .claimed-divider-line { flex: 1; height: 1px; background: var(--border); }
+    .claimed-divider-label {
+      font-size: 0.78em; color: var(--text-faint);
+      white-space: nowrap; text-transform: uppercase; letter-spacing: 0.08em;
+    }
+    .claimed-grid { display: flex; flex-wrap: wrap; gap: 20px; justify-content: flex-start; }
+
     /* ── Item card ───────────────────────────────────────────────────────── */
-    .item-card { width: calc(50% - 10px); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; box-shadow: 0 2px 6px rgba(0,0,0,0.1); display: flex; flex-direction: column; background: var(--card-bg); transition: background 0.3s, opacity 0.2s, transform 0.15s; }
+    .item-card {
+      width: calc(50% - 10px);
+      border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+      display: flex; flex-direction: column;
+      background: var(--card-bg);
+      transition: background 0.3s, opacity 0.2s, transform 0.15s, box-shadow 0.15s;
+    }
     .item-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
-    .item-card.claimed { background: var(--card-claimed-bg); opacity: 0.85; }
+    .item-card.claimed { background: var(--card-claimed-bg); opacity: 0.8; }
     .item-card img { width: 100%; height: 200px; object-fit: contain; background: var(--card-img-bg); }
+
+    /* Sink animation — card fades out, claimed section fades in */
+    @keyframes cardFadeOut { from { opacity: 1; transform: translateY(0); } to { opacity: 0; transform: translateY(16px); } }
+    @keyframes cardFadeIn  { from { opacity: 0; transform: translateY(-12px); } to { opacity: 1; transform: translateY(0); } }
+    .card-sinking  { animation: cardFadeOut 0.35s ease forwards; pointer-events: none; }
+    .card-rising   { animation: cardFadeIn  0.35s ease forwards; }
 
     /* ── Skeleton ────────────────────────────────────────────────────────── */
     .skeleton-card { width: calc(50% - 10px); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: var(--card-bg); box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
@@ -125,6 +230,20 @@
     .price[data-has-price="true"]:not(.price-loading)::after { content: " 🟢"; font-size: 0.7em; vertical-align: middle; }
     .sold-out-badge { display: inline-block; background-color: #fde8e8; color: #9b1c1c; font-size: 0.78em; font-weight: normal; padding: 2px 6px; border-radius: 4px; }
 
+    /* ── Item action row (view + share) ──────────────────────────────────── */
+    .item-action-row { display: flex; gap: 8px; align-items: stretch; }
+    .item-action-row .button.view-btn { flex: 1; }
+    .item-share-btn {
+      display: flex; align-items: center; justify-content: center;
+      width: 36px; flex-shrink: 0;
+      border-radius: 5px; border: 1px solid var(--border);
+      background: var(--card-bg); color: var(--text-muted);
+      cursor: pointer; transition: background 0.15s, color 0.15s, border-color 0.15s;
+      font-size: 1em; padding: 0;
+    }
+    .item-share-btn:hover { background: #8f2121; color: #fff; border-color: #8f2121; }
+    .item-share-btn.copied { background: #27ae60; color: #fff; border-color: #27ae60; }
+
     /* ── Buttons ─────────────────────────────────────────────────────────── */
     .button.view-btn { background-color: var(--btn-bg); color: var(--btn-text); text-align: center; padding: 8px; border-radius: 5px; text-decoration: none; font-size: 0.9em; cursor: pointer; display: block; border: none; font-family: 'Lexend', sans-serif; }
 
@@ -140,64 +259,20 @@
     .unclaim-btn:hover { background: var(--unclaim-hover); }
 
     /* ══════════════════════════════════════════════════════════════════════
-       CUSTOM MODAL SYSTEM
-       ══════════════════════════════════════════════════════════════════════ */
-    .modal-backdrop {
-      display: none;
-      position: fixed; inset: 0;
-      background: var(--modal-overlay);
-      z-index: 900;
-      align-items: center; justify-content: center;
-      padding: 20px;
-      backdrop-filter: blur(3px);
-      -webkit-backdrop-filter: blur(3px);
-    }
+       MODAL SYSTEM
+    ══════════════════════════════════════════════════════════════════════ */
+    .modal-backdrop { display: none; position: fixed; inset: 0; background: var(--modal-overlay); z-index: 900; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); }
     .modal-backdrop.open { display: flex; animation: backdropIn 0.2s ease; }
     @keyframes backdropIn { from { opacity: 0; } to { opacity: 1; } }
-
-    .modal-box {
-      background: var(--card-bg);
-      border-radius: 16px;
-      padding: 32px 36px;
-      max-width: 400px; width: 100%;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.05);
-      animation: modalIn 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
-      position: relative;
-    }
+    .modal-box { background: var(--card-bg); border-radius: 16px; padding: 32px 36px; max-width: 400px; width: 100%; box-shadow: 0 20px 60px rgba(0,0,0,0.35), 0 0 0 1px rgba(255,255,255,0.05); animation: modalIn 0.28s cubic-bezier(0.34, 1.56, 0.64, 1); position: relative; }
     @keyframes modalIn { from { transform: scale(0.88) translateY(12px); opacity: 0; } to { transform: scale(1) translateY(0); opacity: 1; } }
-
     .modal-icon { font-size: 2.6em; margin-bottom: 10px; line-height: 1; }
     .modal-title { font-family: 'Merriweather', serif; font-size: 1.2em; margin: 0 0 8px 0; color: var(--text); }
     .modal-body { font-size: 0.92em; color: var(--text-muted); margin: 0 0 24px 0; line-height: 1.55; }
-
-    /* PIN input for admin modal */
-    .modal-pin-input {
-      width: 100%; padding: 10px 14px; font-size: 1.1em;
-      font-family: 'Lexend', sans-serif; letter-spacing: 0.3em;
-      border: 1px solid var(--border); border-radius: 8px;
-      background: var(--bg); color: var(--text);
-      margin-bottom: 20px; text-align: center;
-      transition: border-color 0.2s;
-    }
+    .modal-pin-input { width: 100%; padding: 10px 14px; font-size: 1.1em; font-family: 'Lexend', sans-serif; letter-spacing: 0.3em; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); color: var(--text); margin-bottom: 20px; text-align: center; transition: border-color 0.2s; }
     .modal-pin-input:focus { outline: none; border-color: #8f2121; }
-    .modal-pin-input.shake {
-      animation: shake 0.4s ease;
-      border-color: #c0392b;
-    }
-    @keyframes shake {
-      0%,100% { transform: translateX(0); }
-      20% { transform: translateX(-8px); }
-      40% { transform: translateX(8px); }
-      60% { transform: translateX(-5px); }
-      80% { transform: translateX(5px); }
-    }
-
     .modal-buttons { display: flex; gap: 10px; justify-content: flex-end; }
-    .modal-btn {
-      font-family: 'Lexend', sans-serif; font-size: 0.88em;
-      padding: 9px 20px; border-radius: 8px; cursor: pointer;
-      border: none; transition: opacity 0.15s, transform 0.1s;
-    }
+    .modal-btn { font-family: 'Lexend', sans-serif; font-size: 0.88em; padding: 9px 20px; border-radius: 8px; cursor: pointer; border: none; transition: opacity 0.15s, transform 0.1s; }
     .modal-btn:active { transform: scale(0.97); }
     .modal-btn.primary { background: #8f2121; color: #fff; }
     .modal-btn.primary:hover { opacity: 0.88; }
@@ -205,16 +280,7 @@
     .modal-btn.secondary:hover { background: var(--unclaim-hover); }
     .modal-btn.danger { background: #c0392b; color: #fff; }
     .modal-btn.danger:hover { opacity: 0.88; }
-
-    /* colour accent strip at top of modal box */
-    .modal-box::before {
-      content: '';
-      display: block;
-      height: 4px;
-      border-radius: 16px 16px 0 0;
-      position: absolute; top: 0; left: 0; right: 0;
-      background: linear-gradient(90deg, #8f2121, #c0392b);
-    }
+    .modal-box::before { content: ''; display: block; height: 4px; border-radius: 16px 16px 0 0; position: absolute; top: 0; left: 0; right: 0; background: linear-gradient(90deg, #8f2121, #c0392b); }
     .modal-box.warning::before { background: linear-gradient(90deg, #e67e22, #f39c12); }
     .modal-box.info::before    { background: linear-gradient(90deg, #2980b9, #3498db); }
     .modal-box.success::before { background: linear-gradient(90deg, #27ae60, #2ecc71); }
@@ -268,7 +334,7 @@
 </head>
 <body>
 
-  <!-- ── Custom modal ── -->
+  <!-- Modal -->
   <div class="modal-backdrop" id="modal-backdrop">
     <div class="modal-box" id="modal-box">
       <div class="modal-icon" id="modal-icon"></div>
@@ -279,7 +345,7 @@
     </div>
   </div>
 
-  <!-- ── Thank you overlay ── -->
+  <!-- Thank you overlay -->
   <div id="thankyou-overlay">
     <canvas id="confetti-canvas"></canvas>
     <div class="thankyou-box">
@@ -294,15 +360,17 @@
     </div>
   </div>
 
-  <!-- ── Banner ── -->
+  <!-- Banner -->
   <div class="banner-wrapper">
     <div class="banner">
       <img src="https://upload.wikimedia.org/wikipedia/commons/d/dd/Birthday_candles.jpg" alt="Birthday candles banner" />
     </div>
   </div>
 
-  <!-- ── Page content ── -->
+  <!-- Page content -->
   <div class="page-content">
+
+    <!-- Header row -->
     <div class="header-row">
       <h1>Tristan's Birthday List</h1>
       <label class="dark-toggle" title="Toggle dark mode">
@@ -311,16 +379,46 @@
       </label>
     </div>
 
-    <p style="font-size: 14pt; font-weight: bold; margin-top: 0;">
-      Howdy! Click "View Item" to see the product, then check "I'm buying this!" to claim it. If you accidentally claim something, hit Undo on that item.
-    </p>
-    <p style="font-size: 1em; color: var(--text-muted); margin-top: -10px;">
-      If you notice any problems, please let me know via
-      <a href="https://forms.gle/YYmsCVazj6CR6v529" target="_blank">this link</a>.
-      For all reported issues go to
-      <a href="https://github.com/MaybeTristan/christmas-list-2025/issues" target="_blank">this link</a>.
-    </p>
+    <!-- Last updated + share -->
+    <div class="meta-row">
+      <div class="last-updated">
+        <span class="last-updated-dot"></span>
+        <span>Last updated March 13, 2026</span>
+      </div>
+      <button class="share-btn" id="shareListBtn">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+          <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+        </svg>
+        Share List
+      </button>
+    </div>
 
+    <!-- Howdy text -->
+    <p class="howdy">Howdy! Click "View Item" to see the product, then check "I'm buying this!" to claim it. If you accidentally claim something, hit Undo on that item.</p>
+
+    <!-- Help dropdown -->
+    <div class="help-dropdown-wrapper" id="helpWrapper">
+      <button class="help-toggle" onclick="toggleHelp()">
+        ❓ Need help or found a problem?
+        <i class="help-toggle-arrow">▾</i>
+      </button>
+      <div class="help-panel" id="helpPanel">
+        <div class="help-panel-inner">
+          <div class="help-panel-content">
+            <p>Found a bug or have feedback? Let Tristan know — or check the issue tracker for known problems.</p>
+            <a href="https://forms.gle/YYmsCVazj6CR6v529" target="_blank" class="help-link-btn">
+              📝 Report a Problem
+            </a>
+            <a href="https://github.com/MaybeTristan/christmas-list-2025/issues" target="_blank" class="help-link-btn">
+              🐛 View Known Issues
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Filter bar -->
     <div class="filter-bar">
       <div class="filter-group">
         <label for="sortSelect">Sort:</label>
@@ -347,7 +445,18 @@
       </div>
     </div>
 
-    <div class="grid-container"></div>
+    <!-- Active items grid -->
+    <div class="grid-container" id="activeGrid"></div>
+
+    <!-- Claimed items section -->
+    <div class="claimed-section" id="claimedSection" style="display:none">
+      <div class="claimed-divider">
+        <div class="claimed-divider-line"></div>
+        <span class="claimed-divider-label">✓ Already Claimed</span>
+        <div class="claimed-divider-line"></div>
+      </div>
+      <div class="claimed-grid" id="claimedGrid"></div>
+    </div>
 
     <img class="footer-img-light" src="https://photos.tristanarbet.com/Adobe%20Express%20Photo%20project-5.png" alt="Footer image" />
     <img class="footer-img-dark"  src="https://photos.tristanarbet.com/Adobe%20Express%20Photo%20project-6.png" alt="Footer image dark" />
@@ -380,6 +489,10 @@
     const CANOPY_API_KEY = "16e57d61-4a2e-4a84-b6b9-75790aee93f3";
     const CACHE_TTL_MS = 6 * 24 * 60 * 60 * 1000;
 
+    // ── UPDATE THIS DATE whenever you change the item list ─────────────────
+    // Format: "Month Day, Year"  e.g. "April 2, 2026"
+    const LIST_LAST_UPDATED = "March 13, 2026";
+
     const items = [
       {id:"swedish_fish_bag",name:"Swedish Fish Bag",price:"$8.00",asin:"B082F2PKQ5",img:"https://m.media-amazon.com/images/I/51Jlys2Z5vL._SS135_.jpg",link:"https://www.amazon.com/dp/B082F2PKQ5",category:"Food",prime:true,note:""},
       {id:"extra_sweet_watermelon_gum",name:"EXTRA Sweet Watermelon Gum",price:"$21.00",asin:"B0BP8531HZ",img:"https://m.media-amazon.com/images/I/51+00nx6CKL._SS135_.jpg",link:"https://www.amazon.com/dp/B0BP8531HZ",category:"Food",prime:true,note:""},
@@ -394,17 +507,27 @@
       {id:"smartwool_medium_gray_socks",name:"Smartwool Gray Socks",price:"$18.00",asin:"B0D7Y6332B",img:"https://m.media-amazon.com/images/I/811p5W6ciUL._AC_SX679_.jpg",link:"https://www.amazon.com/dp/B0D7Y6332B",category:"Clothes, Size M",prime:true,note:""},
     ];
 
-    // ══════════════════════════════════════════════════════════════════════
-    // MODAL SYSTEM
-    // showModal(options) — returns a Promise that resolves with the button
-    // label the user clicked, or null if dismissed.
-    //
-    // options: {
-    //   icon, title, body, type,   // type: 'default'|'warning'|'info'|'success'|'admin'
-    //   buttons: [{ label, style }] // style: 'primary'|'secondary'|'danger'
-    //   pin: boolean                // show PIN input field
-    // }
-    // ══════════════════════════════════════════════════════════════════════
+    // ── Help dropdown ──────────────────────────────────────────────────────
+    window.toggleHelp = function() {
+      document.getElementById("helpWrapper").classList.toggle("open");
+    };
+
+    // ── Share list button ──────────────────────────────────────────────────
+    document.getElementById("shareListBtn").addEventListener("click", async () => {
+      const shareText = "Tristan has this on his list! 🎁 " + window.location.href;
+      const btn = document.getElementById("shareListBtn");
+      try {
+        await navigator.clipboard.writeText(shareText);
+        btn.textContent = "✓ Copied!";
+        btn.classList.add("copied");
+        setTimeout(() => { btn.innerHTML = `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:13px;height:13px"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg> Share List`; btn.classList.remove("copied"); }, 2000);
+      } catch { /* fallback for older browsers */ }
+    });
+
+    // ── Set last updated date ──────────────────────────────────────────────
+    document.querySelector(".last-updated span:last-child").textContent = "Last updated " + LIST_LAST_UPDATED;
+
+    // ── Modal system ───────────────────────────────────────────────────────
     function showModal({ icon = '', title = '', body = '', type = 'default', buttons = [], pin = false }) {
       return new Promise((resolve) => {
         const backdrop = document.getElementById('modal-backdrop');
@@ -415,72 +538,41 @@
         const pinEl    = document.getElementById('modal-pin');
         const btnsEl   = document.getElementById('modal-buttons');
 
-        // Set content
         iconEl.textContent  = icon;
         titleEl.textContent = title;
         bodyEl.innerHTML    = body;
         box.className = 'modal-box ' + (type || 'default');
-
-        // PIN field
         pinEl.style.display = pin ? 'block' : 'none';
         pinEl.value = '';
-        pinEl.classList.remove('shake');
-
-        // Build buttons
         btnsEl.innerHTML = '';
+
         buttons.forEach(btn => {
           const b = document.createElement('button');
           b.className = 'modal-btn ' + (btn.style || 'secondary');
           b.textContent = btn.label;
-          b.addEventListener('click', () => {
-            close();
-            resolve({ action: btn.label, pinValue: pinEl.value });
-          });
+          b.addEventListener('click', () => { close(); resolve({ action: btn.label, pinValue: pinEl.value }); });
           btnsEl.appendChild(b);
         });
 
-        // Open
         backdrop.classList.add('open');
         if (pin) setTimeout(() => pinEl.focus(), 100);
 
         function close() { backdrop.classList.remove('open'); }
-
-        // Close on backdrop click
-        backdrop.addEventListener('click', (e) => {
-          if (e.target === backdrop) { close(); resolve(null); }
-        }, { once: true });
-
-        // Close on Escape
-        function onKey(e) {
-          if (e.key === 'Escape') { close(); resolve(null); document.removeEventListener('keydown', onKey); }
-        }
+        backdrop.addEventListener('click', (e) => { if (e.target === backdrop) { close(); resolve(null); } }, { once: true });
+        function onKey(e) { if (e.key === 'Escape') { close(); resolve(null); document.removeEventListener('keydown', onKey); } }
         document.addEventListener('keydown', onKey);
       });
     }
 
-    // Convenience wrappers that mirror the old alert/confirm/prompt API
     async function showAlert({ icon, title, body, type = 'info' }) {
       await showModal({ icon, title, body, type, buttons: [{ label: 'OK', style: 'primary' }] });
     }
-
     async function showConfirm({ icon, title, body, type = 'warning', confirmLabel = 'Yes', cancelLabel = 'Cancel' }) {
-      const result = await showModal({ icon, title, body, type, buttons: [
-        { label: cancelLabel, style: 'secondary' },
-        { label: confirmLabel, style: 'danger' }
-      ]});
+      const result = await showModal({ icon, title, body, type, buttons: [{ label: cancelLabel, style: 'secondary' }, { label: confirmLabel, style: 'danger' }] });
       return result?.action === confirmLabel;
     }
-
     async function showPinPrompt() {
-      const result = await showModal({
-        icon: '🔐', title: 'Admin Reset', type: 'admin',
-        body: 'Enter the 4-digit PIN to reset all claimed items.',
-        pin: true,
-        buttons: [
-          { label: 'Cancel', style: 'secondary' },
-          { label: 'Reset', style: 'danger' }
-        ]
-      });
+      const result = await showModal({ icon: '🔐', title: 'Admin Reset', type: 'admin', body: 'Enter the 4-digit PIN to reset all claimed items.', pin: true, buttons: [{ label: 'Cancel', style: 'secondary' }, { label: 'Reset', style: 'danger' }] });
       if (result?.action === 'Reset') return result.pinValue;
       return null;
     }
@@ -532,7 +624,6 @@
 
     // ── Thank you overlay ──────────────────────────────────────────────────
     let _lastClaimedItemId = null;
-
     window.showThankYou = function(productLink, itemId) {
       _lastClaimedItemId = itemId || null;
       const linkEl = document.getElementById("thankyou-product-link");
@@ -540,9 +631,7 @@
       document.getElementById("thankyou-overlay").classList.add("show");
       launchConfetti();
     };
-    window.closeThankYou = function() {
-      document.getElementById("thankyou-overlay").classList.remove("show");
-    };
+    window.closeThankYou = function() { document.getElementById("thankyou-overlay").classList.remove("show"); };
     window.undoFromThankYou = async function() {
       if (!_lastClaimedItemId) { closeThankYou(); return; }
       await set(ref(db, 'items/' + _lastClaimedItemId), { claimed: false, claimedAt: null });
@@ -572,7 +661,6 @@
           }
         }
       } catch (e) { console.warn("Firebase cache read failed", asin, e); }
-
       try {
         const res = await fetch(`https://rest.canopyapi.co/api/amazon/product?asin=${asin}`, { headers: { "API-KEY": CANOPY_API_KEY } });
         const data = await res.json();
@@ -584,7 +672,6 @@
           return { price, cachedAt: now, stale: false, isInStock };
         }
       } catch (e) { console.warn("Canopy fetch failed", asin, e); }
-
       if (cachedPrice === null) {
         try { await set(priceRef, { price: null, cachedAt: Date.now(), isInStock: null }); } catch {}
         return null;
@@ -627,11 +714,7 @@
           saveMyClaim(itemId, now);
           showThankYou(itemData?.link || "#", itemId);
         } else {
-          await showAlert({
-            icon: '😬', title: 'Already Claimed',
-            body: 'Someone else just claimed this item! Check another one.',
-            type: 'warning'
-          });
+          await showAlert({ icon: '😬', title: 'Already Claimed', body: 'Someone else just claimed this item! Check another one.', type: 'warning' });
         }
       } catch (error) {
         await showAlert({ icon: '⚠️', title: 'Something Went Wrong', body: 'Please try again in a moment.', type: 'warning' });
@@ -640,11 +723,7 @@
     };
 
     window.unclaimItem = async function(itemId) {
-      const confirmed = await showConfirm({
-        icon: '↩️', title: 'Undo Claim',
-        body: 'Are you sure you want to un-claim this item? Someone else will be able to claim it.',
-        type: 'warning', confirmLabel: 'Yes, Undo', cancelLabel: 'Keep It'
-      });
+      const confirmed = await showConfirm({ icon: '↩️', title: 'Undo Claim', body: 'Are you sure you want to un-claim this item? Someone else will be able to claim it.', type: 'warning', confirmLabel: 'Yes, Undo', cancelLabel: 'Keep It' });
       if (!confirmed) return;
       await set(ref(db, 'items/' + itemId), { claimed: false, claimedAt: null });
       removeMyClaim(itemId);
@@ -660,6 +739,7 @@
 
       const div = document.createElement("div");
       div.className = "item-card" + (claimed ? " claimed" : "");
+      div.dataset.id       = item.id;
       div.dataset.category = item.category;
       div.dataset.claimed  = claimed ? "true" : "false";
       div.dataset.price    = item.price.replace(/[^0-9.]/g, "");
@@ -687,20 +767,32 @@
         const soldOut = document.createElement("span"); soldOut.className = "sold-out-badge"; soldOut.id = "soldout_" + item.id; soldOut.textContent = "⚠️ Currently Out of Stock"; soldOut.style.display = "none"; info.appendChild(soldOut);
       }
 
+      // View + Share button row
       if (item.link) {
+        const actionRow = document.createElement("div"); actionRow.className = "item-action-row";
+
         const viewBtn = document.createElement("a"); viewBtn.href = item.link; viewBtn.target = "_blank"; viewBtn.className = "button view-btn"; viewBtn.textContent = "View Item";
         if (claimed) {
           viewBtn.addEventListener("click", async (e) => {
             e.preventDefault();
-            const go = await showConfirm({
-              icon: '⚠️', title: 'Already Claimed',
-              body: `<strong>${item.name}</strong> has already been claimed by someone.<br><br>Are you sure you want to view/buy it anyway?`,
-              type: 'warning', confirmLabel: 'View Anyway', cancelLabel: 'Go Back'
-            });
+            const go = await showConfirm({ icon: '⚠️', title: 'Already Claimed', body: `<strong>${item.name}</strong> has already been claimed.<br><br>Are you sure you want to view/buy it anyway?`, type: 'warning', confirmLabel: 'View Anyway', cancelLabel: 'Go Back' });
             if (go) window.open(item.link, '_blank');
           });
         }
-        info.appendChild(viewBtn);
+        actionRow.appendChild(viewBtn);
+
+        // Per-item share button
+        const shareBtn = document.createElement("button"); shareBtn.className = "item-share-btn"; shareBtn.title = "Copy share link"; shareBtn.textContent = "🔗";
+        shareBtn.addEventListener("click", async () => {
+          const shareText = `Tristan has this on his list! 🎁\n${item.name}\n${item.link}`;
+          try {
+            await navigator.clipboard.writeText(shareText);
+            shareBtn.textContent = "✓"; shareBtn.classList.add("copied");
+            setTimeout(() => { shareBtn.textContent = "🔗"; shareBtn.classList.remove("copied"); }, 2000);
+          } catch {}
+        });
+        actionRow.appendChild(shareBtn);
+        info.appendChild(actionRow);
       }
 
       const claimRow = document.createElement("div"); claimRow.className = "claim-row";
@@ -732,8 +824,8 @@
       const sort = document.getElementById("sortSelect").value;
       const category = document.getElementById("categorySelect").value;
       const unclaimedOnly = document.getElementById("unclaimedOnly").checked;
-      const container = document.querySelector(".grid-container");
-      let cards = Array.from(container.querySelectorAll(".item-card"));
+      const activeGrid = document.getElementById("activeGrid");
+      let cards = Array.from(activeGrid.querySelectorAll(".item-card"));
       cards.forEach(c => {
         const catMatch   = category === "all" || (c.dataset.category || "").startsWith(category);
         const claimMatch = !unclaimedOnly || c.dataset.claimed !== "true";
@@ -745,23 +837,87 @@
         if (sort === "price-desc") return parseFloat(b.dataset.price) - parseFloat(a.dataset.price);
         return 0;
       });
-      visible.forEach(c => container.appendChild(c));
+      visible.forEach(c => activeGrid.appendChild(c));
     }
 
-    // ── Real-time render ───────────────────────────────────────────────────
+    // ── Render with claimed-sink ───────────────────────────────────────────
     let pricesLoaded = false;
+    let prevSnapshot = {};
+
     function renderItemsFromSnapshot(snapshot) {
-      const container = document.querySelector(".grid-container");
-      container.innerHTML = "";
-      for (const item of items) { container.appendChild(createItemCard(item, snapshot[item.id] || { claimed: false })); }
-      applyFilters();
-      if (!pricesLoaded) { pricesLoaded = true; loadLivePrices(); }
+      const activeGrid   = document.getElementById("activeGrid");
+      const claimedGrid  = document.getElementById("claimedGrid");
+      const claimedSection = document.getElementById("claimedSection");
+
+      const isFirstRender = activeGrid.querySelectorAll(".item-card").length === 0
+                         && claimedGrid.querySelectorAll(".item-card").length === 0;
+
+      if (isFirstRender) {
+        // Initial render — place cards directly, no animation
+        activeGrid.innerHTML = "";
+        claimedGrid.innerHTML = "";
+        for (const item of items) {
+          const claimData = snapshot[item.id] || { claimed: false };
+          const card = createItemCard(item, claimData);
+          if (claimData.claimed) {
+            claimedGrid.appendChild(card);
+          } else {
+            activeGrid.appendChild(card);
+          }
+        }
+        const hasAnyClaimed = items.some(i => (snapshot[i.id] || {}).claimed);
+        claimedSection.style.display = hasAnyClaimed ? "block" : "none";
+        applyFilters();
+        if (!pricesLoaded) { pricesLoaded = true; loadLivePrices(); }
+      } else {
+        // Subsequent updates — animate newly claimed/unclaimed cards
+        for (const item of items) {
+          const claimData   = snapshot[item.id] || { claimed: false };
+          const prevData    = prevSnapshot[item.id] || { claimed: false };
+          const justClaimed = claimData.claimed && !prevData.claimed;
+          const justUnclaimed = !claimData.claimed && prevData.claimed;
+
+          if (justClaimed) {
+            // Find card in activeGrid, animate it out, then move to claimedGrid
+            const existing = activeGrid.querySelector(`[data-id="${item.id}"]`);
+            if (existing) {
+              existing.classList.add("card-sinking");
+              setTimeout(() => {
+                existing.remove();
+                const newCard = createItemCard(item, claimData);
+                newCard.classList.add("card-rising");
+                claimedGrid.appendChild(newCard);
+                claimedSection.style.display = "block";
+                setTimeout(() => newCard.classList.remove("card-rising"), 400);
+              }, 360);
+            }
+          } else if (justUnclaimed) {
+            // Find card in claimedGrid, animate it out, then move to activeGrid
+            const existing = claimedGrid.querySelector(`[data-id="${item.id}"]`);
+            if (existing) {
+              existing.classList.add("card-sinking");
+              setTimeout(() => {
+                existing.remove();
+                const newCard = createItemCard(item, claimData);
+                newCard.classList.add("card-rising");
+                activeGrid.appendChild(newCard);
+                applyFilters();
+                const hasAnyClaimed = claimedGrid.querySelectorAll(".item-card").length > 0;
+                claimedSection.style.display = hasAnyClaimed ? "block" : "none";
+                setTimeout(() => newCard.classList.remove("card-rising"), 400);
+              }, 360);
+            }
+          }
+        }
+      }
+
+      prevSnapshot = { ...snapshot };
     }
 
     function showSkeletons() {
-      const container = document.querySelector(".grid-container");
-      container.innerHTML = "";
-      for (let i = 0; i < 6; i++) container.appendChild(createSkeletonCard());
+      const activeGrid = document.getElementById("activeGrid");
+      activeGrid.innerHTML = "";
+      for (let i = 0; i < 6; i++) activeGrid.appendChild(createSkeletonCard());
     }
 
     window.addEventListener("DOMContentLoaded", () => {
@@ -771,16 +927,11 @@
 
       document.getElementById("resetButton").addEventListener("click", async () => {
         const pin = await showPinPrompt();
-        if (pin === null) return; // cancelled
-
-        // Validate PIN — shake if wrong
+        if (pin === null) return;
         if (pin !== "3323") {
-          const pinEl = document.getElementById("modal-pin");
-          // Re-open with error since the modal is already closed
           await showAlert({ icon: '🔒', title: 'Incorrect PIN', body: 'The PIN you entered was incorrect. Please try again.', type: 'warning' });
           return;
         }
-
         const updates = {};
         items.forEach(item => { updates['items/' + item.id + '/claimed'] = false; updates['items/' + item.id + '/claimedAt'] = null; });
         await update(ref(db), updates);
