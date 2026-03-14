@@ -314,7 +314,10 @@
     .list-row-thumb {
       width: 60px; height: 60px; flex-shrink: 0;
       object-fit: contain; background: var(--card-img-bg);
-      border-right: 1px solid var(--border);
+      border-radius: 7px;
+      margin: 8px 0 8px 8px;
+      padding: 4px;
+      border: 1px solid var(--border);
     }
     .list-row-main {
       flex: 1; min-width: 0; overflow: hidden;
@@ -398,7 +401,7 @@
     .claimed-grid.list-view .item-card { display: none !important; }
 
     @media (max-width: 600px) {
-      .list-row-thumb { width: 48px; height: 48px; }
+      .list-row-thumb { width: 48px; height: 48px; border-radius: 6px; }
       .list-row-name { font-size: 0.85em; }
       .list-row-wrapper { max-width: 100%; overflow: hidden; }
       .list-row { max-width: 100%; }
