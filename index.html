@@ -295,11 +295,13 @@
     /* List row */
     .list-row {
       width: 100%;
+      min-width: 0;
       display: flex; align-items: center; gap: 12px;
       background: var(--card-bg); border: 1px solid var(--border);
       border-radius: 8px; overflow: hidden;
       box-shadow: 0 1px 4px rgba(0,0,0,0.07);
       transition: background 0.3s, box-shadow 0.15s;
+      box-sizing: border-box;
     }
     .list-row:hover { box-shadow: 0 3px 10px rgba(0,0,0,0.12); }
     .list-row.claimed { background: var(--card-claimed-bg); opacity: 0.82; }
@@ -309,18 +311,18 @@
       border-right: 1px solid var(--border);
     }
     .list-row-main {
-      flex: 1; min-width: 0;
+      flex: 1; min-width: 0; overflow: hidden;
       display: flex; flex-direction: column; gap: 3px;
       padding: 10px 0;
     }
     .list-row-name {
       font-size: 0.92em; font-weight: 600; color: var(--text);
-      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+      overflow-wrap: break-word; word-break: break-word;
     }
     .list-row-meta {
-      display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+      display: flex; align-items: center; gap: 6px; flex-wrap: wrap; min-width: 0;
     }
-    .list-row-price { font-size: 0.82em; font-weight: bold; color: var(--text); }
+    .list-row-price { font-size: 0.82em; font-weight: bold; color: var(--text); overflow-wrap: break-word; min-width: 0; max-width: 100%; }
     .list-row-price.price-loading { color: var(--text-faint); font-style: italic; font-weight: normal; }
     .list-row-price.price-unavailable { color: var(--text-faint); font-style: italic; }
     .list-row-price[data-has-price="true"]::after { content: " 🟢"; font-size: 0.7em; }
@@ -329,7 +331,7 @@
     .list-row-claimed-badge.me { color: #8f2121; }
     .list-row-actions {
       display: flex; align-items: center; gap: 6px;
-      padding-right: 12px; flex-shrink: 0;
+      padding-right: 12px; flex-shrink: 0; min-width: 0;
     }
     .list-row-share {
       display: flex; align-items: center; justify-content: center;
@@ -392,6 +394,9 @@
     @media (max-width: 600px) {
       .list-row-thumb { width: 48px; height: 48px; }
       .list-row-name { font-size: 0.85em; }
+      .list-row-wrapper { max-width: 100%; overflow: hidden; }
+      .list-row { max-width: 100%; }
+      .list-row-price.price-unavailable { font-size: 0.7em; }
     }
 
     /* ── Filter bar ──────────────────────────────────────────────────────── */
@@ -1060,7 +1065,30 @@
     };
 
     window.unclaimItem = async function(itemId) {
-      const confirmed = await showConfirm({ icon: '↩️', title: 'Undo Claim', body: 'Are you sure you want to un-claim this item? Someone else will be able to claim it.', type: 'warning', confirmLabel: 'Yes, Undo', cancelLabel: 'Keep It' });
+      const myClaims = getMyClaims();
+      const iClaimedThis = !!myClaims[itemId];
+
+      // If we have no record of this device claiming it, show an extra warning first
+      if (!iClaimedThis) {
+        const proceed = await showConfirm({
+          icon: '🤔',
+          title: 'Heads Up!',
+          body: "It looks like this item wasn't claimed from this device — we don't have a record of it here. If someone else claimed it, undoing this will free it up for others to grab.<br><br>Are you sure you'd like to proceed?",
+          type: 'warning',
+          confirmLabel: 'Yes, Undo Anyway',
+          cancelLabel: 'Never Mind'
+        });
+        if (!proceed) return;
+      }
+
+      const confirmed = await showConfirm({
+        icon: '↩️',
+        title: 'Undo Claim',
+        body: 'Are you sure you want to un-claim this item? It will become available for someone else to claim.',
+        type: 'warning',
+        confirmLabel: 'Yes, Undo',
+        cancelLabel: 'Keep It'
+      });
       if (!confirmed) return;
       await set(ref(db, 'items/' + itemId), { claimed: false, claimedAt: null });
       removeMyClaim(itemId);
@@ -1380,6 +1408,8 @@
 
       const wrapper = document.createElement("div");
       wrapper.className = "list-row-wrapper";
+      wrapper.style.minWidth = "0";
+      wrapper.style.overflow = "hidden";
       wrapper.dataset.id       = item.id;
       wrapper.dataset.category = item.category;
       wrapper.dataset.claimed  = claimed ? "true" : "false";
