@@ -146,9 +146,10 @@
       display: flex; align-items: center; gap: 12px;
     }
     .giftcard-logo {
-      width: 48px; height: 48px; border-radius: 10px;
+      width: 56px; height: 56px; border-radius: 10px;
       object-fit: contain; background: #f5f5f5; flex-shrink: 0;
       border: 1px solid var(--border);
+      box-sizing: border-box;
     }
     .giftcard-name { font-size: 0.95em; font-weight: 600; color: var(--text); margin: 0 0 3px 0; font-family: 'Merriweather', serif; }
     .giftcard-price { font-size: 0.8em; color: var(--text-faint); }
@@ -746,7 +747,7 @@
 
         <div class="giftcard-card">
           <div class="giftcard-header">
-            <img class="giftcard-logo" src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Apple_logo_black.svg/640px-Apple_logo_black.svg.png" alt="Apple" style="padding:8px;" />
+            <img class="giftcard-logo" src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg" alt="Apple" style="padding:12px; object-fit:contain;" />
             <div>
               <p class="giftcard-name">Apple Gift Card</p>
               <p class="giftcard-price">$10 – $200 · You Choose</p>
@@ -760,7 +761,7 @@
 
         <div class="giftcard-card">
           <div class="giftcard-header">
-            <img class="giftcard-logo" src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Amazon_logo.svg/640px-Amazon_logo.svg.png" alt="Amazon" style="padding:6px;" />
+            <img class="giftcard-logo" src="https://upload.wikimedia.org/wikipedia/commons/d/de/Amazon_icon.png" alt="Amazon" style="padding:10px; object-fit:contain;" />
             <div>
               <p class="giftcard-name">Amazon Gift Card</p>
               <p class="giftcard-price">$5 – $200 · You Choose</p>
