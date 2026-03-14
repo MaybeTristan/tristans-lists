@@ -67,7 +67,127 @@
     body { font-family: 'Lexend', sans-serif; margin: 0; background: var(--bg); color: var(--text); transition: background 0.3s, color 0.3s; }
     h1, h2, h3, h4 { font-family: 'Merriweather', serif; }
 
-    /* ── Banner ──────────────────────────────────────────────────────────── */
+    /* ── Quick Info Strip ───────────────────────────────────────────────── */
+    .quick-info-strip {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin: 0 20px;
+      box-shadow: 0 1px 6px rgba(0,0,0,0.07);
+      overflow: hidden;
+      transition: background 0.3s, border-color 0.3s;
+    }
+    .quick-info-header {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 9px 16px; cursor: pointer; user-select: none;
+      gap: 10px;
+    }
+    .quick-info-header:hover { background: rgba(143,33,33,0.04); }
+    .quick-info-title {
+      font-size: 0.82em; font-weight: 600; color: var(--text-muted);
+      display: flex; align-items: center; gap: 6px; letter-spacing: 0.01em;
+    }
+    .quick-info-pills {
+      display: flex; align-items: center; gap: 8px; flex-wrap: wrap;
+    }
+    .quick-info-pill {
+      font-size: 0.75em; color: var(--text-faint);
+      display: flex; align-items: center; gap: 4px;
+      white-space: nowrap;
+    }
+    .quick-info-pill-dot { width: 5px; height: 5px; border-radius: 50%; background: #4caf50; flex-shrink: 0; }
+    .quick-info-pill-sep { color: var(--border); font-size: 1.2em; line-height: 1; }
+    .quick-info-arrow { font-size: 0.75em; color: var(--text-faint); transition: transform 0.25s; flex-shrink: 0; }
+    .quick-info-strip.open .quick-info-arrow { transform: rotate(180deg); }
+    .quick-info-body {
+      display: grid; grid-template-rows: 0fr;
+      transition: grid-template-rows 0.28s ease;
+    }
+    .quick-info-strip.open .quick-info-body { grid-template-rows: 1fr; }
+    .quick-info-body-inner { overflow: hidden; }
+    .quick-info-body-content {
+      padding: 12px 16px 14px;
+      border-top: 1px solid var(--border);
+      display: flex; flex-wrap: wrap; gap: 14px;
+    }
+    .quick-info-item {
+      display: flex; flex-direction: column; gap: 2px; min-width: 140px;
+    }
+    .quick-info-item-label { font-size: 0.7em; text-transform: uppercase; letter-spacing: 0.08em; color: var(--text-faint); }
+    .quick-info-item-value { font-size: 0.88em; color: var(--text); font-weight: 500; }
+    .quick-info-need-help {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 0.78em; color: var(--text-faint);
+      background: none; border: none; cursor: pointer;
+      font-family: 'Lexend', sans-serif; padding: 0; text-decoration: underline;
+      text-underline-offset: 2px;
+    }
+    .quick-info-need-help:hover { color: var(--text-muted); }
+
+    /* ── Gift cards section ──────────────────────────────────────────────── */
+    .giftcard-section { margin-top: 32px; }
+    .giftcard-divider {
+      display: flex; align-items: center; gap: 12px; margin-bottom: 16px;
+    }
+    .giftcard-divider-line { flex: 1; height: 1px; background: var(--border); }
+    .giftcard-divider-label { font-size: 0.78em; color: var(--text-faint); white-space: nowrap; text-transform: uppercase; letter-spacing: 0.08em; }
+    .giftcard-grid { display: flex; flex-wrap: wrap; gap: 16px; }
+    .giftcard-card {
+      width: calc(50% - 8px);
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 10px; overflow: hidden;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.07);
+      display: flex; flex-direction: column;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+    .giftcard-card:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.12); }
+    .giftcard-header {
+      padding: 14px 14px 10px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .giftcard-logo {
+      width: 48px; height: 48px; border-radius: 10px;
+      object-fit: contain; background: #f5f5f5; flex-shrink: 0;
+      border: 1px solid var(--border);
+    }
+    .giftcard-name { font-size: 0.95em; font-weight: 600; color: var(--text); margin: 0 0 3px 0; font-family: 'Merriweather', serif; }
+    .giftcard-price { font-size: 0.8em; color: var(--text-faint); }
+    .giftcard-body { padding: 0 14px 14px; display: flex; flex-direction: column; gap: 8px; margin-top: auto; }
+    .giftcard-btn {
+      display: block; width: 100%; text-align: center;
+      background: var(--btn-bg); color: var(--btn-text);
+      border: none; border-radius: 6px; padding: 8px;
+      font-family: 'Lexend', sans-serif; font-size: 0.88em;
+      cursor: pointer; text-decoration: none;
+    }
+    .giftcard-btn:hover { opacity: 0.88; }
+    .giftcard-info-tag {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 0.72em; color: var(--text-faint);
+      background: var(--note-bg); border-radius: 4px;
+      padding: 3px 7px; align-self: flex-start;
+    }
+
+    /* ── Gift card info modal extras ─────────────────────────────────────── */
+    .gc-info-table { width: 100%; border-collapse: collapse; margin-bottom: 4px; }
+    .gc-info-table tr td { padding: 5px 0; font-size: 0.88em; vertical-align: top; }
+    .gc-info-table tr td:first-child { color: var(--text-faint); width: 44%; font-size: 0.82em; padding-right: 8px; }
+    .gc-copy-btn {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 0.75em; background: var(--bg); border: 1px solid var(--border);
+      border-radius: 4px; padding: 2px 7px; cursor: pointer;
+      font-family: 'Lexend', sans-serif; color: var(--text-muted);
+      margin-left: 6px; vertical-align: middle;
+    }
+    .gc-copy-btn.copied { background: #27ae60; color: #fff; border-color: #27ae60; }
+
+    @media (max-width: 600px) {
+      .quick-info-strip { margin: 0 12px; }
+      .quick-info-pills { display: none; }
+      .giftcard-card { width: 100%; }
+    }
+
+        /* ── Banner ──────────────────────────────────────────────────────────── */
     .banner-wrapper { padding: 20px 20px 0 20px; }
     .banner { width: 100%; max-height: 220px; overflow: hidden; display: flex; align-items: center; justify-content: center; background: #1a1a1a; border-radius: 12px; box-shadow: 0 4px 16px rgba(0,0,0,0.2); }
     .banner img { width: 100%; max-width: 100%; height: 220px; object-fit: cover; object-position: center 40%; display: block; border-radius: 12px; }
@@ -360,6 +480,43 @@
     </div>
   </div>
 
+  <!-- Quick Info Strip -->
+  <div class="quick-info-strip" id="quickInfoStrip">
+    <div class="quick-info-header" id="quickInfoHeader">
+      <span class="quick-info-title">🎂 Quick Info!</span>
+      <div class="quick-info-pills">
+        <span class="quick-info-pill">🎂 Birthday: June 17th</span>
+        <span class="quick-info-pill-sep">·</span>
+        <span class="quick-info-pill"><span class="quick-info-pill-dot"></span> Last updated March 13, 2026</span>
+        <span class="quick-info-pill-sep">·</span>
+        <span class="quick-info-pill" id="claimedCountPill">Loading…</span>
+      </div>
+      <span class="quick-info-arrow">▾</span>
+    </div>
+    <div class="quick-info-body">
+      <div class="quick-info-body-inner">
+        <div class="quick-info-body-content">
+          <div class="quick-info-item">
+            <span class="quick-info-item-label">🎂 Birthday</span>
+            <span class="quick-info-item-value">June 17th</span>
+          </div>
+          <div class="quick-info-item">
+            <span class="quick-info-item-label">📅 Last Updated</span>
+            <span class="quick-info-item-value" id="quickInfoUpdated">March 13, 2026</span>
+          </div>
+          <div class="quick-info-item">
+            <span class="quick-info-item-label">🎁 Items Claimed</span>
+            <span class="quick-info-item-value" id="quickInfoClaimed">Loading…</span>
+          </div>
+          <div class="quick-info-item">
+            <span class="quick-info-item-label">❓ Need Help?</span>
+            <button class="quick-info-need-help" id="quickInfoHelpBtn">Report a problem →</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- Banner -->
   <div class="banner-wrapper">
     <div class="banner">
@@ -399,14 +556,14 @@
 
     <!-- Help dropdown -->
     <div class="help-dropdown-wrapper" id="helpWrapper">
-      <button class="help-toggle" onclick="toggleHelp()">
+      <button class="help-toggle" id="helpToggleBtn">
         ❓ Need help or found a problem?
         <i class="help-toggle-arrow">▾</i>
       </button>
       <div class="help-panel" id="helpPanel">
         <div class="help-panel-inner">
           <div class="help-panel-content">
-            <p>Found a bug or have feedback? Let me know or check the issue tracker for known problems.</p>
+            <p>Found a bug or have feedback? Let Tristan know — or check the issue tracker for known problems.</p>
             <a href="https://forms.gle/YYmsCVazj6CR6v529" target="_blank" class="help-link-btn">
               📝 Report a Problem
             </a>
@@ -458,6 +615,60 @@
       <div class="claimed-grid" id="claimedGrid"></div>
     </div>
 
+    <!-- Gift Cards Section -->
+    <div class="giftcard-section">
+      <div class="giftcard-divider">
+        <div class="giftcard-divider-line"></div>
+        <span class="giftcard-divider-label">🎁 Gift Cards Welcome!</span>
+        <div class="giftcard-divider-line"></div>
+      </div>
+      <div class="giftcard-grid">
+
+        <div class="giftcard-card">
+          <div class="giftcard-header">
+            <img class="giftcard-logo" src="https://upload.wikimedia.org/wikipedia/en/thumb/d/d3/Starbucks_Corporation_Logo_2011.svg/640px-Starbucks_Corporation_Logo_2011.svg.png" alt="Starbucks" />
+            <div>
+              <p class="giftcard-name">Starbucks Gift Card</p>
+              <p class="giftcard-price">$5 – $100 · You Choose</p>
+            </div>
+          </div>
+          <div class="giftcard-body">
+            <span class="giftcard-info-tag">ℹ️ Requires recipient info</span>
+            <button class="giftcard-btn" onclick="openGiftCard('starbucks')">Go to Gift Card →</button>
+          </div>
+        </div>
+
+        <div class="giftcard-card">
+          <div class="giftcard-header">
+            <img class="giftcard-logo" src="https://upload.wikimedia.org/wikipedia/commons/thumb/f/fa/Apple_logo_black.svg/640px-Apple_logo_black.svg.png" alt="Apple" style="padding:8px;" />
+            <div>
+              <p class="giftcard-name">Apple Gift Card</p>
+              <p class="giftcard-price">$10 – $200 · You Choose</p>
+            </div>
+          </div>
+          <div class="giftcard-body">
+            <span class="giftcard-info-tag">ℹ️ Requires recipient info</span>
+            <button class="giftcard-btn" onclick="openGiftCard('apple')">Go to Gift Card →</button>
+          </div>
+        </div>
+
+        <div class="giftcard-card">
+          <div class="giftcard-header">
+            <img class="giftcard-logo" src="https://upload.wikimedia.org/wikipedia/commons/thumb/a/a9/Amazon_logo.svg/640px-Amazon_logo.svg.png" alt="Amazon" style="padding:6px;" />
+            <div>
+              <p class="giftcard-name">Amazon Gift Card</p>
+              <p class="giftcard-price">$5 – $200 · You Choose</p>
+            </div>
+          </div>
+          <div class="giftcard-body">
+            <span class="giftcard-info-tag">ℹ️ Requires recipient info</span>
+            <button class="giftcard-btn" onclick="openGiftCard('amazon')">Go to Gift Card →</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
     <img class="footer-img-light" src="https://photos.tristanarbet.com/Adobe%20Express%20Photo%20project-5.png" alt="Footer image" />
     <img class="footer-img-dark"  src="https://photos.tristanarbet.com/Adobe%20Express%20Photo%20project-6.png" alt="Footer image dark" />
 
@@ -506,11 +717,6 @@
       {id:"anker_braided_cables_2_pack",name:"Anker Braided Cables 2 Pack",price:"$13.00",asin:"B09LCJPZ1P",img:"https://m.media-amazon.com/images/I/71fWdhjLjJL._AC_SY240_.jpg",link:"https://www.amazon.com/dp/B09LCJPZ1P",category:"Tech",prime:true,note:""},
       {id:"smartwool_medium_gray_socks",name:"Smartwool Gray Socks",price:"$18.00",asin:"B0D7Y6332B",img:"https://m.media-amazon.com/images/I/811p5W6ciUL._AC_SX679_.jpg",link:"https://www.amazon.com/dp/B0D7Y6332B",category:"Clothes, Size M",prime:true,note:""},
     ];
-
-    // ── Help dropdown ──────────────────────────────────────────────────────
-    window.toggleHelp = function() {
-      document.getElementById("helpWrapper").classList.toggle("open");
-    };
 
     // ── Share list button ──────────────────────────────────────────────────
     document.getElementById("shareListBtn").addEventListener("click", async () => {
@@ -920,9 +1126,113 @@
       for (let i = 0; i < 6; i++) activeGrid.appendChild(createSkeletonCard());
     }
 
+    // ── Gift card data ─────────────────────────────────────────────────────
+    const giftCards = {
+      starbucks: {
+        name: "Starbucks",
+        link: "https://www.starbucks.com/gift/00001056",
+        info: [
+          { label: "Recipient Name", value: "Tristan" },
+          { label: "Recipient Email", value: "tristanarbet@gmail.com" },
+        ]
+      },
+      apple: {
+        name: "Apple",
+        link: "https://www.apple.com/shop/buy-giftcard/giftcard",
+        info: [
+          { label: "Recipient Name", value: "Tristan" },
+          { label: "Recipient Email", value: "tristanarbet@gmail.com" },
+        ]
+      },
+      amazon: {
+        name: "Amazon",
+        link: "https://www.amazon.com/Amazon-eGift-Card-Logo-Animated/dp/B07PCMWTSG",
+        info: [
+          { label: "Recipient Email", value: "tristanarbet@gmail.com" },
+          { label: "Phone Number", value: "(314) 671-9435" },
+        ]
+      }
+    };
+
+    window.openGiftCard = async function(cardId) {
+      const gc = giftCards[cardId];
+      if (!gc) return;
+
+      // Build info table with copy buttons
+      let tableRows = gc.info.map(row => `
+        <tr>
+          <td>${row.label}</td>
+          <td>
+            <strong>${row.value}</strong>
+            <button class="gc-copy-btn" onclick="gcCopy(this, '${row.value}')">Copy</button>
+          </td>
+        </tr>`).join("");
+
+      const body = `
+        <p style="margin:0 0 12px 0; font-size:0.88em; color:var(--text-muted); line-height:1.5;">
+          When checking out, you may be asked for the following details. Feel free to copy them! 💛
+        </p>
+        <table class="gc-info-table">${tableRows}</table>`;
+
+      await showModal({
+        icon: '🎁',
+        title: `${gc.name} Gift Card Info`,
+        body,
+        type: 'info',
+        buttons: [
+          { label: 'Cancel', style: 'secondary' },
+          { label: 'Go to Gift Card →', style: 'primary' }
+        ]
+      }).then(result => {
+        if (result?.action === 'Go to Gift Card →') {
+          window.open(gc.link, '_blank');
+        }
+      });
+    };
+
+    // Copy helper for gc copy buttons (needs to be global)
+    window.gcCopy = function(btn, text) {
+      navigator.clipboard.writeText(text).then(() => {
+        btn.textContent = "✓ Copied";
+        btn.classList.add("copied");
+        setTimeout(() => { btn.textContent = "Copy"; btn.classList.remove("copied"); }, 2000);
+      }).catch(() => {});
+    };
+
     window.addEventListener("DOMContentLoaded", () => {
       showSkeletons();
-      onValue(ref(db, 'items'), (snapshot) => { renderItemsFromSnapshot(snapshot.val() || {}); });
+      // Quick info strip toggle
+      document.getElementById("quickInfoHeader").addEventListener("click", () => {
+        document.getElementById("quickInfoStrip").classList.toggle("open");
+      });
+
+      // Quick info help button opens help panel
+      document.getElementById("quickInfoHelpBtn").addEventListener("click", () => {
+        document.getElementById("helpWrapper").classList.add("open");
+        document.getElementById("helpWrapper").scrollIntoView({ behavior: "smooth", block: "center" });
+      });
+
+      // Set last updated in quick info
+      document.getElementById("quickInfoUpdated").textContent = LIST_LAST_UPDATED;
+      document.querySelector(".quick-info-pills .quick-info-pill:nth-child(3)").innerHTML =
+        '<span class="quick-info-pill-dot"></span> Last updated ' + LIST_LAST_UPDATED;
+
+      // Real-time claimed count in quick info
+      onValue(ref(db, 'items'), (snapshot) => {
+        const data = snapshot.val() || {};
+        const claimed = Object.values(data).filter(v => v?.claimed).length;
+        const total = items.length;
+        const countText = claimed + " of " + total + " claimed";
+        const el = document.getElementById("quickInfoClaimed");
+        const pill = document.getElementById("claimedCountPill");
+        if (el) el.textContent = countText;
+        if (pill) pill.textContent = "🎁 " + countText;
+        renderItemsFromSnapshot(data);
+      });
+
+      document.getElementById("helpToggleBtn").addEventListener("click", () => {
+        document.getElementById("helpWrapper").classList.toggle("open");
+      });
       ["sortSelect","categorySelect","unclaimedOnly"].forEach(id => { document.getElementById(id).addEventListener("change", applyFilters); });
 
       document.getElementById("resetButton").addEventListener("click", async () => {
