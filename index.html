@@ -278,6 +278,119 @@
     /* ── Howdy text ──────────────────────────────────────────────────────── */
     .howdy { font-size: 14pt; font-weight: bold; margin: 0 0 14px 0; }
 
+
+    /* ── List mode ───────────────────────────────────────────────────────── */
+    .list-mode-toggle {
+      display: flex; align-items: center; gap: 5px;
+      font-family: 'Lexend', sans-serif; font-size: 0.8em;
+      padding: 5px 11px; border-radius: 20px;
+      border: 1px solid var(--border);
+      background: var(--card-bg); color: var(--text-muted);
+      cursor: pointer; transition: background 0.15s, color 0.15s, border-color 0.15s;
+      white-space: nowrap; user-select: none;
+    }
+    .list-mode-toggle:hover { background: #8f2121; color: #fff; border-color: #8f2121; }
+    .list-mode-toggle.active { background: #8f2121; color: #fff; border-color: #8f2121; }
+
+    /* List row */
+    .list-row {
+      width: 100%;
+      display: flex; align-items: center; gap: 12px;
+      background: var(--card-bg); border: 1px solid var(--border);
+      border-radius: 8px; overflow: hidden;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.07);
+      transition: background 0.3s, box-shadow 0.15s;
+    }
+    .list-row:hover { box-shadow: 0 3px 10px rgba(0,0,0,0.12); }
+    .list-row.claimed { background: var(--card-claimed-bg); opacity: 0.82; }
+    .list-row-thumb {
+      width: 60px; height: 60px; flex-shrink: 0;
+      object-fit: contain; background: var(--card-img-bg);
+      border-right: 1px solid var(--border);
+    }
+    .list-row-main {
+      flex: 1; min-width: 0;
+      display: flex; flex-direction: column; gap: 3px;
+      padding: 10px 0;
+    }
+    .list-row-name {
+      font-size: 0.92em; font-weight: 600; color: var(--text);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .list-row-meta {
+      display: flex; align-items: center; gap: 6px; flex-wrap: wrap;
+    }
+    .list-row-price { font-size: 0.82em; font-weight: bold; color: var(--text); }
+    .list-row-price.price-loading { color: var(--text-faint); font-style: italic; font-weight: normal; }
+    .list-row-price.price-unavailable { color: var(--text-faint); font-style: italic; }
+    .list-row-price[data-has-price="true"]::after { content: " 🟢"; font-size: 0.7em; }
+    .list-row-cat { font-size: 0.72em; background: var(--tag-bg); color: var(--tag-text); padding: 1px 6px; border-radius: 4px; }
+    .list-row-claimed-badge { font-size: 0.72em; font-weight: bold; color: #3a7a3a; }
+    .list-row-claimed-badge.me { color: #8f2121; }
+    .list-row-actions {
+      display: flex; align-items: center; gap: 6px;
+      padding-right: 12px; flex-shrink: 0;
+    }
+    .list-row-share {
+      display: flex; align-items: center; justify-content: center;
+      width: 30px; height: 30px; border-radius: 5px;
+      border: 1px solid var(--border); background: var(--card-bg);
+      color: var(--text-muted); cursor: pointer; font-size: 0.85em;
+      transition: background 0.15s, color 0.15s, border-color 0.15s;
+      flex-shrink: 0;
+    }
+    .list-row-share:hover { background: #8f2121; color: #fff; border-color: #8f2121; }
+    .list-row-share.copied { background: #27ae60; color: #fff; border-color: #27ae60; }
+    .list-row-expand {
+      display: flex; align-items: center; justify-content: center;
+      width: 30px; height: 30px; border-radius: 5px;
+      border: 1px solid var(--border); background: var(--card-bg);
+      color: var(--text-muted); cursor: pointer; font-size: 0.8em;
+      transition: background 0.15s, color 0.15s, border-color 0.15s, transform 0.2s;
+      flex-shrink: 0;
+    }
+    .list-row-expand:hover { background: var(--unclaim-hover); }
+    .list-row-expand.open { transform: rotate(180deg); }
+    .list-row-checkbox {
+      width: 17px; height: 17px; accent-color: #8f2121; cursor: pointer; flex-shrink: 0;
+    }
+    .list-row-undo {
+      background: none; border: 1px solid var(--unclaim-border); border-radius: 4px;
+      padding: 2px 7px; font-size: 0.72em; color: var(--unclaim-text);
+      cursor: pointer; font-family: 'Lexend', sans-serif; white-space: nowrap;
+    }
+    .list-row-undo:hover { background: var(--unclaim-hover); }
+
+    /* Expanded card inside list row */
+    .list-row-expanded {
+      display: grid; grid-template-rows: 0fr;
+      transition: grid-template-rows 0.28s ease;
+      width: 100%;
+    }
+    .list-row-expanded.open { grid-template-rows: 1fr; }
+    .list-row-expanded-inner { overflow: hidden; }
+    .list-row-expanded-card {
+      border-top: 1px solid var(--border);
+      padding: 14px;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .list-row-expanded-card .item-action-row { max-width: 320px; }
+
+    /* Grid/list containers */
+    .grid-container.list-view,
+    .claimed-grid.list-view { flex-direction: column; gap: 8px; }
+    .grid-container.list-view .item-card,
+    .claimed-grid.list-view .item-card { display: none !important; }
+
+    /* Hide list rows in grid mode */
+    .grid-container:not(.list-view) .list-row,
+    .claimed-grid:not(.list-view) .list-row { display: none !important; }
+
+    @media (max-width: 600px) {
+      .list-row-thumb { width: 48px; height: 48px; }
+      .list-row-name { font-size: 0.85em; }
+    }
+
     /* ── Filter bar ──────────────────────────────────────────────────────── */
     .filter-bar { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; margin-bottom: 16px; padding: 10px 14px; background: var(--card-bg); border-radius: 8px; border: 1px solid var(--border); box-shadow: 0 1px 4px rgba(0,0,0,0.06); }
     .filter-group { display: flex; align-items: center; gap: 6px; flex-wrap: nowrap; }
@@ -494,6 +607,9 @@
     <div class="header-row">
       <h1>Tristan's Birthday List</h1>
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <button class="list-mode-toggle" id="listModeBtn" title="Toggle list mode">
+          ☰ List Mode
+        </button>
         <button class="share-btn" id="shareListBtn">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
@@ -512,7 +628,7 @@
     <!-- Quick Info Strip -->
     <div class="quick-info-strip" id="quickInfoStrip" style="margin: 14px 0 16px 0;">
       <div class="quick-info-header" id="quickInfoHeader">
-        <span class="quick-info-title">🎂 Quick Info!</span>
+        <span class="quick-info-title">✨ Quick Info!</span>
         <div class="quick-info-pills">
           <span class="quick-info-pill">🎂 Birthday: June 17th</span>
           <span class="quick-info-pill-sep">·</span>
@@ -608,7 +724,7 @@
 
         <div class="giftcard-card">
           <div class="giftcard-header">
-            <img class="giftcard-logo" src="https://upload.wikimedia.org/wikipedia/en/thumb/d/d3/Starbucks_Corporation_Logo_2011.svg/640px-Starbucks_Corporation_Logo_2011.svg.png" alt="Starbucks" />
+            <img class="giftcard-logo" src="https://images.seeklogo.com/logo-png/16/2/starbucks-logo-png_seeklogo-168511.png" alt="Starbucks" />
             <div>
               <p class="giftcard-name">Starbucks Gift Card</p>
               <p class="giftcard-price">$5 – $100 · You Choose</p>
@@ -885,17 +1001,34 @@
         const el   = document.getElementById("price_" + item.id);
         const tsEl = document.getElementById("price_ts_" + item.id);
         if (!el) return;
-        if (result && result.price) {
-          const { price, cachedAt, stale, isInStock } = result;
-          el.textContent = price; el.classList.remove("price-loading");
-          el.title = stale ? "Last known price (API unavailable)" : "Live price from Amazon";
-          if (stale) el.classList.add("price-stale");
-          if (price) el.setAttribute("data-has-price", "true");
-          if (tsEl && cachedAt) { tsEl.textContent = (stale ? "⚠️ Last known: " : "Updated: ") + formatTimestamp(cachedAt); tsEl.style.display = "block"; }
-          if (isInStock === false) { const s = document.getElementById("soldout_" + item.id); if (s) s.style.display = "inline-block"; }
-        } else {
-          el.textContent = "Live Price Unavailable"; el.classList.remove("price-loading"); el.classList.add("price-unavailable");
-          if (tsEl) { tsEl.textContent = "Click View Item for Live Price"; tsEl.style.display = "block"; }
+        // Helper to update a price element
+        function updatePriceEl(el, tsEl, result, item) {
+          if (!el) return;
+          if (result && result.price) {
+            const { price, cachedAt, stale, isInStock } = result;
+            el.textContent = price; el.classList.remove("price-loading");
+            el.title = stale ? "Last known price (API unavailable)" : "Live price from Amazon";
+            if (stale) el.classList.add("price-stale");
+            if (price) el.setAttribute("data-has-price", "true");
+            if (tsEl && cachedAt) { tsEl.textContent = (stale ? "⚠️ Last known: " : "Updated: ") + formatTimestamp(cachedAt); tsEl.style.display = "block"; }
+            if (isInStock === false) { const s = document.getElementById("soldout_" + item.id); if (s) s.style.display = "inline-block"; }
+          } else {
+            el.textContent = "Live Price Unavailable"; el.classList.remove("price-loading"); el.classList.add("price-unavailable");
+            if (tsEl) { tsEl.textContent = "Click View Item for Live Price"; tsEl.style.display = "block"; }
+          }
+        }
+        // Update card price
+        updatePriceEl(el, tsEl, result, item);
+        // Also update list row price
+        const listPriceEl = document.getElementById("list_price_" + item.id);
+        if (listPriceEl) {
+          if (result && result.price) {
+            listPriceEl.textContent = result.price;
+            listPriceEl.classList.remove("price-loading");
+            if (result.price) listPriceEl.setAttribute("data-has-price", "true");
+          } else {
+            listPriceEl.textContent = "N/A"; listPriceEl.classList.remove("price-loading"); listPriceEl.classList.add("price-unavailable");
+          }
         }
       }));
     }
@@ -1025,19 +1158,37 @@
       const category = document.getElementById("categorySelect").value;
       const unclaimedOnly = document.getElementById("unclaimedOnly").checked;
       const activeGrid = document.getElementById("activeGrid");
-      let cards = Array.from(activeGrid.querySelectorAll(".item-card"));
-      cards.forEach(c => {
-        const catMatch   = category === "all" || (c.dataset.category || "").startsWith(category);
-        const claimMatch = !unclaimedOnly || c.dataset.claimed !== "true";
+
+      // Handle both cards and list rows together (by wrapper dataset)
+      const allItems = Array.from(activeGrid.querySelectorAll(".item-card, [data-id]"));
+      const seen = new Set();
+      const unique = allItems.filter(el => {
+        const id = el.dataset.id || el.dataset.id;
+        if (!id || seen.has(id)) { seen.add(id); return !seen.has(id + "_card"); }
+        seen.add(id + "_card"); return true;
+      });
+
+      // Show/hide based on filters — match by dataset on both card and list row
+      Array.from(activeGrid.children).forEach(c => {
+        const cat = c.dataset.category || "";
+        const isClaimed = c.dataset.claimed === "true";
+        const catMatch   = category === "all" || cat.startsWith(category);
+        const claimMatch = !unclaimedOnly || !isClaimed;
         c.style.display  = (catMatch && claimMatch) ? "" : "none";
       });
-      const visible = cards.filter(c => c.style.display !== "none");
-      visible.sort((a, b) => {
-        if (sort === "price-asc")  return parseFloat(a.dataset.price) - parseFloat(b.dataset.price);
-        if (sort === "price-desc") return parseFloat(b.dataset.price) - parseFloat(a.dataset.price);
-        return 0;
+
+      // Sort visible item cards (grid mode) and list rows (list mode) together by price
+      const visibleCards = Array.from(activeGrid.querySelectorAll(".item-card")).filter(c => c.style.display !== "none");
+      const visibleRows  = Array.from(activeGrid.querySelectorAll("[data-id]")).filter(c => c.style.display !== "none");
+
+      [visibleCards, visibleRows].forEach(els => {
+        els.sort((a, b) => {
+          if (sort === "price-asc")  return parseFloat(a.dataset.price||0) - parseFloat(b.dataset.price||0);
+          if (sort === "price-desc") return parseFloat(b.dataset.price||0) - parseFloat(a.dataset.price||0);
+          return 0;
+        });
+        els.forEach(c => activeGrid.appendChild(c));
       });
-      visible.forEach(c => activeGrid.appendChild(c));
     }
 
     // ── Render with claimed-sink ───────────────────────────────────────────
@@ -1059,10 +1210,13 @@
         for (const item of items) {
           const claimData = snapshot[item.id] || { claimed: false };
           const card = createItemCard(item, claimData);
+          const listRow = createListRow(item, claimData);
           if (claimData.claimed) {
             claimedGrid.appendChild(card);
+            claimedGrid.appendChild(listRow);
           } else {
             activeGrid.appendChild(card);
+            activeGrid.appendChild(listRow);
           }
         }
         const hasAnyClaimed = items.some(i => (snapshot[i.id] || {}).claimed);
@@ -1193,14 +1347,192 @@
       }).catch(() => {});
     };
 
+
+    // ── List mode ──────────────────────────────────────────────────────────
+    let isListMode = false;
+    try { isListMode = localStorage.getItem("listMode") === "true"; } catch {}
+
+    function setListMode(val) {
+      isListMode = val;
+      try { localStorage.setItem("listMode", val); } catch {}
+      const btn = document.getElementById("listModeBtn");
+      if (btn) { btn.classList.toggle("active", val); btn.textContent = val ? "⊞ Grid Mode" : "☰ List Mode"; }
+      document.getElementById("activeGrid").classList.toggle("list-view", val);
+      document.getElementById("claimedGrid").classList.toggle("list-view", val);
+    }
+
+    function createListRow(item, claimData) {
+      const claimed     = claimData?.claimed || false;
+      const claimedAt   = claimData?.claimedAt || null;
+      const myClaims    = getMyClaims();
+      const iClaimedThis = !!myClaims[item.id];
+      const myClaimedAt  = myClaims[item.id] || null;
+
+      const wrapper = document.createElement("div");
+      wrapper.dataset.id       = item.id;
+      wrapper.dataset.category = item.category;
+      wrapper.dataset.claimed  = claimed ? "true" : "false";
+      wrapper.dataset.price    = item.price.replace(/[^0-9.]/g, "");
+      wrapper.style.width = "100%";
+
+      // Main row
+      const row = document.createElement("div");
+      row.className = "list-row" + (claimed ? " claimed" : "");
+
+      // Thumbnail
+      const thumb = document.createElement("img");
+      thumb.className = "list-row-thumb"; thumb.src = item.img; thumb.alt = item.name;
+      row.appendChild(thumb);
+
+      // Main info
+      const main = document.createElement("div"); main.className = "list-row-main";
+      const name = document.createElement("div"); name.className = "list-row-name"; name.textContent = item.name;
+      main.appendChild(name);
+
+      const meta = document.createElement("div"); meta.className = "list-row-meta";
+      const priceEl = document.createElement("span");
+      priceEl.className = "list-row-price" + (item.asin ? " price-loading" : "");
+      priceEl.id = "list_price_" + item.id;
+      priceEl.textContent = item.asin ? "Loading…" : item.price;
+      meta.appendChild(priceEl);
+
+      const catEl = document.createElement("span"); catEl.className = "list-row-cat"; catEl.textContent = item.category;
+      meta.appendChild(catEl);
+
+      if (claimed) {
+        const cb = document.createElement("span");
+        cb.className = "list-row-claimed-badge" + (iClaimedThis ? " me" : "");
+        cb.textContent = iClaimedThis ? "✓ You claimed this!" : "✓ Claimed";
+        meta.appendChild(cb);
+      }
+      main.appendChild(meta);
+      row.appendChild(main);
+
+      // Actions
+      const actions = document.createElement("div"); actions.className = "list-row-actions";
+
+      // Share button
+      const shareBtn = document.createElement("button"); shareBtn.className = "list-row-share"; shareBtn.title = "Copy share link"; shareBtn.textContent = "🔗";
+      if (item.link) {
+        shareBtn.addEventListener("click", async (e) => {
+          e.stopPropagation();
+          try {
+            await navigator.clipboard.writeText("Tristan has this on his list! 🎁\n" + item.name + "\n" + item.link);
+            shareBtn.textContent = "✓"; shareBtn.classList.add("copied");
+            setTimeout(() => { shareBtn.textContent = "🔗"; shareBtn.classList.remove("copied"); }, 2000);
+          } catch {}
+        });
+      }
+      actions.appendChild(shareBtn);
+
+      // Claim checkbox or undo
+      if (!claimed) {
+        const cb = document.createElement("input"); cb.type = "checkbox"; cb.className = "list-row-checkbox";
+        cb.addEventListener("change", function() { if (this.checked) claimItem(item.id); });
+        actions.appendChild(cb);
+      } else {
+        const undoBtn = document.createElement("button"); undoBtn.className = "list-row-undo"; undoBtn.textContent = "Undo";
+        undoBtn.onclick = () => unclaimItem(item.id);
+        actions.appendChild(undoBtn);
+      }
+
+      // Expand button
+      const expandBtn = document.createElement("button"); expandBtn.className = "list-row-expand"; expandBtn.textContent = "▾";
+      actions.appendChild(expandBtn);
+      row.appendChild(actions);
+      wrapper.appendChild(row);
+
+      // Expanded section
+      const expanded = document.createElement("div"); expanded.className = "list-row-expanded";
+      const expandedInner = document.createElement("div"); expandedInner.className = "list-row-expanded-inner";
+      const expandedCard = document.createElement("div"); expandedCard.className = "list-row-expanded-card";
+
+      // Tag bar
+      const tagBar = document.createElement("div"); tagBar.className = "tag-bar"; tagBar.style.padding = "0";
+      const catTag = document.createElement("div"); catTag.className = "category-tag"; catTag.textContent = item.category; tagBar.appendChild(catTag);
+      if (item.prime) { const pt = document.createElement("div"); pt.className = "prime-tag"; pt.textContent = "Prime ✓"; tagBar.appendChild(pt); }
+      if (item.note)  { const nt = document.createElement("div"); nt.className = "note-tag";  nt.textContent = item.note;  tagBar.appendChild(nt); }
+      expandedCard.appendChild(tagBar);
+
+      // Full price + timestamp
+      const fullPrice = document.createElement("p");
+      fullPrice.className = "price" + (item.asin ? " price-loading" : "");
+      fullPrice.id = "price_" + item.id;
+      fullPrice.textContent = item.asin ? "Live Price Loading…" : item.price;
+      expandedCard.appendChild(fullPrice);
+      if (item.asin) {
+        const pts = document.createElement("span"); pts.className = "price-timestamp"; pts.id = "price_ts_" + item.id; pts.style.display = "none"; expandedCard.appendChild(pts);
+        const so = document.createElement("span"); so.className = "sold-out-badge"; so.id = "soldout_" + item.id; so.textContent = "⚠️ Currently Out of Stock"; so.style.display = "none"; expandedCard.appendChild(so);
+      }
+
+      // View + share action row
+      if (item.link) {
+        const ar = document.createElement("div"); ar.className = "item-action-row";
+        const vb = document.createElement("a"); vb.href = item.link; vb.target = "_blank"; vb.className = "button view-btn"; vb.textContent = "View Item";
+        if (claimed) {
+          vb.addEventListener("click", async (e) => {
+            e.preventDefault();
+            const go = await showConfirm({ icon: "⚠️", title: "Already Claimed", body: "<strong>" + item.name + "</strong> has already been claimed.<br><br>Are you sure you want to view/buy it anyway?", type: "warning", confirmLabel: "View Anyway", cancelLabel: "Go Back" });
+            if (go) window.open(item.link, "_blank");
+          });
+        }
+        ar.appendChild(vb);
+        const sb2 = document.createElement("button"); sb2.className = "item-share-btn"; sb2.title = "Copy share link"; sb2.textContent = "🔗";
+        sb2.addEventListener("click", async () => {
+          try {
+            await navigator.clipboard.writeText("Tristan has this on his list! 🎁\n" + item.name + "\n" + item.link);
+            sb2.textContent = "✓"; sb2.classList.add("copied");
+            setTimeout(() => { sb2.textContent = "🔗"; sb2.classList.remove("copied"); }, 2000);
+          } catch {}
+        });
+        ar.appendChild(sb2);
+        expandedCard.appendChild(ar);
+      }
+
+      // Claim row in expanded
+      const claimRow = document.createElement("div"); claimRow.className = "claim-row";
+      if (!claimed) {
+        const checkbox = document.createElement("input"); checkbox.type = "checkbox"; checkbox.id = "expand_claim_" + item.id; checkbox.className = "claim-checkbox";
+        checkbox.addEventListener("change", function() { if (this.checked) claimItem(item.id); });
+        const label = document.createElement("label"); label.htmlFor = "expand_claim_" + item.id; label.className = "claim-label"; label.textContent = "I'm buying this!";
+        claimRow.appendChild(checkbox); claimRow.appendChild(label);
+      } else {
+        const ci = document.createElement("div"); ci.className = "claim-info";
+        const badge = document.createElement("span"); badge.className = "claimed-badge" + (iClaimedThis ? " claimed-by-me" : ""); badge.textContent = iClaimedThis ? "✓ You claimed this!" : "✓ Claimed"; ci.appendChild(badge);
+        const ts = myClaimedAt || claimedAt;
+        if (ts) { const tel = document.createElement("span"); tel.className = "claim-timestamp"; tel.textContent = "🕐 " + formatTimestamp(ts); ci.appendChild(tel); }
+        claimRow.appendChild(ci);
+        const ub = document.createElement("button"); ub.className = "unclaim-btn"; ub.textContent = "Undo"; ub.onclick = () => unclaimItem(item.id); claimRow.appendChild(ub);
+      }
+      expandedCard.appendChild(claimRow);
+
+      expandedInner.appendChild(expandedCard);
+      expanded.appendChild(expandedInner);
+      wrapper.appendChild(expanded);
+
+      // Toggle expand
+      expandBtn.addEventListener("click", (e) => {
+        e.stopPropagation();
+        const isOpen = expanded.classList.toggle("open");
+        expandBtn.classList.toggle("open", isOpen);
+      });
+
+      return wrapper;
+    }
+
     window.addEventListener("DOMContentLoaded", () => {
       showSkeletons();
+
+      // List mode init
+      setListMode(isListMode);
+      document.getElementById("listModeBtn").addEventListener("click", () => setListMode(!isListMode));
+
       // Quick info strip — starts open, auto-closes after 5s
       const strip = document.getElementById("quickInfoStrip");
       strip.classList.add("open");
       let autoCloseTimer = setTimeout(() => {
         strip.classList.remove("open");
-      }, 5000);
+      }, 10000);
       // If user interacts (clicks to close or re-open), cancel auto-close
       document.getElementById("quickInfoHeader").addEventListener("click", () => {
         clearTimeout(autoCloseTimer);
