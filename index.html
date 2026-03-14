@@ -487,7 +487,7 @@
       <div class="quick-info-pills">
         <span class="quick-info-pill">🎂 Birthday: June 17th</span>
         <span class="quick-info-pill-sep">·</span>
-        <span class="quick-info-pill"><span class="quick-info-pill-dot"></span> Last updated March 13, 2026</span>
+        <span class="quick-info-pill" id="lastUpdatedPill"><span class="quick-info-pill-dot"></span> Last updated March 13, 2026</span>
         <span class="quick-info-pill-sep">·</span>
         <span class="quick-info-pill" id="claimedCountPill">Loading…</span>
       </div>
@@ -739,8 +739,6 @@
       } catch {}
     });
 
-    // ── Set last updated date ──────────────────────────────────────────────
-    document.querySelector(".last-updated span:last-child").textContent = "Last updated " + LIST_LAST_UPDATED;
 
     // ── Modal system ───────────────────────────────────────────────────────
     function showModal({ icon = '', title = '', body = '', type = 'default', buttons = [], pin = false }) {
@@ -1229,9 +1227,10 @@
       });
 
       // Set last updated in quick info
-      document.getElementById("quickInfoUpdated").textContent = LIST_LAST_UPDATED;
-      document.querySelector(".quick-info-pills .quick-info-pill:nth-child(3)").innerHTML =
-        '<span class="quick-info-pill-dot"></span> Last updated ' + LIST_LAST_UPDATED;
+      const updatedEl = document.getElementById("quickInfoUpdated");
+      if (updatedEl) updatedEl.textContent = LIST_LAST_UPDATED;
+      const updatedPill = document.getElementById("lastUpdatedPill");
+      if (updatedPill) updatedPill.innerHTML = '<span class="quick-info-pill-dot"></span> Last updated ' + LIST_LAST_UPDATED;
 
       // Real-time claimed count in quick info
       onValue(ref(db, 'items'), (snapshot) => {
