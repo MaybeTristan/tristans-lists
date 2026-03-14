@@ -401,6 +401,8 @@
 
     /* ── Grids ───────────────────────────────────────────────────────────── */
     .grid-container { display: flex; flex-wrap: wrap; gap: 20px; justify-content: flex-start; }
+    .grid-container:not(.list-view) .item-card { width: calc(50% - 10px); }
+    .claimed-grid:not(.list-view) .item-card { width: calc(50% - 10px); }
 
     /* ── Claimed section divider ─────────────────────────────────────────── */
     .claimed-section {
@@ -537,12 +539,10 @@
     #confetti-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 999; }
 
     /* ── Footer images ───────────────────────────────────────────────────── */
-    .footer-img-light { display: block; }
+    .footer-img-light, .footer-img-dark { max-width: 200px; margin: 12px auto 15px auto; display: block; }
     .footer-img-dark  { display: none; }
     [data-theme="dark"] .footer-img-light { display: none; }
     [data-theme="dark"] .footer-img-dark  { display: block; }
-    .footer-img-light, .footer-img-dark { max-width: 200px; margin: 12px auto 15px auto; display: block; }
-    [data-theme="dark"] .footer-img-dark { display: block; }
 
     /* ── Reset / footer ──────────────────────────────────────────────────── */
     .reset-area { margin-top: 30px; margin-bottom: 10px; display: flex; justify-content: center; }
@@ -1020,14 +1020,14 @@
         // Update card price
         updatePriceEl(el, tsEl, result, item);
         // Also update list row price
-        const listPriceEl = document.getElementById("list_price_" + item.id);
+        const listPriceEl = document.querySelector(`[data-list-price-for="${item.id}"]`);
         if (listPriceEl) {
           if (result && result.price) {
             listPriceEl.textContent = result.price;
             listPriceEl.classList.remove("price-loading");
             if (result.price) listPriceEl.setAttribute("data-has-price", "true");
           } else {
-            listPriceEl.textContent = "N/A"; listPriceEl.classList.remove("price-loading"); listPriceEl.classList.add("price-unavailable");
+            listPriceEl.textContent = "Live Price Not Available — Expand For Info"; listPriceEl.classList.remove("price-loading"); listPriceEl.classList.add("price-unavailable");
           }
         }
       }));
@@ -1392,7 +1392,7 @@
       const meta = document.createElement("div"); meta.className = "list-row-meta";
       const priceEl = document.createElement("span");
       priceEl.className = "list-row-price" + (item.asin ? " price-loading" : "");
-      priceEl.id = "list_price_" + item.id;
+      priceEl.dataset.listPriceFor = item.id;
       priceEl.textContent = item.asin ? "Loading…" : item.price;
       meta.appendChild(priceEl);
 
@@ -1425,16 +1425,7 @@
       }
       actions.appendChild(shareBtn);
 
-      // Claim checkbox or undo
-      if (!claimed) {
-        const cb = document.createElement("input"); cb.type = "checkbox"; cb.className = "list-row-checkbox";
-        cb.addEventListener("change", function() { if (this.checked) claimItem(item.id); });
-        actions.appendChild(cb);
-      } else {
-        const undoBtn = document.createElement("button"); undoBtn.className = "list-row-undo"; undoBtn.textContent = "Undo";
-        undoBtn.onclick = () => unclaimItem(item.id);
-        actions.appendChild(undoBtn);
-      }
+      // No checkbox in bare list view — claim/undo lives in the expanded section only
 
       // Expand button
       const expandBtn = document.createElement("button"); expandBtn.className = "list-row-expand"; expandBtn.textContent = "▾";
