@@ -5,10 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tristan's Birthday List</title>
   <link rel="icon" href="birthdayfavicon.ico">
-  <link href="https://fonts.googleapis.com/css2?family=Lexend&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Lexend&family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&display=swap" rel="stylesheet">
 
   <style>
-    /* ── CSS Variables (light/dark) ───────────────────────────────────────── */
     :root {
       --bg: #f0f0f0;
       --card-bg: #ffffff;
@@ -59,56 +58,69 @@
     }
 
     * { box-sizing: border-box; }
-    body { font-family: 'Lexend', sans-serif; margin: 20px; background: var(--bg); color: var(--text); transition: background 0.3s, color 0.3s; }
+    body { font-family: 'Lexend', sans-serif; margin: 0; background: var(--bg); color: var(--text); transition: background 0.3s, color 0.3s; }
 
-    /* ── Header ───────────────────────────────────────────────────────────── */
+    /* ── Merriweather for all headings ───────────────────────────────────── */
+    h1, h2, h3, h4 { font-family: 'Merriweather', serif; }
+
+    /* ── Banner image ────────────────────────────────────────────────────── */
+    .banner {
+      width: 100%;
+      max-height: 220px;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #1a1a1a;
+    }
+    .banner img {
+      width: 100%;
+      max-width: 900px;
+      height: 220px;
+      object-fit: cover;
+      object-position: center 40%;
+      display: block;
+    }
+
+    /* ── Page content wrapper ────────────────────────────────────────────── */
+    .page-content { padding: 20px; }
+
+    /* ── Header row ──────────────────────────────────────────────────────── */
     .header-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 8px; }
     .header-row h1 { margin: 0; font-size: 1.6em; }
 
-    /* ── Dark mode toggle ─────────────────────────────────────────────────── */
-    .dark-toggle {
-      display: flex; align-items: center; gap: 8px;
-      font-size: 0.85em; color: var(--text-muted); cursor: pointer; user-select: none;
-    }
-    .toggle-track {
-      width: 42px; height: 24px; border-radius: 12px;
-      background: #ccc; position: relative; transition: background 0.3s; cursor: pointer;
-    }
+    /* ── Dark mode toggle ────────────────────────────────────────────────── */
+    .dark-toggle { display: flex; align-items: center; gap: 8px; font-size: 0.85em; color: var(--text-muted); cursor: pointer; user-select: none; }
+    .toggle-track { width: 42px; height: 24px; border-radius: 12px; background: #ccc; position: relative; transition: background 0.3s; cursor: pointer; }
     [data-theme="dark"] .toggle-track { background: #8f2121; }
-    .toggle-thumb {
-      width: 18px; height: 18px; border-radius: 50%;
-      background: #fff; position: absolute; top: 3px; left: 3px;
-      transition: transform 0.3s; box-shadow: 0 1px 3px rgba(0,0,0,0.3);
-    }
+    .toggle-thumb { width: 18px; height: 18px; border-radius: 50%; background: #fff; position: absolute; top: 3px; left: 3px; transition: transform 0.3s; box-shadow: 0 1px 3px rgba(0,0,0,0.3); }
     [data-theme="dark"] .toggle-thumb { transform: translateX(18px); }
 
-    /* ── Sort / Filter bar ────────────────────────────────────────────────── */
+    /* ── Filter bar ──────────────────────────────────────────────────────── */
     .filter-bar {
-      display: flex; gap: 10px; flex-wrap: wrap; align-items: center;
+      display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
       margin-bottom: 16px; padding: 10px 14px;
       background: var(--card-bg); border-radius: 8px;
       border: 1px solid var(--border);
       box-shadow: 0 1px 4px rgba(0,0,0,0.06);
     }
-    .filter-bar label { font-size: 0.82em; color: var(--text-muted); }
+    .filter-group { display: flex; align-items: center; gap: 6px; flex-wrap: nowrap; }
+    .filter-bar label { font-size: 0.82em; color: var(--text-muted); white-space: nowrap; }
     .filter-bar select, .filter-bar input[type=checkbox] { accent-color: #8f2121; }
     .filter-bar select {
-      font-family: 'Lexend', sans-serif;
-      font-size: 0.82em; padding: 4px 8px;
-      border: 1px solid var(--filter-border);
-      border-radius: 5px; background: var(--filter-bg);
-      color: var(--text); cursor: pointer;
+      font-family: 'Lexend', sans-serif; font-size: 0.82em; padding: 4px 8px;
+      border: 1px solid var(--filter-border); border-radius: 5px;
+      background: var(--filter-bg); color: var(--text); cursor: pointer;
     }
-    .filter-sep { width: 1px; height: 20px; background: var(--border); }
+    .filter-sep { width: 1px; height: 20px; background: var(--border); flex-shrink: 0; }
 
-    /* ── Grid ─────────────────────────────────────────────────────────────── */
+    /* ── Grid ────────────────────────────────────────────────────────────── */
     .grid-container { display: flex; flex-wrap: wrap; gap: 20px; justify-content: flex-start; }
 
-    /* ── Item card ────────────────────────────────────────────────────────── */
+    /* ── Item card ───────────────────────────────────────────────────────── */
     .item-card {
       width: calc(50% - 10px);
-      border: 1px solid var(--border);
-      border-radius: 8px; overflow: hidden;
+      border: 1px solid var(--border); border-radius: 8px; overflow: hidden;
       box-shadow: 0 2px 6px rgba(0,0,0,0.1);
       display: flex; flex-direction: column;
       background: var(--card-bg);
@@ -118,56 +130,33 @@
     .item-card.claimed { background: var(--card-claimed-bg); opacity: 0.85; }
     .item-card img { width: 100%; height: 200px; object-fit: contain; background: var(--card-img-bg); }
 
-    /* ── Skeleton loading ─────────────────────────────────────────────────── */
-    .skeleton-card {
-      width: calc(50% - 10px);
-      border: 1px solid var(--border);
-      border-radius: 8px; overflow: hidden;
-      background: var(--card-bg);
-      box-shadow: 0 2px 6px rgba(0,0,0,0.05);
-    }
-    .skeleton-img {
-      width: 100%; height: 200px;
-      background: linear-gradient(90deg, var(--skeleton-base) 25%, var(--skeleton-shine) 50%, var(--skeleton-base) 75%);
-      background-size: 200% 100%;
-      animation: shimmer 1.4s infinite;
-    }
+    /* ── Skeleton ────────────────────────────────────────────────────────── */
+    .skeleton-card { width: calc(50% - 10px); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; background: var(--card-bg); box-shadow: 0 2px 6px rgba(0,0,0,0.05); }
+    .skeleton-img { width: 100%; height: 200px; background: linear-gradient(90deg, var(--skeleton-base) 25%, var(--skeleton-shine) 50%, var(--skeleton-base) 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; }
     .skeleton-body { padding: 10px; display: flex; flex-direction: column; gap: 8px; }
-    .skeleton-line {
-      height: 12px; border-radius: 4px;
-      background: linear-gradient(90deg, var(--skeleton-base) 25%, var(--skeleton-shine) 50%, var(--skeleton-base) 75%);
-      background-size: 200% 100%;
-      animation: shimmer 1.4s infinite;
-    }
+    .skeleton-line { height: 12px; border-radius: 4px; background: linear-gradient(90deg, var(--skeleton-base) 25%, var(--skeleton-shine) 50%, var(--skeleton-base) 75%); background-size: 200% 100%; animation: shimmer 1.4s infinite; }
     .skeleton-line.short { width: 40%; }
     .skeleton-line.btn { width: 100%; height: 32px; border-radius: 5px; margin-top: 4px; }
     @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
 
-    /* ── Tags ─────────────────────────────────────────────────────────────── */
+    /* ── Tags ────────────────────────────────────────────────────────────── */
     .tag-bar { display: flex; gap: 5px; padding: 5px 10px; flex-wrap: wrap; }
-    .category-tag, .prime-tag, .note-tag {
-      background-color: var(--tag-bg); padding: 2px 6px;
-      border-radius: 4px; font-size: 0.8em; color: var(--tag-text);
-    }
+    .category-tag, .prime-tag, .note-tag { background-color: var(--tag-bg); padding: 2px 6px; border-radius: 4px; font-size: 0.8em; color: var(--tag-text); }
     .prime-tag { background-color: var(--prime-bg); }
     .note-tag { background-color: var(--note-bg); }
 
-    /* ── Item info ────────────────────────────────────────────────────────── */
+    /* ── Item info ───────────────────────────────────────────────────────── */
     .item-info { padding: 10px; display: flex; flex-direction: column; flex-grow: 1; gap: 6px; }
     .item-info h3 { margin: 0 0 2px 0; font-size: 1em; }
-
     .price { margin: 0; font-weight: bold; }
     .price-loading { color: var(--text-faint); font-style: italic; font-weight: normal; }
     .price-stale { color: #b07800; }
     .price-unavailable { color: var(--text-faint); font-style: italic; font-weight: normal; font-size: 0.9em; }
     .price-timestamp { font-size: 0.72em; color: var(--text-faint); font-style: italic; margin-top: -2px; }
     .price[data-has-price="true"]:not(.price-loading)::after { content: " 🟢"; font-size: 0.7em; vertical-align: middle; }
-    .sold-out-badge {
-      display: inline-block; background-color: #fde8e8; color: #9b1c1c;
-      font-size: 0.78em; font-weight: normal; padding: 2px 6px; border-radius: 4px;
-    }
+    .sold-out-badge { display: inline-block; background-color: #fde8e8; color: #9b1c1c; font-size: 0.78em; font-weight: normal; padding: 2px 6px; border-radius: 4px; }
 
-    /* ── Buttons ──────────────────────────────────────────────────────────── */
+    /* ── Buttons ─────────────────────────────────────────────────────────── */
     .button.view-btn {
       background-color: var(--btn-bg); color: var(--btn-text);
       text-align: center; padding: 8px; border-radius: 5px;
@@ -175,137 +164,145 @@
       border: none; font-family: 'Lexend', sans-serif;
     }
 
-    /* ── Claim row ────────────────────────────────────────────────────────── */
-    .claim-row {
-      display: flex; align-items: center; gap: 8px;
-      border-top: 1px solid var(--claim-border);
-      padding-top: 8px; margin-top: auto;
-    }
+    /* ── Claim row ───────────────────────────────────────────────────────── */
+    .claim-row { display: flex; align-items: center; gap: 8px; border-top: 1px solid var(--claim-border); padding-top: 8px; margin-top: auto; }
     .claim-checkbox { width: 18px; height: 18px; accent-color: #8f2121; cursor: pointer; flex-shrink: 0; }
     .claim-label { font-size: 0.9em; color: var(--text-muted); cursor: pointer; user-select: none; }
     .claim-info { display: flex; flex-direction: column; gap: 2px; }
     .claimed-badge { font-size: 0.9em; font-weight: bold; color: #3a7a3a; }
     .claimed-badge.claimed-by-me { color: #8f2121; }
     .claim-timestamp { font-size: 0.75em; color: var(--text-faint); font-style: italic; }
-    .unclaim-btn {
-      background: none; border: 1px solid var(--unclaim-border);
-      border-radius: 4px; padding: 2px 8px; font-size: 0.78em;
-      color: var(--unclaim-text); cursor: pointer; margin-left: auto; flex-shrink: 0;
-      font-family: 'Lexend', sans-serif;
-    }
+    .unclaim-btn { background: none; border: 1px solid var(--unclaim-border); border-radius: 4px; padding: 2px 8px; font-size: 0.78em; color: var(--unclaim-text); cursor: pointer; margin-left: auto; flex-shrink: 0; font-family: 'Lexend', sans-serif; }
     .unclaim-btn:hover { background: var(--unclaim-hover); }
 
-    /* ── Thank you overlay ────────────────────────────────────────────────── */
-    #thankyou-overlay {
-      display: none; position: fixed; inset: 0;
-      background: rgba(0,0,0,0.75); z-index: 1000;
-      flex-direction: column; align-items: center; justify-content: center;
-      text-align: center;
-    }
+    /* ── Thank you overlay ───────────────────────────────────────────────── */
+    #thankyou-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 1000; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; }
     #thankyou-overlay.show { display: flex; animation: fadeIn 0.3s ease; }
-    .thankyou-box {
-      background: var(--card-bg); border-radius: 16px;
-      padding: 40px 48px; max-width: 400px;
-      box-shadow: 0 8px 40px rgba(0,0,0,0.4);
-      animation: popIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
-    }
+    .thankyou-box { background: var(--card-bg); border-radius: 16px; padding: 40px 48px; max-width: 420px; width: 100%; box-shadow: 0 8px 40px rgba(0,0,0,0.4); animation: popIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1); }
     .thankyou-box .emoji { font-size: 3.5em; margin-bottom: 12px; }
-    .thankyou-box h2 { margin: 0 0 8px 0; font-size: 1.5em; color: var(--text); }
-    .thankyou-box p { margin: 0 0 20px 0; color: var(--text-muted); font-size: 0.95em; }
-    .thankyou-close {
-      background: #8f2121; color: #fff; border: none; border-radius: 8px;
-      padding: 10px 28px; font-size: 0.95em; cursor: pointer;
-      font-family: 'Lexend', sans-serif;
-    }
+    .thankyou-box h2 { margin: 0 0 10px 0; font-size: 1.4em; color: var(--text); }
+    .thankyou-box p { margin: 0 0 20px 0; color: var(--text-muted); font-size: 0.93em; line-height: 1.5; }
+    .thankyou-buttons { display: flex; flex-direction: column; gap: 10px; }
+    .thankyou-buy { background: #8f2121; color: #fff; border: none; border-radius: 8px; padding: 11px 28px; font-size: 0.95em; cursor: pointer; font-family: 'Lexend', sans-serif; text-decoration: none; display: block; text-align: center; }
+    .thankyou-close-link { font-size: 0.82em; color: var(--text-faint); cursor: pointer; background: none; border: none; font-family: 'Lexend', sans-serif; text-decoration: underline; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     @keyframes popIn { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 
-    /* ── Confetti canvas ──────────────────────────────────────────────────── */
-    #confetti-canvas {
-      position: fixed; inset: 0; pointer-events: none; z-index: 999;
-    }
+    /* ── Confetti ────────────────────────────────────────────────────────── */
+    #confetti-canvas { position: fixed; inset: 0; pointer-events: none; z-index: 999; }
 
-    /* ── Footer ───────────────────────────────────────────────────────────── */
-    .reset-area { margin-top: 30px; margin-bottom: 10px; text-align: center; }
+    /* ── Footer image — swaps on dark mode ───────────────────────────────── */
+    .footer-img-light { display: block; }
+    .footer-img-dark  { display: none; }
+    [data-theme="dark"] .footer-img-light { display: none; }
+    [data-theme="dark"] .footer-img-dark  { display: block; }
+    .footer-img-light, .footer-img-dark { max-width: 200px; margin: 12px auto 15px auto; display: block; }
+    [data-theme="dark"] .footer-img-dark { display: block; }
+
+    /* ── Reset / footer ──────────────────────────────────────────────────── */
+    .reset-area { margin-top: 30px; margin-bottom: 10px; display: flex; justify-content: center; }
     .footer { margin-top: 16px; text-align: center; font-size: 0.9em; color: var(--text-muted); }
-    .footer-img { max-width: 200px; margin: 12px auto 15px auto; display: block; }
 
-    /* ── Mobile ───────────────────────────────────────────────────────────── */
+    /* ── Mobile ──────────────────────────────────────────────────────────── */
     @media (max-width: 600px) {
-      body { margin: 12px; }
+      .page-content { padding: 12px; }
       .item-card, .skeleton-card { width: 100%; }
-      .header-row h1 { font-size: 1.3em; }
-      .filter-bar { gap: 8px; padding: 8px 10px; }
-      .thankyou-box { padding: 28px 24px; margin: 0 16px; }
+      .header-row h1 { font-size: 1.25em; }
+      .banner img { height: 140px; }
+      .filter-bar { padding: 8px 10px; gap: 6px; }
+      .filter-group { flex-wrap: wrap; }
+      .filter-sep { display: none; }
+      .thankyou-box { padding: 28px 20px; }
     }
   </style>
 </head>
 <body>
 
+  <!-- Banner -->
+  <div class="banner">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/d/dd/Birthday_candles.jpg" alt="Birthday candles banner" />
+  </div>
+
+  <!-- Confetti canvas -->
+  <canvas id="confetti-canvas"></canvas>
+
   <!-- Thank you overlay -->
   <div id="thankyou-overlay">
-    <canvas id="confetti-canvas"></canvas>
     <div class="thankyou-box">
       <div class="emoji">🎉</div>
-      <h2>Thank You So Much!</h2>
-      <p>You're the best! Tristan is going to love it. 💛<br>Head to the product page to complete your purchase.</p>
-      <button class="thankyou-close" onclick="closeThankYou()">Sounds good!</button>
+      <h2>Thank You So, So Much!!!</h2>
+      <p>Head to the product page to complete your purchase if you have not already.</p>
+      <div class="thankyou-buttons">
+        <a id="thankyou-product-link" href="#" target="_blank" class="thankyou-buy">Go to Product Page</a>
+        <button class="thankyou-close-link" onclick="closeThankYou()">I've already purchased it</button>
+      </div>
     </div>
   </div>
 
-  <!-- Header -->
-  <div class="header-row">
-    <h1>Tristan's Birthday List</h1>
-    <label class="dark-toggle" title="Toggle dark mode">
-      <span id="dark-label">🌙 Dark Mode</span>
-      <div class="toggle-track" onclick="toggleDark()">
-        <div class="toggle-thumb"></div>
+  <!-- Page content -->
+  <div class="page-content">
+
+    <div class="header-row">
+      <h1>Tristan's Birthday List</h1>
+      <label class="dark-toggle" title="Toggle dark mode">
+        <span id="dark-label">🌙 Dark Mode</span>
+        <div class="toggle-track" onclick="toggleDark()">
+          <div class="toggle-thumb"></div>
+        </div>
+      </label>
+    </div>
+
+    <p style="font-size: 14pt; font-weight: bold; margin-top: 0;">
+      Howdy! Click "View Item" to see the product, then check "I'm buying this!" to claim it. If you accidentally claim something, hit Undo on that item.
+    </p>
+    <p style="font-size: 1em; color: var(--text-muted); margin-top: -10px;">
+      If you notice any problems, please let me know via
+      <a href="https://forms.gle/YYmsCVazj6CR6v529" target="_blank">this link</a>.
+      For all reported issues go to
+      <a href="https://github.com/MaybeTristan/christmas-list-2025/issues" target="_blank">this link</a>.
+    </p>
+
+    <!-- Filter bar -->
+    <div class="filter-bar">
+      <div class="filter-group">
+        <label for="sortSelect">Sort:</label>
+        <select id="sortSelect">
+          <option value="default">Default</option>
+          <option value="price-asc">Price: Low → High</option>
+          <option value="price-desc">Price: High → Low</option>
+        </select>
       </div>
-    </label>
-  </div>
+      <div class="filter-sep"></div>
+      <div class="filter-group">
+        <label for="categorySelect">Category:</label>
+        <select id="categorySelect">
+          <option value="all">All</option>
+          <option value="Food">Food</option>
+          <option value="Tech">Tech</option>
+          <option value="Clothes">Clothes</option>
+        </select>
+      </div>
+      <div class="filter-sep"></div>
+      <div class="filter-group">
+        <input type="checkbox" id="unclaimedOnly">
+        <label for="unclaimedOnly">Unclaimed only</label>
+      </div>
+    </div>
 
-  <p style="font-size: 14pt; color: var(--text); font-weight: bold; margin-top: 0;">
-    Howdy! Click "View Item" to see the product, then check "I'm buying this!" to claim it. If you accidentally claim something, hit Undo on that item.
-  </p>
-  <p style="font-size: 1em; color: var(--text-muted); margin-top: -10px;">
-    If you notice any problems, please let me know via
-    <a href="https://forms.gle/YYmsCVazj6CR6v529" target="_blank">this link</a>.
-    For all reported issues go to
-    <a href="https://github.com/MaybeTristan/christmas-list-2025/issues" target="_blank">this link</a>.
-  </p>
+    <div class="grid-container"></div>
 
-  <!-- Filter bar -->
-  <div class="filter-bar">
-    <label for="sortSelect">Sort:</label>
-    <select id="sortSelect">
-      <option value="default">Default</option>
-      <option value="price-asc">Price: Low → High</option>
-      <option value="price-desc">Price: High → Low</option>
-    </select>
-    <div class="filter-sep"></div>
-    <label for="categorySelect">Category:</label>
-    <select id="categorySelect">
-      <option value="all">All</option>
-      <option value="Food">Food</option>
-      <option value="Tech">Tech</option>
-      <option value="Clothes">Clothes</option>
-    </select>
-    <div class="filter-sep"></div>
-    <label>
-      <input type="checkbox" id="unclaimedOnly"> Unclaimed only
-    </label>
-  </div>
+    <!-- Footer images (light + dark) -->
+    <img class="footer-img-light" src="https://photos.tristanarbet.com/Adobe%20Express%20Photo%20project-5.png" alt="Footer image" />
+    <img class="footer-img-dark"  src="https://photos.tristanarbet.com/Adobe%20Express%20Photo%20project-6.png" alt="Footer image dark" />
 
-  <div class="grid-container"></div>
+    <div class="reset-area">
+      <button id="resetButton" class="button view-btn" style="width:auto;padding:8px 20px;">Reset All Claims</button>
+    </div>
 
-  <img class="footer-img" src="https://photos.tristanarbet.com/Adobe%20Express%20Photo%20project-5.png" alt="Footer image" />
-
-  <div class="reset-area">
-    <button id="resetButton" class="button view-btn" style="width:auto;padding:8px 20px;">Reset All Claims</button>
-  </div>
-  <div class="footer">
-    Thank You!!! Love from Tristan ♡ Note: All clothes sizes, or other notes, should be next to the other tags on the item.
-  </div>
+    <div class="footer">
+      Thank You!!! Love from Tristan ♡ Note: All clothes sizes, or other notes, should be next to the other tags on the item.
+    </div>
+  </div><!-- end .page-content -->
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
@@ -344,8 +341,7 @@
     // ── Dark mode ──────────────────────────────────────────────────────────
     window.toggleDark = function() {
       const html = document.documentElement;
-      const isDark = html.getAttribute("data-theme") === "dark";
-      const next = isDark ? "light" : "dark";
+      const next = html.getAttribute("data-theme") === "dark" ? "light" : "dark";
       html.setAttribute("data-theme", next);
       try { localStorage.setItem("theme", next); } catch {}
       document.getElementById("dark-label").textContent = next === "dark" ? "☀️ Light Mode" : "🌙 Dark Mode";
@@ -369,13 +365,10 @@
       const pieces = Array.from({length: 120}, () => ({
         x: Math.random() * canvas.width,
         y: Math.random() * -canvas.height,
-        w: Math.random() * 10 + 6,
-        h: Math.random() * 6 + 4,
+        w: Math.random() * 10 + 6, h: Math.random() * 6 + 4,
         color: ["#8f2121","#f5c842","#4caf50","#2196f3","#ff69b4","#ff9800"][Math.floor(Math.random()*6)],
         rot: Math.random() * 360,
-        vx: (Math.random() - 0.5) * 3,
-        vy: Math.random() * 4 + 2,
-        vr: (Math.random() - 0.5) * 6,
+        vx: (Math.random() - 0.5) * 3, vy: Math.random() * 4 + 2, vr: (Math.random() - 0.5) * 6,
       }));
       let frame;
       function draw() {
@@ -384,12 +377,8 @@
         pieces.forEach(p => {
           p.x += p.vx; p.y += p.vy; p.rot += p.vr;
           if (p.y < canvas.height + 20) alive = true;
-          ctx.save();
-          ctx.translate(p.x, p.y);
-          ctx.rotate(p.rot * Math.PI / 180);
-          ctx.fillStyle = p.color;
-          ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h);
-          ctx.restore();
+          ctx.save(); ctx.translate(p.x, p.y); ctx.rotate(p.rot * Math.PI / 180);
+          ctx.fillStyle = p.color; ctx.fillRect(-p.w/2, -p.h/2, p.w, p.h); ctx.restore();
         });
         if (alive) frame = requestAnimationFrame(draw);
         else ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -399,7 +388,9 @@
     }
 
     // ── Thank you overlay ──────────────────────────────────────────────────
-    window.showThankYou = function() {
+    window.showThankYou = function(productLink) {
+      const linkEl = document.getElementById("thankyou-product-link");
+      if (linkEl) linkEl.href = productLink || "#";
       document.getElementById("thankyou-overlay").classList.add("show");
       launchConfetti();
     };
@@ -409,31 +400,19 @@
 
     // ── localStorage claim tracking ────────────────────────────────────────
     const MY_CLAIMS_KEY = "my_claims";
-    function getMyClaims() {
-      try { return JSON.parse(localStorage.getItem(MY_CLAIMS_KEY)) || {}; } catch { return {}; }
-    }
-    function saveMyClaim(itemId, ts) {
-      const c = getMyClaims(); c[itemId] = ts;
-      try { localStorage.setItem(MY_CLAIMS_KEY, JSON.stringify(c)); } catch {}
-    }
-    function removeMyClaim(itemId) {
-      const c = getMyClaims(); delete c[itemId];
-      try { localStorage.setItem(MY_CLAIMS_KEY, JSON.stringify(c)); } catch {}
-    }
-    function formatTimestamp(ts) {
-      return new Date(ts).toLocaleString(undefined, {month:"short",day:"numeric",year:"numeric",hour:"numeric",minute:"2-digit"});
-    }
+    function getMyClaims() { try { return JSON.parse(localStorage.getItem(MY_CLAIMS_KEY)) || {}; } catch { return {}; } }
+    function saveMyClaim(id, ts) { const c = getMyClaims(); c[id] = ts; try { localStorage.setItem(MY_CLAIMS_KEY, JSON.stringify(c)); } catch {} }
+    function removeMyClaim(id) { const c = getMyClaims(); delete c[id]; try { localStorage.setItem(MY_CLAIMS_KEY, JSON.stringify(c)); } catch {} }
+    function formatTimestamp(ts) { return new Date(ts).toLocaleString(undefined, {month:"short",day:"numeric",year:"numeric",hour:"numeric",minute:"2-digit"}); }
 
     // ── Firebase price cache ───────────────────────────────────────────────
     async function fetchLivePrice(asin) {
       const priceRef = ref(db, 'prices/' + asin);
       let cachedPrice = null, cachedAt = null, cachedStock = null;
-
       try {
-        const snapshot = await get(priceRef);
-        if (snapshot.exists()) {
-          const val = snapshot.val();
-          cachedPrice = val.price; cachedAt = val.cachedAt; cachedStock = val.isInStock ?? null;
+        const snap = await get(priceRef);
+        if (snap.exists()) {
+          const v = snap.val(); cachedPrice = v.price; cachedAt = v.cachedAt; cachedStock = v.isInStock ?? null;
           if (Date.now() - cachedAt < CACHE_TTL_MS) {
             if (cachedPrice === null) return null;
             return { price: cachedPrice, cachedAt, stale: false, isInStock: cachedStock };
@@ -447,8 +426,7 @@
         const priceValue = data?.data?.amazonProduct?.price?.display ?? null;
         const isInStock = data?.data?.amazonProduct?.isInStock ?? null;
         if (priceValue !== null) {
-          const price = String(priceValue);
-          const now = Date.now();
+          const price = String(priceValue); const now = Date.now();
           try { await set(priceRef, { price, cachedAt: now, isInStock }); } catch {}
           return { price, cachedAt: now, stale: false, isInStock };
         }
@@ -469,23 +447,14 @@
         if (!el) return;
         if (result && result.price) {
           const { price, cachedAt, stale, isInStock } = result;
-          el.textContent = price;
-          el.classList.remove("price-loading");
+          el.textContent = price; el.classList.remove("price-loading");
           el.title = stale ? "Last known price (API unavailable)" : "Live price from Amazon";
           if (stale) el.classList.add("price-stale");
           if (price) el.setAttribute("data-has-price", "true");
-          if (tsEl && cachedAt) {
-            tsEl.textContent = (stale ? "⚠️ Last known: " : "Updated: ") + formatTimestamp(cachedAt);
-            tsEl.style.display = "block";
-          }
-          if (isInStock === false) {
-            const soldOut = document.getElementById("soldout_" + item.id);
-            if (soldOut) soldOut.style.display = "inline-block";
-          }
+          if (tsEl && cachedAt) { tsEl.textContent = (stale ? "⚠️ Last known: " : "Updated: ") + formatTimestamp(cachedAt); tsEl.style.display = "block"; }
+          if (isInStock === false) { const s = document.getElementById("soldout_" + item.id); if (s) s.style.display = "inline-block"; }
         } else {
-          el.textContent = "Live Price Unavailable";
-          el.classList.remove("price-loading");
-          el.classList.add("price-unavailable");
+          el.textContent = "Live Price Unavailable"; el.classList.remove("price-loading"); el.classList.add("price-unavailable");
           if (tsEl) { tsEl.textContent = "Click View Item for Live Price"; tsEl.style.display = "block"; }
         }
       }));
@@ -495,6 +464,7 @@
     window.claimItem = async function(itemId) {
       const itemRef = ref(db, 'items/' + itemId);
       const now = Date.now();
+      const itemData = items.find(i => i.id === itemId);
       try {
         const result = await runTransaction(itemRef, (currentData) => {
           if (currentData && currentData.claimed) return;
@@ -502,13 +472,12 @@
         });
         if (result.committed) {
           saveMyClaim(itemId, now);
-          showThankYou();
+          showThankYou(itemData?.link || "#");
         } else {
           alert("This item has already been claimed by someone else!");
         }
       } catch (error) {
-        alert("Something went wrong. Please try again.");
-        console.error(error);
+        alert("Something went wrong. Please try again."); console.error(error);
       }
     };
 
@@ -532,33 +501,16 @@
       div.dataset.claimed = claimed ? "true" : "false";
       div.dataset.price = item.price.replace(/[^0-9.]/g, "");
 
-      const tagBar = document.createElement("div");
-      tagBar.className = "tag-bar";
-      const catTag = document.createElement("div");
-      catTag.className = "category-tag"; catTag.textContent = item.category;
-      tagBar.appendChild(catTag);
-      if (item.prime) {
-        const pt = document.createElement("div");
-        pt.className = "prime-tag"; pt.textContent = "Prime ✓";
-        tagBar.appendChild(pt);
-      }
-      if (item.note) {
-        const nt = document.createElement("div");
-        nt.className = "note-tag"; nt.textContent = item.note;
-        tagBar.appendChild(nt);
-      }
+      const tagBar = document.createElement("div"); tagBar.className = "tag-bar";
+      const catTag = document.createElement("div"); catTag.className = "category-tag"; catTag.textContent = item.category; tagBar.appendChild(catTag);
+      if (item.prime) { const pt = document.createElement("div"); pt.className = "prime-tag"; pt.textContent = "Prime ✓"; tagBar.appendChild(pt); }
+      if (item.note) { const nt = document.createElement("div"); nt.className = "note-tag"; nt.textContent = item.note; tagBar.appendChild(nt); }
       div.appendChild(tagBar);
 
-      const img = document.createElement("img");
-      img.src = item.img; img.alt = item.name;
-      div.appendChild(img);
+      const img = document.createElement("img"); img.src = item.img; img.alt = item.name; div.appendChild(img);
 
-      const info = document.createElement("div");
-      info.className = "item-info";
-
-      const title = document.createElement("h3");
-      title.textContent = item.name;
-      info.appendChild(title);
+      const info = document.createElement("div"); info.className = "item-info";
+      const title = document.createElement("h3"); title.textContent = item.name; info.appendChild(title);
 
       const price = document.createElement("p");
       price.className = "price" + (item.asin ? " price-loading" : "");
@@ -568,100 +520,52 @@
       info.appendChild(price);
 
       if (item.asin) {
-        const priceTs = document.createElement("span");
-        priceTs.className = "price-timestamp";
-        priceTs.id = "price_ts_" + item.id;
-        priceTs.style.display = "none";
-        info.appendChild(priceTs);
-
-        const soldOut = document.createElement("span");
-        soldOut.className = "sold-out-badge";
-        soldOut.id = "soldout_" + item.id;
-        soldOut.textContent = "⚠️ Currently Out of Stock";
-        soldOut.style.display = "none";
-        info.appendChild(soldOut);
+        const priceTs = document.createElement("span"); priceTs.className = "price-timestamp"; priceTs.id = "price_ts_" + item.id; priceTs.style.display = "none"; info.appendChild(priceTs);
+        const soldOut = document.createElement("span"); soldOut.className = "sold-out-badge"; soldOut.id = "soldout_" + item.id; soldOut.textContent = "⚠️ Currently Out of Stock"; soldOut.style.display = "none"; info.appendChild(soldOut);
       }
 
       if (item.link) {
-        const viewBtn = document.createElement("a");
-        viewBtn.href = item.link; viewBtn.target = "_blank";
-        viewBtn.className = "button view-btn"; viewBtn.textContent = "View Item";
-        if (claimed) {
-          viewBtn.addEventListener("click", (e) => {
-            if (!confirm("⚠️ This item has already been claimed!\n\nAre you sure you want to view/buy it anyway?")) e.preventDefault();
-          });
-        }
+        const viewBtn = document.createElement("a"); viewBtn.href = item.link; viewBtn.target = "_blank"; viewBtn.className = "button view-btn"; viewBtn.textContent = "View Item";
+        if (claimed) { viewBtn.addEventListener("click", (e) => { if (!confirm("⚠️ This item has already been claimed!\n\nAre you sure you want to view/buy it anyway?")) e.preventDefault(); }); }
         info.appendChild(viewBtn);
       }
 
-      const claimRow = document.createElement("div");
-      claimRow.className = "claim-row";
-
+      const claimRow = document.createElement("div"); claimRow.className = "claim-row";
       if (!claimed) {
-        const checkbox = document.createElement("input");
-        checkbox.type = "checkbox"; checkbox.id = "claim_" + item.id;
-        checkbox.className = "claim-checkbox";
+        const checkbox = document.createElement("input"); checkbox.type = "checkbox"; checkbox.id = "claim_" + item.id; checkbox.className = "claim-checkbox";
         checkbox.addEventListener("change", function() { if (this.checked) claimItem(item.id); });
-        const label = document.createElement("label");
-        label.htmlFor = "claim_" + item.id;
-        label.className = "claim-label"; label.textContent = "I'm buying this!";
-        claimRow.appendChild(checkbox);
-        claimRow.appendChild(label);
+        const label = document.createElement("label"); label.htmlFor = "claim_" + item.id; label.className = "claim-label"; label.textContent = "I'm buying this!";
+        claimRow.appendChild(checkbox); claimRow.appendChild(label);
       } else {
-        const claimInfo = document.createElement("div");
-        claimInfo.className = "claim-info";
-        const badge = document.createElement("span");
-        badge.className = "claimed-badge" + (iClaimedThis ? " claimed-by-me" : "");
-        badge.textContent = iClaimedThis ? "✓ You claimed this!" : "✓ Claimed";
-        claimInfo.appendChild(badge);
+        const claimInfo = document.createElement("div"); claimInfo.className = "claim-info";
+        const badge = document.createElement("span"); badge.className = "claimed-badge" + (iClaimedThis ? " claimed-by-me" : ""); badge.textContent = iClaimedThis ? "✓ You claimed this!" : "✓ Claimed"; claimInfo.appendChild(badge);
         const ts = myClaimedAt || claimedAt;
-        if (ts) {
-          const tsEl = document.createElement("span");
-          tsEl.className = "claim-timestamp";
-          tsEl.textContent = "🕐 " + formatTimestamp(ts);
-          claimInfo.appendChild(tsEl);
-        }
+        if (ts) { const tsEl = document.createElement("span"); tsEl.className = "claim-timestamp"; tsEl.textContent = "🕐 " + formatTimestamp(ts); claimInfo.appendChild(tsEl); }
         claimRow.appendChild(claimInfo);
-        const undoBtn = document.createElement("button");
-        undoBtn.className = "unclaim-btn"; undoBtn.textContent = "Undo";
-        undoBtn.onclick = () => unclaimItem(item.id);
-        claimRow.appendChild(undoBtn);
+        const undoBtn = document.createElement("button"); undoBtn.className = "unclaim-btn"; undoBtn.textContent = "Undo"; undoBtn.onclick = () => unclaimItem(item.id); claimRow.appendChild(undoBtn);
       }
-
-      info.appendChild(claimRow);
-      div.appendChild(info);
+      info.appendChild(claimRow); div.appendChild(info);
       return div;
     }
 
     function createSkeletonCard() {
-      const div = document.createElement("div");
-      div.className = "skeleton-card";
-      div.innerHTML = `
-        <div class="skeleton-img"></div>
-        <div class="skeleton-body">
-          <div class="skeleton-line" style="width:70%"></div>
-          <div class="skeleton-line short"></div>
-          <div class="skeleton-line btn"></div>
-        </div>`;
+      const div = document.createElement("div"); div.className = "skeleton-card";
+      div.innerHTML = `<div class="skeleton-img"></div><div class="skeleton-body"><div class="skeleton-line" style="width:70%"></div><div class="skeleton-line short"></div><div class="skeleton-line btn"></div></div>`;
       return div;
     }
 
-    // ── Filter / sort helpers ──────────────────────────────────────────────
+    // ── Filter / sort ──────────────────────────────────────────────────────
     function applyFilters() {
       const sort = document.getElementById("sortSelect").value;
       const category = document.getElementById("categorySelect").value;
       const unclaimedOnly = document.getElementById("unclaimedOnly").checked;
       const container = document.querySelector(".grid-container");
       let cards = Array.from(container.querySelectorAll(".item-card"));
-
       cards.forEach(c => {
-        const cat = c.dataset.category || "";
-        const isClaimed = c.dataset.claimed === "true";
-        const catMatch = category === "all" || cat.startsWith(category);
-        const claimMatch = !unclaimedOnly || !isClaimed;
+        const catMatch = category === "all" || (c.dataset.category || "").startsWith(category);
+        const claimMatch = !unclaimedOnly || c.dataset.claimed !== "true";
         c.style.display = (catMatch && claimMatch) ? "" : "none";
       });
-
       const visible = cards.filter(c => c.style.display !== "none");
       visible.sort((a, b) => {
         if (sort === "price-asc") return parseFloat(a.dataset.price) - parseFloat(b.dataset.price);
@@ -671,21 +575,14 @@
       visible.forEach(c => container.appendChild(c));
     }
 
-    // ── Real-time render using onValue ─────────────────────────────────────
+    // ── Real-time render ───────────────────────────────────────────────────
     let pricesLoaded = false;
-
     function renderItemsFromSnapshot(snapshot) {
       const container = document.querySelector(".grid-container");
       container.innerHTML = "";
-      for (const item of items) {
-        const claimData = snapshot[item.id] || { claimed: false };
-        container.appendChild(createItemCard(item, claimData));
-      }
+      for (const item of items) { container.appendChild(createItemCard(item, snapshot[item.id] || { claimed: false })); }
       applyFilters();
-      if (!pricesLoaded) {
-        pricesLoaded = true;
-        loadLivePrices();
-      }
+      if (!pricesLoaded) { pricesLoaded = true; loadLivePrices(); }
     }
 
     function showSkeletons() {
@@ -696,28 +593,13 @@
 
     window.addEventListener("DOMContentLoaded", () => {
       showSkeletons();
-
-      // Real-time listener — auto-updates when any item is claimed
-      const itemsRef = ref(db, 'items');
-      onValue(itemsRef, (snapshot) => {
-        const data = snapshot.val() || {};
-        renderItemsFromSnapshot(data);
-      });
-
-      // Filter/sort listeners
-      ["sortSelect","categorySelect","unclaimedOnly"].forEach(id => {
-        document.getElementById(id).addEventListener("change", applyFilters);
-      });
-
-      // Reset all
+      onValue(ref(db, 'items'), (snapshot) => { renderItemsFromSnapshot(snapshot.val() || {}); });
+      ["sortSelect","categorySelect","unclaimedOnly"].forEach(id => { document.getElementById(id).addEventListener("change", applyFilters); });
       document.getElementById("resetButton").addEventListener("click", async () => {
         const pin = prompt("Enter 4-digit admin PIN to reset all items:");
         if (pin !== "3323") return alert("Incorrect PIN / No PIN entered.");
         const updates = {};
-        items.forEach(item => {
-          updates['items/' + item.id + '/claimed'] = false;
-          updates['items/' + item.id + '/claimedAt'] = null;
-        });
+        items.forEach(item => { updates['items/' + item.id + '/claimed'] = false; updates['items/' + item.id + '/claimedAt'] = null; });
         await update(ref(db), updates);
         try { localStorage.removeItem(MY_CLAIMS_KEY); } catch {}
         alert("All items have been reset!");
