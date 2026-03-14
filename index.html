@@ -124,7 +124,6 @@
       }
 
       // 4. API failed but we have an old price — return it as stale
-      const cachedStock = (() => { try { return JSON.parse(localStorage.getItem('stock_' + asin)); } catch { return null; } })();
       return { price: cachedPrice, cachedAt, stale: true, isInStock: cachedStock ?? null };
     }
 
