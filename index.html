@@ -1137,7 +1137,8 @@
       div.dataset.id       = item.id;
       div.dataset.category = item.category;
       div.dataset.claimed  = claimed ? "true" : "false";
-      div.dataset.price    = item.price.replace(/[^0-9.]/g, "");
+      // Items with asin start at 0 until live price loads; then gets updated
+      div.dataset.price    = item.asin ? "0" : item.price.replace(/[^0-9.]/g, "");
 
       const tagBar = document.createElement("div"); tagBar.className = "tag-bar";
       const catTag = document.createElement("div"); catTag.className = "category-tag"; catTag.textContent = item.category; tagBar.appendChild(catTag);
@@ -1466,7 +1467,7 @@
       wrapper.dataset.id       = item.id;
       wrapper.dataset.category = item.category;
       wrapper.dataset.claimed  = claimed ? "true" : "false";
-      wrapper.dataset.price    = item.price.replace(/[^0-9.]/g, "");
+      wrapper.dataset.price    = item.asin ? "0" : item.price.replace(/[^0-9.]/g, "");
 
       // Main row
       const row = document.createElement("div");
