@@ -1202,43 +1202,51 @@
 
     // ── Filter / sort ──────────────────────────────────────────────────────
     function applyFilters() {
-      const sort = document.getElementById("sortSelect").value;
-      const category = document.getElementById("categorySelect").value;
+      const sort        = document.getElementById("sortSelect").value;
+      const category    = document.getElementById("categorySelect").value;
       const unclaimedOnly = document.getElementById("unclaimedOnly").checked;
-      const activeGrid = document.getElementById("activeGrid");
+      const activeGrid  = document.getElementById("activeGrid");
 
-      // Handle both cards and list rows together (by wrapper dataset)
-      const allItems = Array.from(activeGrid.querySelectorAll(".item-card, [data-id]"));
-      const seen = new Set();
-      const unique = allItems.filter(el => {
-        const id = el.dataset.id || el.dataset.id;
-        if (!id || seen.has(id)) { seen.add(id); return !seen.has(id + "_card"); }
-        seen.add(id + "_card"); return true;
+      // Build paired groups: each item has a card + a list row wrapper
+      // Group them by item id so we can sort and reorder them as units
+      const cardMap = {};
+      const rowMap  = {};
+      Array.from(activeGrid.querySelectorAll(".item-card")).forEach(el => {
+        if (el.dataset.id) cardMap[el.dataset.id] = el;
+      });
+      Array.from(activeGrid.querySelectorAll(".list-row-wrapper")).forEach(el => {
+        if (el.dataset.id) rowMap[el.dataset.id] = el;
       });
 
-      // Show/hide based on filters — match by dataset on both card and list row
-      Array.from(activeGrid.children).forEach(c => {
-        const cat = c.dataset.category || "";
-        const isClaimed = c.dataset.claimed === "true";
+      // Get all unique item ids present in the grid
+      const allIds = [...new Set([...Object.keys(cardMap), ...Object.keys(rowMap)])];
+
+      // Filter: show/hide both card and row for each item
+      const visibleIds = allIds.filter(id => {
+        const el = cardMap[id] || rowMap[id];
+        const cat = el?.dataset.category || "";
+        const isClaimed = el?.dataset.claimed === "true";
         const catMatch   = category === "all" || cat.startsWith(category);
         const claimMatch = !unclaimedOnly || !isClaimed;
-        // Only apply filter display logic to cards and list row wrappers, not other elements
-        if (c.classList.contains('item-card') || c.classList.contains('list-row-wrapper')) {
-          c.style.display = (catMatch && claimMatch) ? "" : "none";
-        }
+        const visible = catMatch && claimMatch;
+        if (cardMap[id]) cardMap[id].style.display = visible ? "" : "none";
+        if (rowMap[id])  rowMap[id].style.display  = visible ? "" : "none";
+        return visible;
       });
 
-      // Sort visible item cards (grid mode) and list rows (list mode) together by price
-      const visibleCards = Array.from(activeGrid.querySelectorAll(".item-card")).filter(c => c.style.display !== "none");
-      const visibleRows  = Array.from(activeGrid.querySelectorAll("[data-id]")).filter(c => c.style.display !== "none");
+      // Sort visible ids by price
+      visibleIds.sort((a, b) => {
+        const priceA = parseFloat((cardMap[a] || rowMap[a])?.dataset.price || 0);
+        const priceB = parseFloat((cardMap[b] || rowMap[b])?.dataset.price || 0);
+        if (sort === "price-asc")  return priceA - priceB;
+        if (sort === "price-desc") return priceB - priceA;
+        return 0;
+      });
 
-      [visibleCards, visibleRows].forEach(els => {
-        els.sort((a, b) => {
-          if (sort === "price-asc")  return parseFloat(a.dataset.price||0) - parseFloat(b.dataset.price||0);
-          if (sort === "price-desc") return parseFloat(b.dataset.price||0) - parseFloat(a.dataset.price||0);
-          return 0;
-        });
-        els.forEach(c => activeGrid.appendChild(c));
+      // Reorder DOM: append card then row for each item in sorted order
+      visibleIds.forEach(id => {
+        if (cardMap[id]) activeGrid.appendChild(cardMap[id]);
+        if (rowMap[id])  activeGrid.appendChild(rowMap[id]);
       });
     }
 
