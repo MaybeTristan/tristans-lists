@@ -1036,7 +1036,7 @@
     const app = initializeApp(firebaseConfig);
     const db = getDatabase(app);
 
-    const CANOPY_API_KEY = "16e57d61-4a2e-4a84-b6b9-75790aee93f3";
+    const WORKER_URL = "https://claude-proxy.tristanarbet.workers.dev";
     const CACHE_TTL_MS = 6 * 24 * 60 * 60 * 1000;
 
     // ── UPDATE THIS DATE whenever you change the item list ─────────────────
@@ -1219,7 +1219,7 @@
         }
       } catch (e) { console.warn("Firebase cache read failed", asin, e); }
       try {
-        const res = await fetch(`https://rest.canopyapi.co/api/amazon/product?asin=${asin}`, { headers: { "API-KEY": CANOPY_API_KEY } });
+        const res = await fetch(`${WORKER_URL}/canopy?asin=${asin}`);
         const data = await res.json();
         const priceValue = data?.data?.amazonProduct?.price?.display ?? null;
         if (priceValue !== null) {
@@ -1950,7 +1950,21 @@
       document.getElementById("resetButton").addEventListener("click", async () => {
         const pin = await showPinPrompt();
         if (pin === null) return;
-        if (pin !== "3323") {
+        // Verify PIN via Cloudflare Worker
+        let pinValid = false;
+        try {
+          const pinRes = await fetch(WORKER_URL + '/verify-pin', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ pin })
+          });
+          const pinData = await pinRes.json();
+          pinValid = pinData.valid === true;
+        } catch {
+          await showAlert({ icon: '⚠️', title: 'Error', body: 'Could not verify PIN. Please try again.', type: 'warning' });
+          return;
+        }
+        if (!pinValid) {
           await showAlert({ icon: '🔒', title: 'Incorrect PIN', body: 'The PIN you entered was incorrect. Please try again.', type: 'warning' });
           return;
         }
