@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tristan's Birthday List</title>
-  <link rel="icon" href="birthdayfavicon.ico">
+  <link rel="icon" href="https://photos.tristanarbet.com/Adobe%20Express%20Photo%20project-8.png">
   <link href="https://fonts.googleapis.com/css2?family=Lexend&family=Merriweather:ital,opsz,wght@0,18..144,300..900;1,18..144,300..900&display=swap" rel="stylesheet">
 
   <style>
@@ -195,6 +195,76 @@
 
     /* ── Page content ────────────────────────────────────────────────────── */
     .page-content { padding: 20px; }
+
+
+    /* ── Hamburger nav ───────────────────────────────────────────────────── */
+    .hamburger-btn {
+      display: flex; flex-direction: column; justify-content: center;
+      gap: 5px; width: 36px; height: 36px; padding: 6px;
+      background: none; border: 1px solid var(--border);
+      border-radius: 8px; cursor: pointer; flex-shrink: 0;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .hamburger-btn:hover { background: var(--unclaim-hover); }
+    .hamburger-btn span {
+      display: block; height: 2px; background: var(--text);
+      border-radius: 2px; transition: transform 0.25s, opacity 0.25s;
+    }
+    .hamburger-btn.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger-btn.open span:nth-child(2) { opacity: 0; }
+    .hamburger-btn.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    /* Slide-in drawer */
+    .nav-drawer-overlay {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.4); z-index: 800;
+      backdrop-filter: blur(2px);
+      animation: fadeIn 0.2s ease;
+    }
+    .nav-drawer-overlay.open { display: block; }
+    .nav-drawer {
+      position: fixed; top: 0; left: 0; bottom: 0;
+      width: 260px; background: var(--card);
+      border-right: 1px solid var(--border);
+      box-shadow: 4px 0 24px rgba(0,0,0,0.15);
+      z-index: 801; display: flex; flex-direction: column;
+      transform: translateX(-100%);
+      transition: transform 0.3s cubic-bezier(0.34, 1.1, 0.64, 1);
+      padding: 0;
+    }
+    .nav-drawer.open { transform: translateX(0); }
+    .nav-drawer-header {
+      padding: 20px 20px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; gap: 10px;
+    }
+    .nav-drawer-logo { height: 36px; width: auto; object-fit: contain; }
+    .nav-drawer-logo-light { display: block; }
+    .nav-drawer-logo-dark  { display: none; }
+    [data-theme="dark"] .nav-drawer-logo-light { display: none; }
+    [data-theme="dark"] .nav-drawer-logo-dark  { display: block; }
+    .nav-drawer-items { padding: 12px 8px; flex: 1; }
+    .nav-item {
+      display: flex; align-items: center; gap: 12px;
+      padding: 11px 14px; border-radius: 8px;
+      text-decoration: none; color: var(--text);
+      font-size: 0.9em; font-family: 'Lexend', sans-serif;
+      transition: background 0.15s, color 0.15s;
+      cursor: pointer; border: none; background: none;
+      width: 100%; text-align: left;
+    }
+    .nav-item:hover { background: var(--unclaim-hover); }
+    .nav-item.active { background: var(--red); color: #fff; font-weight: 500; }
+    .nav-item-icon { font-size: 1.1em; width: 22px; text-align: center; flex-shrink: 0; }
+    .nav-item-label { flex: 1; }
+    .nav-item-arrow { font-size: 0.75em; color: var(--text-faint); }
+    .nav-item.active .nav-item-arrow { color: rgba(255,255,255,0.6); }
+    .nav-drawer-footer {
+      padding: 12px 8px 20px;
+      border-top: 1px solid var(--border);
+      font-size: 0.72em; color: var(--text-faint);
+      text-align: center;
+    }
 
     /* ── Header ──────────────────────────────────────────────────────────── */
     .header-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px; margin-bottom: 4px; }
@@ -495,6 +565,95 @@
     .item-share-btn:hover { background: #8f2121; color: #fff; border-color: #8f2121; }
     .item-share-btn.copied { background: #27ae60; color: #fff; border-color: #27ae60; }
 
+
+    /* ── Hamburger menu ──────────────────────────────────────────────────── */
+    .hamburger-btn {
+      display: flex; flex-direction: column; justify-content: center;
+      gap: 5px; width: 36px; height: 36px; padding: 6px;
+      background: none; border: 1px solid var(--border);
+      border-radius: 8px; cursor: pointer; flex-shrink: 0;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .hamburger-btn:hover { background: var(--unclaim-hover); }
+    .hamburger-btn span {
+      display: block; width: 100%; height: 2px;
+      background: var(--text-muted); border-radius: 2px;
+      transition: transform 0.3s ease, opacity 0.3s ease;
+      transform-origin: center;
+    }
+    .hamburger-btn.open span:nth-child(1) { transform: translateY(7px) rotate(45deg); }
+    .hamburger-btn.open span:nth-child(2) { opacity: 0; transform: scaleX(0); }
+    .hamburger-btn.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
+
+    .nav-overlay {
+      position: fixed; inset: 0; background: var(--modal-overlay);
+      z-index: 800; opacity: 0; pointer-events: none;
+      transition: opacity 0.3s ease;
+      backdrop-filter: blur(2px);
+    }
+    .nav-overlay.open { opacity: 1; pointer-events: all; }
+
+    .nav-drawer {
+      position: fixed; top: 0; right: 0; bottom: 0;
+      width: 280px; max-width: 85vw;
+      background: var(--card-bg); z-index: 801;
+      box-shadow: -8px 0 40px rgba(0,0,0,0.2);
+      transform: translateX(100%);
+      transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+      display: flex; flex-direction: column;
+      border-left: 1px solid var(--border);
+    }
+    .nav-drawer.open { transform: translateX(0); }
+
+    .nav-drawer-header {
+      padding: 20px 20px 16px;
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .nav-drawer-title {
+      font-family: 'Merriweather', serif;
+      font-size: 1em; color: var(--text);
+    }
+    .nav-close-btn {
+      background: none; border: none; cursor: pointer;
+      color: var(--text-faint); font-size: 1.3em; padding: 4px;
+      line-height: 1; transition: color 0.15s;
+    }
+    .nav-close-btn:hover { color: var(--text); }
+
+    .nav-items { padding: 12px 0; flex: 1; }
+    .nav-item {
+      display: flex; align-items: center; gap: 14px;
+      padding: 14px 20px; text-decoration: none;
+      color: var(--text); font-size: 0.95em;
+      transition: background 0.15s;
+      cursor: pointer; border: none; background: none;
+      width: 100%; text-align: left; font-family: 'Lexend', sans-serif;
+    }
+    .nav-item:hover { background: var(--unclaim-hover); }
+    .nav-item-icon {
+      width: 36px; height: 36px; border-radius: 10px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1em; flex-shrink: 0;
+    }
+    .nav-item-icon.red    { background: rgba(143,33,33,0.12); }
+    .nav-item-icon.green  { background: rgba(39,174,96,0.12); }
+    .nav-item-icon.yellow { background: rgba(243,156,18,0.12); }
+    .nav-item-icon.blue   { background: rgba(41,128,185,0.12); }
+    .nav-item-text { display: flex; flex-direction: column; gap: 2px; }
+    .nav-item-label { font-weight: 500; font-size: 0.92em; }
+    .nav-item-desc  { font-size: 0.72em; color: var(--text-faint); }
+    .nav-item-arrow { margin-left: auto; color: var(--text-faint); font-size: 0.75em; }
+
+    .nav-divider { height: 1px; background: var(--border); margin: 8px 20px; }
+
+    .nav-drawer-footer {
+      padding: 16px 20px;
+      border-top: 1px solid var(--border);
+      font-size: 0.72em; color: var(--text-faint);
+      text-align: center;
+    }
+
     /* ── Buttons ─────────────────────────────────────────────────────────── */
     .button.view-btn { background-color: var(--btn-bg); color: var(--btn-text); text-align: center; padding: 8px; border-radius: 5px; text-decoration: none; font-size: 0.9em; cursor: pointer; display: block; border: none; font-family: 'Lexend', sans-serif; }
 
@@ -611,10 +770,95 @@
     </div>
   </div>
 
+  <!-- Nav drawer overlay -->
+  <div class="nav-drawer-overlay" id="navOverlay"></div>
+
+  <!-- Nav drawer -->
+  <div class="nav-drawer" id="navDrawer">
+    <div class="nav-drawer-header">
+      <img class="nav-drawer-logo nav-drawer-logo-light" src="https://photos.tristanarbet.com/Adobe%20Express%20Photo%20project-5.png" alt="Logo" />
+      <img class="nav-drawer-logo nav-drawer-logo-dark"  src="https://photos.tristanarbet.com/Adobe%20Express%20Photo%20project-6.png" alt="Logo" />
+    </div>
+    <div class="nav-drawer-items">
+      <a class="nav-item active" href="#">
+        <span class="nav-item-icon">🎁</span>
+        <span class="nav-item-label">List</span>
+        <span class="nav-item-arrow">›</span>
+      </a>
+      <a class="nav-item" href="https://www.google.com" target="_blank">
+        <span class="nav-item-icon">➕</span>
+        <span class="nav-item-label">Add More</span>
+        <span class="nav-item-arrow">›</span>
+      </a>
+      <a class="nav-item" href="https://forms.gle/YYmsCVazj6CR6v529" target="_blank">
+        <span class="nav-item-icon">🐛</span>
+        <span class="nav-item-label">Report a Bug</span>
+        <span class="nav-item-arrow">›</span>
+      </a>
+      <a class="nav-item" href="https://github.com/MaybeTristan/christmas-list-2025/issues" target="_blank">
+        <span class="nav-item-icon">📋</span>
+        <span class="nav-item-label">Current Bugs</span>
+        <span class="nav-item-arrow">›</span>
+      </a>
+    </div>
+    <div class="nav-drawer-footer">
+      Tristan's Birthday List ♡
+    </div>
+  </div>
+
   <!-- Banner -->
   <div class="banner-wrapper">
     <div class="banner">
       <img src="https://upload.wikimedia.org/wikipedia/commons/d/dd/Birthday_candles.jpg" alt="Birthday candles banner" />
+    </div>
+  </div>
+
+  <!-- Nav overlay -->
+  <div class="nav-overlay" id="navOverlay"></div>
+
+  <!-- Nav drawer -->
+  <div class="nav-drawer" id="navDrawer">
+    <div class="nav-drawer-header">
+      <span class="nav-drawer-title">Menu</span>
+      <button class="nav-close-btn" id="navCloseBtn">✕</button>
+    </div>
+    <div class="nav-items">
+      <a class="nav-item" href="#" onclick="closeNav()">
+        <div class="nav-item-icon red">🎁</div>
+        <div class="nav-item-text">
+          <span class="nav-item-label">List</span>
+          <span class="nav-item-desc">Back to the birthday list</span>
+        </div>
+        <span class="nav-item-arrow">›</span>
+      </a>
+      <a class="nav-item" href="https://www.google.com" target="_blank" onclick="closeNav()">
+        <div class="nav-item-icon green">➕</div>
+        <div class="nav-item-text">
+          <span class="nav-item-label">Add More</span>
+          <span class="nav-item-desc">Suggest a gift idea</span>
+        </div>
+        <span class="nav-item-arrow">›</span>
+      </a>
+      <div class="nav-divider"></div>
+      <a class="nav-item" href="https://forms.gle/YYmsCVazj6CR6v529" target="_blank" onclick="closeNav()">
+        <div class="nav-item-icon yellow">📝</div>
+        <div class="nav-item-text">
+          <span class="nav-item-label">Report a Bug</span>
+          <span class="nav-item-desc">Something not working?</span>
+        </div>
+        <span class="nav-item-arrow">›</span>
+      </a>
+      <a class="nav-item" href="https://github.com/MaybeTristan/christmas-list-2025/issues" target="_blank" onclick="closeNav()">
+        <div class="nav-item-icon blue">🐛</div>
+        <div class="nav-item-text">
+          <span class="nav-item-label">Current Bugs</span>
+          <span class="nav-item-desc">View known issues on GitHub</span>
+        </div>
+        <span class="nav-item-arrow">›</span>
+      </a>
+    </div>
+    <div class="nav-drawer-footer">
+      Tristan's Birthday List ♡
     </div>
   </div>
 
@@ -628,6 +872,10 @@
         <img class="header-logo-dark"  src="https://photos.tristanarbet.com/Adobe%20Express%20Photo%20project-6.png" alt="Tristan's Birthday List" />
       </div>
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <button class="hamburger-btn" id="hamburgerBtn" title="Menu"><span></span><span></span><span></span></button>
+        <button class="hamburger-btn" id="hamburgerBtn" title="Menu">
+          <span></span><span></span><span></span>
+        </button>
         <button class="list-mode-toggle" id="listModeBtn" title="Toggle list mode">
           ☰ List Mode
         </button>
@@ -1629,8 +1877,40 @@
       return wrapper;
     }
 
+    // ── Nav drawer ────────────────────────────────────────────────────────────
+    function openNav() {
+      document.getElementById('navDrawer').classList.add('open');
+      document.getElementById('navOverlay').classList.add('open');
+      document.getElementById('hamburgerBtn').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    }
+    function closeNav() {
+      document.getElementById('navDrawer').classList.remove('open');
+      document.getElementById('navOverlay').classList.remove('open');
+      document.getElementById('hamburgerBtn').classList.remove('open');
+      document.body.style.overflow = '';
+    }
+    window.closeNav = closeNav;
+
     window.addEventListener("DOMContentLoaded", () => {
+      document.getElementById('hamburgerBtn').addEventListener('click', openNav);
+      document.getElementById('navCloseBtn').addEventListener('click', closeNav);
+      document.getElementById('navOverlay').addEventListener('click', closeNav);
+      // Close on Escape
+      document.addEventListener('keydown', e => { if (e.key === 'Escape') closeNav(); });
+
       showSkeletons();
+
+      // Hamburger nav
+      const hamburgerBtn = document.getElementById('hamburgerBtn');
+      const navDrawer    = document.getElementById('navDrawer');
+      const navOverlay   = document.getElementById('navOverlay');
+      function openNav()  { navDrawer.classList.add('open'); navOverlay.classList.add('open'); hamburgerBtn.classList.add('open'); }
+      function closeNav() { navDrawer.classList.remove('open'); navOverlay.classList.remove('open'); hamburgerBtn.classList.remove('open'); }
+      hamburgerBtn.addEventListener('click', () => navDrawer.classList.contains('open') ? closeNav() : openNav());
+      navOverlay.addEventListener('click', closeNav);
+      document.addEventListener('keydown', e => { if (e.key === 'Escape') closeNav(); });
+
 
       // List mode init
       setListMode(isListMode);
