@@ -1,7 +1,6 @@
-# Christmas List 2025
 ### Submit bugs via this form: https://forms.gle/YYmsCVazj6CR6v529
 
-Hello! This is a messy but functional project for my Christmas list. It's online at christmas.tristanarbet.com
+Hello! This is a messy but functional project for my Christmas & Birthdays list. It's online for now at birthday.tristanarbet.com
 
 Services I used:
 - Google Firebase (For real time tracking to see if presents have been bought already.)
