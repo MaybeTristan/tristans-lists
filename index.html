@@ -480,7 +480,6 @@
     .price-unavailable { color: var(--text-faint); font-style: italic; font-weight: normal; font-size: 0.9em; }
     .price-timestamp { font-size: 0.72em; color: var(--text-faint); font-style: italic; margin-top: -2px; }
     .price[data-has-price="true"]:not(.price-loading)::after { content: " 🟢"; font-size: 0.7em; vertical-align: middle; }
-    .sold-out-badge { display: inline-block; background-color: #fde8e8; color: #9b1c1c; font-size: 0.78em; font-weight: normal; padding: 2px 6px; border-radius: 4px; }
 
     /* ── Item action row (view + share) ──────────────────────────────────── */
     .item-action-row { display: flex; gap: 8px; align-items: stretch; }
@@ -990,14 +989,14 @@
     // ── Firebase price cache ───────────────────────────────────────────────
     async function fetchLivePrice(asin) {
       const priceRef = ref(db, 'prices/' + asin);
-      let cachedPrice = null, cachedAt = null, cachedStock = null;
+      let cachedPrice = null, cachedAt = null;
       try {
         const snap = await get(priceRef);
         if (snap.exists()) {
-          const v = snap.val(); cachedPrice = v.price; cachedAt = v.cachedAt; cachedStock = v.isInStock ?? null;
+          const v = snap.val(); cachedPrice = v.price; cachedAt = v.cachedAt;
           if (Date.now() - cachedAt < CACHE_TTL_MS) {
             if (cachedPrice === null) return null;
-            return { price: cachedPrice, cachedAt, stale: false, isInStock: cachedStock };
+            return { price: cachedPrice, cachedAt, stale: false };
           }
         }
       } catch (e) { console.warn("Firebase cache read failed", asin, e); }
@@ -1005,18 +1004,17 @@
         const res = await fetch(`https://rest.canopyapi.co/api/amazon/product?asin=${asin}`, { headers: { "API-KEY": CANOPY_API_KEY } });
         const data = await res.json();
         const priceValue = data?.data?.amazonProduct?.price?.display ?? null;
-        const isInStock  = data?.data?.amazonProduct?.isInStock ?? null;
         if (priceValue !== null) {
           const price = String(priceValue); const now = Date.now();
-          try { await set(priceRef, { price, cachedAt: now, isInStock }); } catch {}
-          return { price, cachedAt: now, stale: false, isInStock };
+          try { await set(priceRef, { price, cachedAt: now }); } catch {}
+          return { price, cachedAt: now, stale: false };
         }
       } catch (e) { console.warn("Canopy fetch failed", asin, e); }
       if (cachedPrice === null) {
-        try { await set(priceRef, { price: null, cachedAt: Date.now(), isInStock: null }); } catch {}
+        try { await set(priceRef, { price: null, cachedAt: Date.now() }); } catch {}
         return null;
       }
-      return { price: cachedPrice, cachedAt, stale: true, isInStock: cachedStock ?? null };
+      return { price: cachedPrice, cachedAt, stale: true };
     }
 
     async function loadLivePrices() {
@@ -1036,7 +1034,6 @@
             if (stale) el.classList.add("price-stale");
             if (price) el.setAttribute("data-has-price", "true");
             if (tsEl && cachedAt) { tsEl.textContent = (stale ? "⚠️ Last known: " : "Updated: ") + formatTimestamp(cachedAt); tsEl.style.display = "block"; }
-            if (isInStock === false) { const s = document.getElementById("soldout_" + item.id); if (s) s.style.display = "inline-block"; }
           } else {
             el.textContent = "Live Price Unavailable"; el.classList.remove("price-loading"); el.classList.add("price-unavailable");
             if (tsEl) { tsEl.textContent = "Click View Item for Live Price"; tsEl.style.display = "block"; }
@@ -1052,8 +1049,18 @@
             listPriceEl.classList.remove("price-loading");
             if (result.price) listPriceEl.setAttribute("data-has-price", "true");
           } else {
-            listPriceEl.textContent = "Live Price Not Available — Expand For Info"; listPriceEl.classList.remove("price-loading"); listPriceEl.classList.add("price-unavailable");
+            listPriceEl.textContent = "Live Price Not Available — Expand For Info";
+            listPriceEl.classList.remove("price-loading");
+            listPriceEl.classList.add("price-unavailable");
           }
+        }
+        // Update dataset.price on card and list row wrapper so sort works with live prices
+        const liveNum = result?.price ? parseFloat(result.price.replace(/[^0-9.]/g, "")) : null;
+        if (liveNum !== null && !isNaN(liveNum)) {
+          const cardEl = document.querySelector(`.item-card[data-id="${item.id}"]`);
+          const rowEl  = document.querySelector(`.list-row-wrapper[data-id="${item.id}"]`);
+          if (cardEl) cardEl.dataset.price = liveNum;
+          if (rowEl)  rowEl.dataset.price  = liveNum;
         }
       }));
     }
@@ -1145,7 +1152,6 @@
 
       if (item.asin) {
         const priceTs = document.createElement("span"); priceTs.className = "price-timestamp"; priceTs.id = "price_ts_" + item.id; priceTs.style.display = "none"; info.appendChild(priceTs);
-        const soldOut = document.createElement("span"); soldOut.className = "sold-out-badge"; soldOut.id = "soldout_" + item.id; soldOut.textContent = "⚠️ Currently Out of Stock"; soldOut.style.display = "none"; info.appendChild(soldOut);
       }
 
       // View + Share button row
@@ -1291,33 +1297,39 @@
           const justUnclaimed = !claimData.claimed && prevData.claimed;
 
           if (justClaimed) {
-            // Find card in activeGrid, animate it out, then move to claimedGrid
-            const existing = activeGrid.querySelector(`[data-id="${item.id}"]`);
-            if (existing) {
-              existing.classList.add("card-sinking");
+            // Find ALL elements (card + list row) in activeGrid and animate them out
+            const existingEls = Array.from(activeGrid.querySelectorAll(`[data-id="${item.id}"]`));
+            if (existingEls.length > 0) {
+              existingEls.forEach(el => el.classList.add("card-sinking"));
               setTimeout(() => {
-                existing.remove();
+                existingEls.forEach(el => el.remove());
                 const newCard = createItemCard(item, claimData);
+                const newRow  = createListRow(item, claimData);
                 newCard.classList.add("card-rising");
+                newRow.classList.add("card-rising");
                 claimedGrid.appendChild(newCard);
+                claimedGrid.appendChild(newRow);
                 claimedSection.style.display = "block";
-                setTimeout(() => newCard.classList.remove("card-rising"), 400);
+                setTimeout(() => { newCard.classList.remove("card-rising"); newRow.classList.remove("card-rising"); }, 400);
               }, 360);
             }
           } else if (justUnclaimed) {
-            // Find card in claimedGrid, animate it out, then move to activeGrid
-            const existing = claimedGrid.querySelector(`[data-id="${item.id}"]`);
-            if (existing) {
-              existing.classList.add("card-sinking");
+            // Find ALL elements (card + list row) in claimedGrid and animate them out
+            const existingEls = Array.from(claimedGrid.querySelectorAll(`[data-id="${item.id}"]`));
+            if (existingEls.length > 0) {
+              existingEls.forEach(el => el.classList.add("card-sinking"));
               setTimeout(() => {
-                existing.remove();
+                existingEls.forEach(el => el.remove());
                 const newCard = createItemCard(item, claimData);
+                const newRow  = createListRow(item, claimData);
                 newCard.classList.add("card-rising");
+                newRow.classList.add("card-rising");
                 activeGrid.appendChild(newCard);
+                activeGrid.appendChild(newRow);
                 applyFilters();
                 const hasAnyClaimed = claimedGrid.querySelectorAll(".item-card").length > 0;
                 claimedSection.style.display = hasAnyClaimed ? "block" : "none";
-                setTimeout(() => newCard.classList.remove("card-rising"), 400);
+                setTimeout(() => { newCard.classList.remove("card-rising"); newRow.classList.remove("card-rising"); }, 400);
               }, 360);
             }
           }
@@ -1517,7 +1529,6 @@
       expandedCard.appendChild(fullPrice);
       if (item.asin) {
         const pts = document.createElement("span"); pts.className = "price-timestamp"; pts.id = "price_ts_" + item.id; pts.style.display = "none"; expandedCard.appendChild(pts);
-        const so = document.createElement("span"); so.className = "sold-out-badge"; so.id = "soldout_" + item.id; so.textContent = "⚠️ Currently Out of Stock"; so.style.display = "none"; expandedCard.appendChild(so);
       }
 
       // View + share action row
