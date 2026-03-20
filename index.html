@@ -1305,7 +1305,7 @@
         const hasAnyClaimed = items.some(i => (snapshot[i.id] || {}).claimed);
         claimedSection.style.display = hasAnyClaimed ? "block" : "none";
         applyFilters();
-        if (!pricesLoaded) { pricesLoaded = true; loadLivePrices(); }
+        if (!pricesLoaded) { pricesLoaded = true; loadLivePrices().then(() => applyFilters()); }
       } else {
         // Subsequent updates — animate newly claimed/unclaimed cards
         for (const item of items) {
