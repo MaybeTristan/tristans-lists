@@ -211,7 +211,7 @@
     .nav-drawer-overlay.open { display: block; }
     .nav-drawer {
       position: fixed; top: 0; left: 0; bottom: 0;
-      width: 260px; background: var(--card);
+      width: 260px; background: var(--card-bg);
       border-right: 1px solid var(--border);
       box-shadow: 4px 0 24px rgba(0,0,0,0.15);
       z-index: 801; display: flex; flex-direction: column;
@@ -1845,6 +1845,7 @@
       function closeNav() { navDrawer.classList.remove('open'); navOverlay.classList.remove('open'); hamburgerBtn.classList.remove('open'); }
       window.closeNav = closeNav;
       hamburgerBtn.addEventListener('click', () => navDrawer.classList.contains('open') ? closeNav() : openNav());
+      document.getElementById('navCloseBtn').addEventListener('click', closeNav);
       navOverlay.addEventListener('click', closeNav);
       document.addEventListener('keydown', e => { if (e.key === 'Escape') closeNav(); });
 
