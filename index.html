@@ -934,9 +934,12 @@
         </select>
       </div>
       <div class="filter-sep"></div>
-      <div class="filter-group">
-        <input type="checkbox" id="unclaimedOnly">
-        <label for="unclaimedOnly">Unclaimed only</label>
+      <div class="filter-group" style="flex-direction:column;align-items:flex-start;gap:2px;">
+        <div style="display:flex;align-items:center;gap:6px;">
+          <input type="checkbox" id="unclaimedOnly">
+          <label for="unclaimedOnly">Hide Claimed Section</label>
+        </div>
+        <span style="font-size:0.7em;color:var(--text-faint);padding-left:24px;">(Will still show items you claimed)</span>
       </div>
     </div>
 
