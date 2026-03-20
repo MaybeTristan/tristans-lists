@@ -64,7 +64,26 @@
       --help-border: #5a4020;
     }
 
-    * { box-sizing: border-box; }
+    /* ── Loading screen ─────────────────────────────────────────────────── */
+    #loading-screen {
+      position: fixed; inset: 0; z-index: 9999;
+      background: var(--bg);
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      gap: 12px;
+      transition: opacity 0.6s ease;
+    }
+    #loading-screen.fade-out { opacity: 0; pointer-events: none; }
+    .loading-emoji { font-size: 2.6em; animation: loadBounce 0.8s ease infinite alternate; }
+    @keyframes loadBounce { from { transform: translateY(0); } to { transform: translateY(-8px); } }
+    .loading-title {
+      font-family: 'Merriweather', serif;
+      font-size: 1.6em; color: var(--text);
+      opacity: 0; animation: loadFadeIn 0.5s ease 0.3s forwards;
+    }
+    @keyframes loadFadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+
+        * { box-sizing: border-box; }
     body { font-family: 'Lexend', sans-serif; margin: 0; background: var(--bg); color: var(--text); transition: background 0.3s, color 0.3s; }
     h1, h2, h3, h4 { font-family: 'Merriweather', serif; }
 
@@ -768,6 +787,13 @@
     </div>
   </div>
 
+  <!-- Loading screen -->
+
+  <div id="loading-screen">
+    <div class="loading-emoji">🎁</div>
+    <div class="loading-title">Welcome</div>
+  </div>
+
   <!-- Nav overlay -->
 
   <div class="nav-drawer-overlay" id="navOverlay"></div>
@@ -789,7 +815,7 @@
         <span class="nav-item-arrow">›</span>
       </a>
       <a class="nav-item" href="https://list.backend.tristanarbet.com" target="_blank" onclick="closeNav()">
-        <div class="nav-item-icon green">🟢</div>
+        <div class="nav-item-icon green" style="font-family:'Lexend',sans-serif;font-size:1.4em;font-weight:300;">+</div>
         <div class="nav-item-text">
           <span class="nav-item-label">Add More</span>
           <span class="nav-item-desc">Item Dashboard</span>
@@ -1836,6 +1862,13 @@
 
     window.addEventListener("DOMContentLoaded", () => {
       showSkeletons();
+
+      // ── Loading screen dismiss ───────────────────────────────────────────
+      const loadingScreen = document.getElementById('loading-screen');
+      setTimeout(() => {
+        loadingScreen.classList.add('fade-out');
+        setTimeout(() => loadingScreen.remove(), 650);
+      }, 1400);
 
       // ── Nav drawer ──────────────────────────────────────────────────────
       const hamburgerBtn = document.getElementById('hamburgerBtn');
