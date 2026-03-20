@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8" />
@@ -71,7 +70,7 @@
       display: flex; flex-direction: column;
       align-items: center; justify-content: center;
       gap: 12px;
-      transition: opacity 0.6s ease;
+      transition: opacity 0.6s ease; /* overridden dynamically for first visit */
     }
     #loading-screen.fade-out { opacity: 0; pointer-events: none; }
     .loading-emoji { font-size: 2.6em; animation: loadBounce 0.8s ease infinite alternate; }
@@ -737,12 +736,10 @@
       .modal-btn { width: 100%; text-align: center; padding: 11px; }
     }
   </style>
-
 </head>
 <body>
 
   <!-- Modal -->
-
   <div class="modal-backdrop" id="modal-backdrop">
     <div class="modal-box" id="modal-box">
       <div class="modal-icon" id="modal-icon"></div>
@@ -754,7 +751,6 @@
   </div>
 
   <!-- Thank you overlay -->
-
   <div id="thankyou-overlay">
     <canvas id="confetti-canvas"></canvas>
     <div class="thankyou-box">
@@ -770,7 +766,6 @@
   </div>
 
   <!-- Hamburger above banner -->
-
   <div style="padding: 10px 20px 0 20px;">
     <button id="hamburgerBtn" title="Menu" style="background:none;border:none;cursor:pointer;padding:6px 4px;display:flex;flex-direction:column;gap:5px;opacity:0.6;transition:opacity 0.15s;" onmouseover="this.style.opacity='1'" onmouseout="this.style.opacity='0.6'">
       <span style="display:block;width:22px;height:2px;background:var(--text);border-radius:2px;transition:transform 0.25s,opacity 0.25s;"></span>
@@ -780,7 +775,6 @@
   </div>
 
   <!-- Banner -->
-
   <div class="banner-wrapper">
     <div class="banner">
       <img src="https://upload.wikimedia.org/wikipedia/commons/d/dd/Birthday_candles.jpg" alt="Birthday candles banner" />
@@ -788,18 +782,15 @@
   </div>
 
   <!-- Loading screen -->
-
   <div id="loading-screen">
     <div class="loading-emoji">🎁</div>
     <div class="loading-title">Welcome</div>
   </div>
 
   <!-- Nav overlay -->
-
   <div class="nav-drawer-overlay" id="navOverlay"></div>
 
   <!-- Nav drawer -->
-
   <div class="nav-drawer" id="navDrawer">
     <div class="nav-drawer-header">
       <span class="nav-drawer-title">Menu</span>
@@ -846,190 +837,186 @@
   </div>
 
   <!-- Page content -->
-
   <div class="page-content">
 
-
-<!-- Header row -->
-<div class="header-row">
-  <div class="header-logo">
-    <img class="header-logo-light" src="https://photos.tristanarbet.com/Adobe%20Express%20Photo%20project-5.png" alt="Tristan's Birthday List" />
-    <img class="header-logo-dark"  src="https://photos.tristanarbet.com/Adobe%20Express%20Photo%20project-6.png" alt="Tristan's Birthday List" />
-  </div>
-  <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
-    <button class="list-mode-toggle" id="listModeBtn" title="Toggle list mode">
-      ☰ List Mode
-    </button>
-    <button class="share-btn" id="shareListBtn">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
-        <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
-      </svg>
-      Share List
-    </button>
-    <label class="dark-toggle" title="Toggle dark mode">
-      <span id="dark-label">🌙 Dark Mode</span>
-      <div class="toggle-track" onclick="toggleDark()"><div class="toggle-thumb"></div></div>
-    </label>
-  </div>
-</div>
-
-
-<!-- Quick Info Strip -->
-<div class="quick-info-strip" id="quickInfoStrip" style="margin: 14px 0 16px 0;">
-  <div class="quick-info-header" id="quickInfoHeader">
-    <span class="quick-info-title">✨ Quick Info!</span>
-    <div class="quick-info-pills">
-      <span class="quick-info-pill">🎂 Birthday: June 17th</span>
-      <span class="quick-info-pill-sep">·</span>
-      <span class="quick-info-pill" id="lastUpdatedPill"><span class="quick-info-pill-dot"></span> Last updated March 13, 2026</span>
-      <span class="quick-info-pill-sep">·</span>
-      <span class="quick-info-pill" id="claimedCountPill">Loading…</span>
+    <!-- Header row -->
+    <div class="header-row">
+      <div class="header-logo">
+        <img class="header-logo-light" src="https://photos.tristanarbet.com/Adobe%20Express%20Photo%20project-5.png" alt="Tristan's Birthday List" />
+        <img class="header-logo-dark"  src="https://photos.tristanarbet.com/Adobe%20Express%20Photo%20project-6.png" alt="Tristan's Birthday List" />
+      </div>
+      <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+        <button class="list-mode-toggle" id="listModeBtn" title="Toggle list mode">
+          ☰ List Mode
+        </button>
+        <button class="share-btn" id="shareListBtn">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/>
+            <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/>
+          </svg>
+          Share List
+        </button>
+        <label class="dark-toggle" title="Toggle dark mode">
+          <span id="dark-label">🌙 Dark Mode</span>
+          <div class="toggle-track" onclick="toggleDark()"><div class="toggle-thumb"></div></div>
+        </label>
+      </div>
     </div>
-    <span class="quick-info-arrow">▾</span>
-  </div>
-  <div class="quick-info-body">
-    <div class="quick-info-body-inner">
-      <div class="quick-info-body-content">
-        <div class="quick-info-item">
-          <span class="quick-info-item-label">🎂 Birthday</span>
-          <span class="quick-info-item-value">June 17th</span>
-        </div>
-        <div class="quick-info-item">
-          <span class="quick-info-item-label">📅 Last Updated</span>
-          <span class="quick-info-item-value" id="quickInfoUpdated">March 13, 2026</span>
-        </div>
-        <div class="quick-info-item">
-          <span class="quick-info-item-label">🎁 Items Claimed</span>
-          <span class="quick-info-item-value" id="quickInfoClaimed">Loading…</span>
-        </div>
 
-        <div class="quick-info-item" style="flex-basis:100%;">
-          <span class="quick-info-item-label">ℹ️ How It Works</span>
-          <span class="quick-info-item-value" style="font-size:0.82em;font-weight:normal;color:var(--text-muted);">Click "View Item" to see the product, then check "I'm buying this!" to claim it. Hit Undo if you accidentally claim something.</span>
+
+    <!-- Quick Info Strip -->
+    <div class="quick-info-strip" id="quickInfoStrip" style="margin: 14px 0 16px 0;">
+      <div class="quick-info-header" id="quickInfoHeader">
+        <span class="quick-info-title">✨ Quick Info!</span>
+        <div class="quick-info-pills">
+          <span class="quick-info-pill">🎂 Birthday: June 17th</span>
+          <span class="quick-info-pill-sep">·</span>
+          <span class="quick-info-pill" id="lastUpdatedPill"><span class="quick-info-pill-dot"></span> Last updated March 13, 2026</span>
+          <span class="quick-info-pill-sep">·</span>
+          <span class="quick-info-pill" id="claimedCountPill">Loading…</span>
         </div>
-        <div class="quick-info-item" style="flex-basis:100%;">
-          <span class="quick-info-item-label">👕 Sizing Note</span>
-          <span class="quick-info-item-value" style="font-size:0.82em;font-weight:normal;color:var(--text-muted);">All clothes sizes and other item notes are shown next to the tags on each card.</span>
-        </div>
-        <div class="quick-info-item" style="flex-basis:100%;">
-          <span class="quick-info-item-label">❓ Need Help?</span>
-          <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:2px;">
-            <a href="https://forms.gle/YYmsCVazj6CR6v529" target="_blank" class="help-link-btn" style="font-size:0.78em;">📝 Report a Problem</a>
-            <a href="https://github.com/MaybeTristan/christmas-list-2025/issues" target="_blank" class="help-link-btn" style="font-size:0.78em;">🐛 View Known Issues</a>
+        <span class="quick-info-arrow">▾</span>
+      </div>
+      <div class="quick-info-body">
+        <div class="quick-info-body-inner">
+          <div class="quick-info-body-content">
+            <div class="quick-info-item">
+              <span class="quick-info-item-label">🎂 Birthday</span>
+              <span class="quick-info-item-value">June 17th</span>
+            </div>
+            <div class="quick-info-item">
+              <span class="quick-info-item-label">📅 Last Updated</span>
+              <span class="quick-info-item-value" id="quickInfoUpdated">March 13, 2026</span>
+            </div>
+            <div class="quick-info-item">
+              <span class="quick-info-item-label">🎁 Items Claimed</span>
+              <span class="quick-info-item-value" id="quickInfoClaimed">Loading…</span>
+            </div>
+
+            <div class="quick-info-item" style="flex-basis:100%;">
+              <span class="quick-info-item-label">ℹ️ How It Works</span>
+              <span class="quick-info-item-value" style="font-size:0.82em;font-weight:normal;color:var(--text-muted);">Click "View Item" to see the product, then check "I'm buying this!" to claim it. Hit Undo if you accidentally claim something.</span>
+            </div>
+            <div class="quick-info-item" style="flex-basis:100%;">
+              <span class="quick-info-item-label">👕 Sizing Note</span>
+              <span class="quick-info-item-value" style="font-size:0.82em;font-weight:normal;color:var(--text-muted);">All clothes sizes and other item notes are shown next to the tags on each card.</span>
+            </div>
+            <div class="quick-info-item" style="flex-basis:100%;">
+              <span class="quick-info-item-label">❓ Need Help?</span>
+              <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:2px;">
+                <a href="https://forms.gle/YYmsCVazj6CR6v529" target="_blank" class="help-link-btn" style="font-size:0.78em;">📝 Report a Problem</a>
+                <a href="https://github.com/MaybeTristan/christmas-list-2025/issues" target="_blank" class="help-link-btn" style="font-size:0.78em;">🐛 View Known Issues</a>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-</div>
 
-<!-- Filter bar -->
-<div class="filter-bar">
-  <div class="filter-group">
-    <label for="sortSelect">Sort:</label>
-    <select id="sortSelect">
-      <option value="default">Default</option>
-      <option value="price-asc">Price: Low → High</option>
-      <option value="price-desc">Price: High → Low</option>
-    </select>
-  </div>
-  <div class="filter-sep"></div>
-  <div class="filter-group">
-    <label for="categorySelect">Category:</label>
-    <select id="categorySelect">
-      <option value="all">All</option>
-      <option value="Food">Food</option>
-      <option value="Tech">Tech</option>
-      <option value="Clothes">Clothes</option>
-    </select>
-  </div>
-  <div class="filter-sep"></div>
-  <div class="filter-group">
-    <input type="checkbox" id="unclaimedOnly">
-    <label for="unclaimedOnly">Unclaimed only</label>
-  </div>
-</div>
-
-<!-- Active items grid -->
-<div class="grid-container" id="activeGrid"></div>
-
-<!-- Claimed items section -->
-<div class="claimed-section" id="claimedSection" style="display:none">
-  <div class="claimed-divider">
-    <div class="claimed-divider-line"></div>
-    <span class="claimed-divider-label">✓ Already Claimed</span>
-    <div class="claimed-divider-line"></div>
-  </div>
-  <div class="claimed-grid" id="claimedGrid"></div>
-</div>
-
-<!-- Gift Cards Section -->
-<div class="giftcard-section">
-  <div class="giftcard-divider">
-    <div class="giftcard-divider-line"></div>
-    <span class="giftcard-divider-label">🎁 Gift Cards Welcome!</span>
-    <div class="giftcard-divider-line"></div>
-  </div>
-  <div class="giftcard-grid">
-
-    <div class="giftcard-card">
-      <div class="giftcard-header">
-        <img class="giftcard-logo" src="https://images.seeklogo.com/logo-png/16/2/starbucks-logo-png_seeklogo-168511.png" alt="Starbucks" />
-        <div>
-          <p class="giftcard-name">Starbucks Gift Card</p>
-          <p class="giftcard-price">$5 – $100 · You Choose</p>
-        </div>
+    <!-- Filter bar -->
+    <div class="filter-bar">
+      <div class="filter-group">
+        <label for="sortSelect">Sort:</label>
+        <select id="sortSelect">
+          <option value="default">Default</option>
+          <option value="price-asc">Price: Low → High</option>
+          <option value="price-desc">Price: High → Low</option>
+        </select>
       </div>
-      <div class="giftcard-body">
-        <span class="giftcard-info-tag">ℹ️ Requires recipient info</span>
-        <button class="giftcard-btn" onclick="openGiftCard('starbucks')">Go to Gift Card →</button>
+      <div class="filter-sep"></div>
+      <div class="filter-group">
+        <label for="categorySelect">Category:</label>
+        <select id="categorySelect">
+          <option value="all">All</option>
+          <option value="Food">Food</option>
+          <option value="Tech">Tech</option>
+          <option value="Clothes">Clothes</option>
+        </select>
+      </div>
+      <div class="filter-sep"></div>
+      <div class="filter-group">
+        <input type="checkbox" id="unclaimedOnly">
+        <label for="unclaimedOnly">Unclaimed only</label>
       </div>
     </div>
 
-    <div class="giftcard-card">
-      <div class="giftcard-header">
-        <img class="giftcard-logo" src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg" alt="Apple" style="padding:12px; object-fit:contain;" />
-        <div>
-          <p class="giftcard-name">Apple Gift Card</p>
-          <p class="giftcard-price">$10 – $200 · You Choose</p>
-        </div>
+    <!-- Active items grid -->
+    <div class="grid-container" id="activeGrid"></div>
+
+    <!-- Claimed items section -->
+    <div class="claimed-section" id="claimedSection" style="display:none">
+      <div class="claimed-divider">
+        <div class="claimed-divider-line"></div>
+        <span class="claimed-divider-label">✓ Already Claimed</span>
+        <div class="claimed-divider-line"></div>
       </div>
-      <div class="giftcard-body">
-        <span class="giftcard-info-tag">ℹ️ Requires recipient info</span>
-        <button class="giftcard-btn" onclick="openGiftCard('apple')">Go to Gift Card →</button>
+      <div class="claimed-grid" id="claimedGrid"></div>
+    </div>
+
+    <!-- Gift Cards Section -->
+    <div class="giftcard-section">
+      <div class="giftcard-divider">
+        <div class="giftcard-divider-line"></div>
+        <span class="giftcard-divider-label">🎁 Gift Cards Welcome!</span>
+        <div class="giftcard-divider-line"></div>
+      </div>
+      <div class="giftcard-grid">
+
+        <div class="giftcard-card">
+          <div class="giftcard-header">
+            <img class="giftcard-logo" src="https://images.seeklogo.com/logo-png/16/2/starbucks-logo-png_seeklogo-168511.png" alt="Starbucks" />
+            <div>
+              <p class="giftcard-name">Starbucks Gift Card</p>
+              <p class="giftcard-price">$5 – $100 · You Choose</p>
+            </div>
+          </div>
+          <div class="giftcard-body">
+            <span class="giftcard-info-tag">ℹ️ Requires recipient info</span>
+            <button class="giftcard-btn" onclick="openGiftCard('starbucks')">Go to Gift Card →</button>
+          </div>
+        </div>
+
+        <div class="giftcard-card">
+          <div class="giftcard-header">
+            <img class="giftcard-logo" src="https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg" alt="Apple" style="padding:12px; object-fit:contain;" />
+            <div>
+              <p class="giftcard-name">Apple Gift Card</p>
+              <p class="giftcard-price">$10 – $200 · You Choose</p>
+            </div>
+          </div>
+          <div class="giftcard-body">
+            <span class="giftcard-info-tag">ℹ️ Requires recipient info</span>
+            <button class="giftcard-btn" onclick="openGiftCard('apple')">Go to Gift Card →</button>
+          </div>
+        </div>
+
+        <div class="giftcard-card">
+          <div class="giftcard-header">
+            <img class="giftcard-logo" src="https://upload.wikimedia.org/wikipedia/commons/d/de/Amazon_icon.png" alt="Amazon" style="padding:10px; object-fit:contain;" />
+            <div>
+              <p class="giftcard-name">Amazon Gift Card</p>
+              <p class="giftcard-price">$5 – $200 · You Choose</p>
+            </div>
+          </div>
+          <div class="giftcard-body">
+            <span class="giftcard-info-tag">ℹ️ Requires recipient info</span>
+            <button class="giftcard-btn" onclick="openGiftCard('amazon')">Go to Gift Card →</button>
+          </div>
+        </div>
+
       </div>
     </div>
 
-    <div class="giftcard-card">
-      <div class="giftcard-header">
-        <img class="giftcard-logo" src="https://upload.wikimedia.org/wikipedia/commons/d/de/Amazon_icon.png" alt="Amazon" style="padding:10px; object-fit:contain;" />
-        <div>
-          <p class="giftcard-name">Amazon Gift Card</p>
-          <p class="giftcard-price">$5 – $200 · You Choose</p>
-        </div>
-      </div>
-      <div class="giftcard-body">
-        <span class="giftcard-info-tag">ℹ️ Requires recipient info</span>
-        <button class="giftcard-btn" onclick="openGiftCard('amazon')">Go to Gift Card →</button>
-      </div>
+    <img class="footer-img-light" src="https://photos.tristanarbet.com/Adobe%20Express%20Photo%20project-5.png" alt="Footer image" />
+    <img class="footer-img-dark"  src="https://photos.tristanarbet.com/Adobe%20Express%20Photo%20project-6.png" alt="Footer image dark" />
+
+    <div class="reset-area" style="flex-direction:column; gap:10px;">
+      <a href="https://www.tristanarbet.com" target="_blank" class="button view-btn" style="width:auto;padding:8px 20px;background:var(--card-bg);color:var(--text-muted);border:1px solid var(--border);text-decoration:none;">🌐 Personal Website</a>
+      <button id="resetButton" class="button view-btn" style="width:auto;padding:8px 20px;">Reset All Claims</button>
     </div>
-
-  </div>
-</div>
-
-<img class="footer-img-light" src="https://photos.tristanarbet.com/Adobe%20Express%20Photo%20project-5.png" alt="Footer image" />
-<img class="footer-img-dark"  src="https://photos.tristanarbet.com/Adobe%20Express%20Photo%20project-6.png" alt="Footer image dark" />
-
-<div class="reset-area" style="flex-direction:column; gap:10px;">
-  <a href="https://www.tristanarbet.com" target="_blank" class="button view-btn" style="width:auto;padding:8px 20px;background:var(--card-bg);color:var(--text-muted);border:1px solid var(--border);text-decoration:none;">🌐 Personal Website</a>
-  <button id="resetButton" class="button view-btn" style="width:auto;padding:8px 20px;">Reset All Claims</button>
-</div>
-<div class="footer">
-  Thank You!!! Love from Tristan ♡
-</div>
-
-
+    <div class="footer">
+      Thank You!!! Love from Tristan ♡
+    </div>
   </div>
 
   <script type="module">
@@ -1865,10 +1852,47 @@
 
       // ── Loading screen dismiss ───────────────────────────────────────────
       const loadingScreen = document.getElementById('loading-screen');
+      const isFirstVisit = !localStorage.getItem('hasVisited');
+      if (isFirstVisit) localStorage.setItem('hasVisited', 'true');
+
+      const holdTime  = isFirstVisit ? 2000 : 1400;
+      const fadeTime  = isFirstVisit ? 700  : 600;
+
+      if (isFirstVisit) {
+        // Mini confetti on the loading screen
+        const canvas = document.createElement('canvas');
+        canvas.style.cssText = 'position:absolute;inset:0;pointer-events:none;width:100%;height:100%;';
+        loadingScreen.appendChild(canvas);
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        const ctx = canvas.getContext('2d');
+        const pieces = Array.from({length: 80}, () => ({
+          x: Math.random() * canvas.width,
+          y: Math.random() * -canvas.height * 0.5,
+          w: Math.random() * 9 + 5, h: Math.random() * 5 + 3,
+          color: ["#8f2121","#f5c842","#4caf50","#2196f3","#ff69b4","#ff9800"][Math.floor(Math.random()*6)],
+          rot: Math.random() * 360, vx: (Math.random()-0.5)*2,
+          vy: Math.random()*2.5+1, vr: (Math.random()-0.5)*4,
+        }));
+        let frame;
+        function drawConfetti() {
+          ctx.clearRect(0,0,canvas.width,canvas.height);
+          pieces.forEach(p => {
+            p.x+=p.vx; p.y+=p.vy; p.rot+=p.vr;
+            ctx.save(); ctx.translate(p.x,p.y); ctx.rotate(p.rot*Math.PI/180);
+            ctx.fillStyle=p.color; ctx.fillRect(-p.w/2,-p.h/2,p.w,p.h); ctx.restore();
+          });
+          frame = requestAnimationFrame(drawConfetti);
+        }
+        drawConfetti();
+        setTimeout(() => cancelAnimationFrame(frame), holdTime);
+      }
+
       setTimeout(() => {
+        loadingScreen.style.transition = `opacity ${fadeTime}ms ease`;
         loadingScreen.classList.add('fade-out');
-        setTimeout(() => loadingScreen.remove(), 650);
-      }, 1400);
+        setTimeout(() => loadingScreen.remove(), fadeTime + 50);
+      }, holdTime);
 
       // ── Nav drawer ──────────────────────────────────────────────────────
       const hamburgerBtn = document.getElementById('hamburgerBtn');
@@ -1938,6 +1962,5 @@
       });
     });
   </script>
-
 </body>
 </html>
