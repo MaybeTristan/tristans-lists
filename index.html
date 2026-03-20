@@ -1054,6 +1054,13 @@
             listPriceEl.classList.add("price-unavailable");
           }
         }
+        // Zero out dataset.price for unavailable items so they sort to bottom
+        if (!result || !result.price) {
+          const cardEl = document.querySelector(`.item-card[data-id="${item.id}"]`);
+          const rowEl  = document.querySelector(`.list-row-wrapper[data-id="${item.id}"]`);
+          if (cardEl) cardEl.dataset.price = "0";
+          if (rowEl)  rowEl.dataset.price  = "0";
+        }
         // Update dataset.price on card and list row wrapper so sort works with live prices
         const liveNum = result?.price ? parseFloat(result.price.replace(/[^0-9.]/g, "")) : null;
         if (liveNum !== null && !isNaN(liveNum)) {
@@ -1240,10 +1247,20 @@
         return visible;
       });
 
-      // Sort visible ids by price
+      // Sort visible ids by price — items with no live price sink to bottom
       visibleIds.sort((a, b) => {
-        const priceA = parseFloat((cardMap[a] || rowMap[a])?.dataset.price || 0);
-        const priceB = parseFloat((cardMap[b] || rowMap[b])?.dataset.price || 0);
+        const elA = cardMap[a] || rowMap[a];
+        const elB = cardMap[b] || rowMap[b];
+        const rawA = elA?.dataset.price;
+        const rawB = elB?.dataset.price;
+        const noA = !rawA || rawA === "0" || rawA === "00";
+        const noB = !rawB || rawB === "0" || rawB === "00";
+        // Always push unavailable prices to the bottom regardless of sort direction
+        if (noA && noB) return 0;
+        if (noA) return 1;
+        if (noB) return -1;
+        const priceA = parseFloat(rawA);
+        const priceB = parseFloat(rawB);
         if (sort === "price-asc")  return priceA - priceB;
         if (sort === "price-desc") return priceB - priceA;
         return 0;
